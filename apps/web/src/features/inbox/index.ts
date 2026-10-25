@@ -1,0 +1,10 @@
+// Public surface of the inbox feature. Import from '@/features/inbox', not deep paths.
+export { inboxKeys, messageQuery, messagesQuery } from './api/queries'
+export { DraftReview } from './components/draft-review'
+export { MessageList } from './components/message-list'
+export { PriorityBadge } from './components/priority-badge'
+export { PriorityFilter } from './components/priority-filter'
+export { useApproveDraft } from './hooks/use-approve-draft'
+export { sortByPriority } from './lib/sort'
+export { priorities } from './types'
+export type { Message, MessageFilters, MessageSummary, Priority } from './types'
