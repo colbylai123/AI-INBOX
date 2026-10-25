@@ -36,9 +36,22 @@ describe('app', () => {
   it('approves a draft only after an explicit click', async () => {
     renderApp('/inbox/m1')
     const approve = await screen.findByRole('button', { name: 'Approve & send' })
+    expect(screen.getByRole('button', { name: 'Edit (coming soon)' })).toBeDisabled()
     expect(screen.queryByText('Approved')).not.toBeInTheDocument()
     await userEvent.click(approve)
     expect(await screen.findByText('Approved')).toBeInTheDocument()
+  })
+
+  it('follows a same-app sign-in redirect', async () => {
+    const router = renderApp('/sign-in?redirect=%2Fsettings')
+    await screen.findByRole('heading', { name: 'Settings' })
+    expect(router.state.location.pathname).toBe('/settings')
+  })
+
+  it('ignores a sign-in redirect that would leave the app', async () => {
+    const router = renderApp('/sign-in?redirect=%2F%5Cevil.example')
+    await screen.findAllByRole('listitem')
+    expect(router.state.location.pathname).toBe('/inbox')
   })
 
   it('shows not found for an unknown message', async () => {

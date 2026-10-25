@@ -19,11 +19,17 @@ export const isApiError = (error: unknown, status?: number): error is ApiError =
  * the generated schema (e.g. openapi-fetch) behind this same module.
  */
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers)
+  // Only JSON bodies get a JSON content type. GETs stay "simple" requests (no CORS
+  // preflight), and FormData/Blob bodies keep the type the browser sets for them.
+  if (typeof init?.body === 'string' && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
   const res = await fetch(`${env.VITE_API_URL}${path}`, {
     ...init,
+    headers,
     // Session cookie set by FastAPI after WorkOS sign-in.
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
   })
   if (!res.ok) {
     throw new ApiError(res.status, (await res.text()) || res.statusText)
