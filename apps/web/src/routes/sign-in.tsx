@@ -3,15 +3,12 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { sessionQuery, signInUrl } from '@/features/auth'
+import { isSafeRedirectPath } from '@/lib/safe-redirect'
 
 export const Route = createFileRoute('/sign-in')({
   validateSearch: z.object({
-    // Only allow same-site paths, so the link can't bounce users to another site.
-    redirect: z
-      .string()
-      .regex(/^\/(?!\/)/)
-      .optional()
-      .catch(undefined),
+    // Only allow paths on this app, so the link can't bounce users to another site.
+    redirect: z.string().refine(isSafeRedirectPath).optional().catch(undefined),
   }),
   beforeLoad: async ({ context, search }) => {
     const user = await context.queryClient.ensureQueryData(sessionQuery())

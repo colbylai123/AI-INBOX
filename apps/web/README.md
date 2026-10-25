@@ -100,3 +100,9 @@ These are placeholders until the FastAPI spec exists. Mocks implement them in `f
 | GET    | `/messages?priority=…`         | inbox list     |
 | GET    | `/messages/{id}`               | message page   |
 | POST   | `/messages/{id}/approve`       | Approve & send |
+
+Backend requirements the browser can't enforce on its own:
+
+- **Validate `return_to` on `/auth/login`.** Accept only a path on this app (starts with a single `/`, no backslashes, resolves to the app's origin), otherwise fall back to `/inbox`. The client check in `lib/safe-redirect.ts` is a convenience, not a defense.
+- **Credentialed CORS.** If the API is on a different origin, allow exactly the app's origin (not `*`) with `allow_credentials=True`, and answer `OPTIONS` preflights. Requests with a JSON body (e.g. future draft edits) send `Content-Type: application/json` and are preflighted; GETs and body-less POSTs are not.
+- **Editing drafts** needs an endpoint to save the changed draft before approval. Until then the Edit button stays disabled.

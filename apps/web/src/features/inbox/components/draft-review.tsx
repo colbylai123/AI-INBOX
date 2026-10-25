@@ -29,8 +29,9 @@ export function DraftReview({ message }: { message: Message }) {
             >
               {approve.isPending ? 'Approving…' : 'Approve & send'}
             </Button>
-            <Button variant="outline" disabled={!message.draftReply}>
-              Edit
+            {/* Enable once the API can save an edited draft before approval. */}
+            <Button variant="outline" disabled>
+              Edit (coming soon)
             </Button>
           </>
         )}
