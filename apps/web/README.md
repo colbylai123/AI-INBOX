@@ -56,10 +56,10 @@ src/
     materials/
   components/
     ui/                 shadcn/ui primitives
-    layout/             App shell (top nav), page header, logo, dismissible banner
+    layout/             App shell (top nav), page header, logo, dismissible banner, live dot
     feedback/           Default error, loading and not-found screens
   lib/                  Framework-free helpers: api client, env, cn(), mock delay
-  styles/               Tailwind entry + design tokens (dark navy theme, blue accent)
+  styles/               Tailwind entry + Modern Dark design tokens (--dp-*)
   test/                 Test setup
 public/_headers         Cloudflare Pages security and cache headers (set the Pages root directory to apps/web)
 ```
@@ -80,7 +80,7 @@ public/_headers         Cloudflare Pages security and cache headers (set the Pag
 - **One HTTP entry point.** `lib/api-client.ts` is the only place that calls `fetch`. When the backend is running, `npm run gen:api` writes `src/lib/api-schema.gen.ts`; then replace the hand-written shapes in `features/*/types.ts` with the generated ones.
 - **Nothing sends without approval.** The AI only drafts. Any action that sends or finalizes must be an explicit user click (see `DraftReview`).
 - **Tests sit next to the code** as `*.test.ts(x)`. `src/app/app.test.tsx` renders the whole app on mocks; use it as the template for page-level tests.
-- **UI primitives come from shadcn/ui.** Add more with `npx shadcn@latest add dialog` (config in `components.json`). Colors, radius and font (Plus Jakarta Sans, self-hosted via Fontsource) are tokens in `styles/globals.css`: change the look there, not in components. Buttons are uppercase pills and cards are rounded-3xl by default, matching the design reference.
+- **UI primitives come from shadcn/ui.** Add more with `npx shadcn@latest add dialog` (config in `components.json`). The look follows the **Modern Dark** design system. Its authoritative tokens are the `--dp-*` variables in `styles/globals.css`, and shadcn roles and Tailwind utilities (`bg-ground`, `bg-panel`, `border-hairline`, `text-bright`, `text-read`, `text-meta`, `bg-live`, `px-gutter`, `max-w-page`) map onto them. Fonts are Geist and Geist Mono (labels, short notes), self-hosted via Fontsource. Rules of thumb: bright for titles and primary actions, read for paragraphs, meta for small notes; the mint `LiveDot` only marks a selected or live state next to its label; pill radius for buttons, 6px panel radius for frames; no colored glows, glass or decorative motion.
 
 ## Adding a page
 

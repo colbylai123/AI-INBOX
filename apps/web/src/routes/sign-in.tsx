@@ -21,33 +21,49 @@ export const Route = createFileRoute('/sign-in')({
 function SignIn() {
   const { redirect: returnTo } = Route.useSearch()
   return (
-    <div className="mx-auto flex min-h-svh max-w-6xl flex-col px-4 md:px-8">
-      <header className="py-5 md:py-7">
-        <Logo />
-      </header>
-      <main className="grid flex-1 items-center gap-12 pb-16 md:grid-cols-[1.1fr_1fr] md:gap-8">
-        <div>
-          <h1 className="text-5xl leading-[1.05] font-bold tracking-tight text-balance md:text-7xl">
-            Your inbox, sorted and drafted
-          </h1>
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground md:text-xl md:leading-relaxed">
-            AI ranks incoming mail by importance and drafts the reply. You review and approve before
-            anything is sent.
-          </p>
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Button
-              size="lg"
-              onClick={() => {
-                window.location.assign(signInUrl(returnTo ?? '/inbox'))
-              }}
-            >
-              Sign in <ChevronRight />
-            </Button>
-            <span className="text-sm text-muted-foreground">Use your work account.</span>
+    <div className="relative min-h-svh overflow-hidden">
+      {/* Static pools of white light across the opening field. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 -left-40 size-[44rem] opacity-60 light-pool"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-1/4 -right-24 size-[40rem] light-pool"
+      />
+
+      <div className="relative mx-auto flex min-h-svh max-w-page flex-col px-gutter">
+        <header className="border-b border-hairline py-4 md:py-5">
+          <Logo />
+        </header>
+        <main className="grid flex-1 content-center items-center gap-12 py-16 lg:grid-cols-12 lg:gap-6">
+          <div className="min-w-0 lg:col-span-7">
+            <h1 className="text-[clamp(44px,7.4vw,104px)] leading-[0.98] font-normal tracking-[-0.04em] text-balance text-bright">
+              Your inbox, sorted and drafted
+            </h1>
+            <p className="mt-8 max-w-xl text-lg leading-relaxed md:text-xl">
+              <span className="text-bright">
+                AI ranks incoming mail by importance and drafts the reply.
+              </span>{' '}
+              <span className="text-read">You review and approve before anything is sent.</span>
+            </p>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <Button
+                size="lg"
+                onClick={() => {
+                  window.location.assign(signInUrl(returnTo ?? '/inbox'))
+                }}
+              >
+                Sign in <ChevronRight />
+              </Button>
+              <span className="font-mono text-xs text-meta">Use your work account.</span>
+            </div>
           </div>
-        </div>
-        <SignInPreview />
-      </main>
+          <div className="min-w-0 lg:col-span-5">
+            <SignInPreview />
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

@@ -25,7 +25,7 @@ function MessagePage() {
     <div className="max-w-3xl">
       <Link
         to="/inbox"
-        className="mb-6 inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-muted-foreground uppercase hover:text-foreground"
+        className="mb-6 inline-flex items-center gap-1.5 rounded-md text-sm text-read transition-colors hover:text-bright"
       >
         <ArrowLeft className="size-4" aria-hidden /> Inbox
       </Link>
