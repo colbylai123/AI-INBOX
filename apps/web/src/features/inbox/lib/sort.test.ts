@@ -2,7 +2,15 @@ import type { MessageSummary } from '../types'
 import { sortByPriority } from './sort'
 
 const msg = (id: string, priority: MessageSummary['priority'], receivedAt: string) =>
-  ({ id, priority, receivedAt, from: '', subject: '', preview: '' }) satisfies MessageSummary
+  ({
+    id,
+    priority,
+    receivedAt,
+    from: '',
+    subject: '',
+    preview: '',
+    summary: null,
+  }) satisfies MessageSummary
 
 describe('sortByPriority', () => {
   it('orders by priority, then newest first', () => {

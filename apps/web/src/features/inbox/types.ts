@@ -8,6 +8,8 @@ export interface MessageSummary {
   from: string
   subject: string
   preview: string
+  /** One line from the AI on what the sender wants. Null until it has read the message. */
+  summary: string | null
   receivedAt: string
   priority: Priority
 }

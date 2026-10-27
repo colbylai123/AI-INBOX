@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_app/settings')({
       <Card className="max-w-2xl">
         <CardHeader>
           <CardTitle>Connected accounts</CardTitle>
-          <CardDescription>Connect Outlook to start (Gmail later).</CardDescription>
+          <CardDescription>Connect your Outlook account to start.</CardDescription>
         </CardHeader>
         <CardContent>
           <Button disabled>Connect Outlook (coming soon)</Button>

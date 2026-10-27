@@ -32,6 +32,8 @@ npm run dev        # http://localhost:5173, runs on mock data, no backend needed
 | `.env.test`        | tests         | Turns mocks on                         |
 | `.env.local`       | your machine  | Personal overrides, gitignored         |
 
+To run the dev server against a real API, put `VITE_USE_MOCKS=false` in `.env.development.local`. A plain `.env.local` loses to `.env.development` in dev mode.
+
 Every variable is declared and validated in `src/lib/env.ts`. `VITE_*` values ship to the browser, so never put secrets in them. In Cloudflare Pages, set `VITE_API_URL` to the production API.
 
 ## Folder structure
@@ -91,18 +93,4 @@ public/_headers         Cloudflare Pages security and cache headers (set the Pag
 
 ## Backend endpoints the app expects
 
-These are placeholders until the FastAPI spec exists. Mocks implement them in `features/*/api/`.
-
-| Method | Path                           | Used by        |
-| ------ | ------------------------------ | -------------- |
-| GET    | `/auth/me` (401 if signed out) | auth guard     |
-| GET    | `/auth/login?return_to=…`      | sign-in button |
-| GET    | `/messages?priority=…`         | inbox list     |
-| GET    | `/messages/{id}`               | message page   |
-| POST   | `/messages/{id}/approve`       | Approve & send |
-
-Backend requirements the browser can't enforce on its own:
-
-- **Validate `return_to` on `/auth/login`.** Accept only a path on this app (starts with a single `/`, no backslashes, resolves to the app's origin), otherwise fall back to `/inbox`. The client check in `lib/safe-redirect.ts` is a convenience, not a defense.
-- **Credentialed CORS.** If the API is on a different origin, allow exactly the app's origin (not `*`) with `allow_credentials=True`, and answer `OPTIONS` preflights. Requests with a JSON body (e.g. future draft edits) send `Content-Type: application/json` and are preflighted; GETs and body-less POSTs are not.
-- **Editing drafts** needs an endpoint to save the changed draft before approval. Until then the Edit button stays disabled.
+The endpoints, JSON shapes and backend requirements (CORS, `return_to` validation, error codes) are in [docs/api-contract.md](../../docs/api-contract.md), the shared agreement with the FastAPI backend. It's split into the same steps as the front-end work. Mocks in `features/*/api/mocks.ts` follow those shapes until each endpoint exists, so update both together.
