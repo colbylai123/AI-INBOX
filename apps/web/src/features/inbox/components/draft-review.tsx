@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { LiveDot } from '@/components/layout/live-dot'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useApproveDraft } from '../hooks/use-approve-draft'
@@ -23,18 +23,18 @@ export function DraftReview({ message }: { message: Message }) {
             {message.draftReply}
           </ChatBubble>
         ) : (
-          <p className="text-sm text-muted-foreground">No draft yet.</p>
+          <p className="text-sm text-read">No draft yet.</p>
         )}
       </CardContent>
-      <CardFooter className="flex-wrap justify-end gap-3 border-t pt-5">
+      <CardFooter className="flex-wrap justify-end gap-3 border-t border-hairline pt-5">
         {approve.isError && (
           <p role="alert" className="mr-auto text-sm text-destructive">
             Couldn't approve. Please try again.
           </p>
         )}
         {message.approvedAt ? (
-          <p className="flex items-center gap-1.5 text-sm font-semibold">
-            <Check className="size-4 text-primary" aria-hidden /> Approved
+          <p className="flex items-center gap-2 text-sm text-bright">
+            <LiveDot /> Approved
           </p>
         ) : (
           <>

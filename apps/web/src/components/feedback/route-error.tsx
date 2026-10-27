@@ -14,8 +14,8 @@ export function RouteError({ error }: ErrorComponentProps) {
 
   return (
     <div role="alert" className="flex flex-col items-start gap-3 p-8">
-      <h1 className="text-lg font-semibold">Something went wrong</h1>
-      <p className="text-sm text-muted-foreground">
+      <h1 className="text-lg text-bright">Something went wrong</h1>
+      <p className="text-sm text-read">
         {import.meta.env.DEV && error instanceof Error
           ? error.message
           : 'Please try again in a moment.'}

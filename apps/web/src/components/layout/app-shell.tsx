@@ -3,7 +3,9 @@ import { ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { User } from '@/features/auth'
 import { env } from '@/lib/env'
+import { cn } from '@/lib/utils'
 import { DismissibleBanner } from './dismissible-banner'
+import { LiveDot } from './live-dot'
 import { Logo } from './logo'
 
 // Add a nav entry here when you add a top-level page under routes/_app/.
@@ -22,7 +24,7 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
           action={
             <Link
               to="/settings"
-              className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold tracking-wider uppercase hover:bg-white/15"
+              className="inline-flex h-7 items-center rounded-full border border-hairline-2 px-3 text-xs font-medium text-bright transition-colors hover:border-dim"
             >
               Connect
             </Link>
@@ -32,43 +34,52 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
         </DismissibleBanner>
       )}
 
-      <header className="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-x-4 gap-y-3 px-4 py-5 md:grid-cols-[1fr_auto_1fr] md:px-8 md:py-7">
-        <Link to="/inbox" className="justify-self-start">
-          <Logo />
-        </Link>
+      <header className="border-b border-hairline">
+        <div className="mx-auto grid max-w-page grid-cols-[1fr_auto] items-center gap-x-6 gap-y-3 px-gutter py-4 md:grid-cols-[1fr_auto_1fr] md:py-5">
+          <Link to="/inbox" className="justify-self-start rounded-md">
+            <Logo />
+          </Link>
 
-        <nav
-          aria-label="Main"
-          className="col-span-2 row-start-2 flex gap-1 overflow-x-auto md:col-span-1 md:col-start-2 md:row-start-1 md:gap-2"
-        >
-          {nav.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              className="rounded-full px-4 py-2 text-sm font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase transition-colors hover:text-foreground"
-              activeProps={{ className: 'bg-white/5 text-foreground' }}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
-
-        <Link
-          to="/settings"
-          className="flex items-center gap-2 justify-self-end rounded-full bg-secondary py-1.5 pr-3 pl-1.5 text-xs font-semibold tracking-wider uppercase hover:bg-accent md:col-start-3"
-        >
-          <span
-            aria-hidden
-            className="grid size-7 place-items-center rounded-full bg-primary text-[11px] text-primary-foreground"
+          <nav
+            aria-label="Main"
+            className="col-span-2 row-start-2 -mx-2 flex gap-1 overflow-x-auto md:col-span-1 md:col-start-2 md:row-start-1 md:mx-0"
           >
-            {user.name.charAt(0)}
-          </span>
-          <span className="hidden sm:inline">{user.name}</span>
-          <ChevronRight className="size-3.5" aria-hidden />
-        </Link>
+            {nav.map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm whitespace-nowrap transition-colors"
+              >
+                {({ isActive }) => (
+                  <>
+                    <span className={cn(isActive ? 'text-bright' : 'text-read hover:text-bright')}>
+                      {label}
+                    </span>
+                    {/* Selected state: a small live signal beside the label. */}
+                    {isActive && <LiveDot />}
+                  </>
+                )}
+              </Link>
+            ))}
+          </nav>
+
+          <Link
+            to="/settings"
+            className="flex items-center gap-2 justify-self-end rounded-full border border-hairline-2 py-1 pr-3 pl-1 text-sm text-bright transition-colors hover:border-dim md:col-start-3"
+          >
+            <span
+              aria-hidden
+              className="grid size-7 place-items-center rounded-full bg-hairline font-mono text-xs"
+            >
+              {user.name.charAt(0)}
+            </span>
+            <span className="hidden sm:inline">{user.name}</span>
+            <ChevronRight className="size-3.5 text-read" aria-hidden />
+          </Link>
+        </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 pt-4 pb-20 md:px-8 md:pt-10">{children}</main>
+      <main className="mx-auto max-w-page px-gutter pt-10 pb-24 md:pt-14">{children}</main>
     </div>
   )
 }

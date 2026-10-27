@@ -2,8 +2,8 @@ import { LoaderCircle } from 'lucide-react'
 
 export function RoutePending() {
   return (
-    <div className="flex items-center gap-2 p-8 text-sm text-muted-foreground">
-      <LoaderCircle className="size-4 animate-spin" aria-hidden />
+    <div className="flex items-center gap-2 p-8 text-sm text-read">
+      <LoaderCircle className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
       Loading…
     </div>
   )

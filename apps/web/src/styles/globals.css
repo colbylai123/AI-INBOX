@@ -1,40 +1,86 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import '@fontsource-variable/plus-jakarta-sans';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
 
 /*
- * Design tokens (shadcn/ui convention). The app uses one dark navy theme with a
- * blue accent. Change colors here, not in components.
+ * Modern Dark design system. The --dp-* values are the system's authoritative
+ * tokens; everything else maps onto them. Change the look here, not in components.
+ * "Modern Dark Grotesk" / "Modern Dark Mono" are aliases for Geist / Geist Mono.
  */
 :root {
   color-scheme: dark;
-  --radius: 1rem;
-  --background: oklch(0.17 0.03 262);
-  --foreground: oklch(0.97 0.005 260);
-  --card: oklch(0.22 0.035 262);
-  --card-foreground: oklch(0.97 0.005 260);
-  --primary: oklch(0.56 0.19 258);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.26 0.035 262);
-  --secondary-foreground: oklch(0.95 0.005 260);
-  --muted: oklch(0.24 0.03 262);
-  --muted-foreground: oklch(0.73 0.03 260);
-  --accent: oklch(0.28 0.04 262);
-  --accent-foreground: oklch(0.97 0.005 260);
-  --destructive: oklch(0.66 0.2 25);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.62 0.18 258);
-  --banner: oklch(0.29 0.055 258);
-  --glow: oklch(0.5 0.17 258 / 35%);
+
+  --dp-color-ground: #050505;
+  --dp-color-panel: #0e0e0e;
+  --dp-color-hairline: #222222;
+  --dp-color-hairline-2: #303030;
+  --dp-color-bright: #f2f2f2;
+  --dp-color-read: #a6a9ad;
+  --dp-color-meta: #8a8d91;
+  --dp-color-live: #3fd6c6;
+  --dp-color-inverse-ink: #0a0a0a;
+  --dp-color-dim: #96999d;
+  --dp-typography-face:
+    'Geist Variable', 'Modern Dark Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --dp-typography-mono:
+    'Geist Mono Variable', 'Modern Dark Mono', 'SFMono-Regular', Menlo, monospace;
+  --dp-spacing-gutter: 48px;
+  --dp-spacing-gap: 24px;
+  --dp-spacing-max: 1360px;
+  --dp-radius-panel: 6px;
+  --dp-radius-pill: 999px;
+  --dp-border-hairline: 1px;
+  --dp-motion-duration: 120ms;
+  --dp-motion-ease: ease-out;
+
+  /* shadcn/ui roles, mapped onto the system tokens. */
+  --radius: var(--dp-radius-panel);
+  --background: var(--dp-color-ground);
+  --foreground: var(--dp-color-bright);
+  --card: var(--dp-color-panel);
+  --card-foreground: var(--dp-color-bright);
+  --primary: var(--dp-color-bright);
+  --primary-foreground: var(--dp-color-inverse-ink);
+  --secondary: var(--dp-color-panel);
+  --secondary-foreground: var(--dp-color-bright);
+  --muted: var(--dp-color-panel);
+  --muted-foreground: var(--dp-color-read);
+  --accent: var(--dp-color-hairline);
+  --accent-foreground: var(--dp-color-bright);
+  --destructive: #f07070;
+  --border: var(--dp-color-hairline);
+  --input: var(--dp-color-hairline-2);
+  --ring: var(--dp-color-bright);
 }
 
 @theme inline {
-  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
-  --radius-sm: calc(var(--radius) - 6px);
-  --radius-md: calc(var(--radius) - 4px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: var(--dp-typography-face);
+  --font-mono: var(--dp-typography-mono);
+
+  /* Breakpoints from the system's responsive rules. */
+  --breakpoint-sm: 560px;
+  --breakpoint-md: 900px;
+  --breakpoint-lg: 1180px;
+
+  --container-page: var(--dp-spacing-max);
+  --radius-sm: var(--dp-radius-panel);
+  --radius-md: var(--dp-radius-panel);
+  --radius-lg: var(--dp-radius-panel);
+  --default-transition-duration: var(--dp-motion-duration);
+  --default-transition-timing-function: var(--dp-motion-ease);
+
+  --color-ground: var(--dp-color-ground);
+  --color-panel: var(--dp-color-panel);
+  --color-hairline: var(--dp-color-hairline);
+  --color-hairline-2: var(--dp-color-hairline-2);
+  --color-bright: var(--dp-color-bright);
+  --color-read: var(--dp-color-read);
+  --color-meta: var(--dp-color-meta);
+  --color-live: var(--dp-color-live);
+  --color-inverse-ink: var(--dp-color-inverse-ink);
+  --color-dim: var(--dp-color-dim);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -51,17 +97,52 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-banner: var(--banner);
+}
+
+/* Side gutters: narrow on phones, reduced below 1180px, full above. */
+@utility px-gutter {
+  padding-inline: 20px;
+  @media (width >= 560px) {
+    padding-inline: 32px;
+  }
+  @media (width >= 1180px) {
+    padding-inline: var(--dp-spacing-gutter);
+  }
+}
+
+/* Subtle grey material for product objects (opaque, no glow). */
+@utility bg-material {
+  background-color: var(--dp-color-panel);
+  background-image: linear-gradient(180deg, var(--dp-color-hairline) 0%, var(--dp-color-panel) 70%);
+}
+
+/* Static pool of white light for the opening and closing fields only. */
+@utility light-pool {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--dp-color-bright) 13%, transparent),
+    transparent
+  );
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
-    @apply min-h-svh bg-background font-sans text-foreground antialiased;
-    /* Soft blue glow from the lower right, as in the design reference. */
-    background-image: radial-gradient(70rem 45rem at 90% 115%, var(--glow), transparent 70%);
-    background-attachment: fixed;
+    @apply min-h-svh bg-ground font-sans text-read antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--dp-color-bright);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0ms !important;
+    }
   }
 }

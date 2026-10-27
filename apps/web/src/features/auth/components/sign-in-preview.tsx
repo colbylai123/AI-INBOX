@@ -1,15 +1,15 @@
-import { Check } from 'lucide-react'
+import { LiveDot } from '@/components/layout/live-dot'
 import { ChatBubble, PriorityBadge } from '@/features/inbox'
 
-// Static illustration for the sign-in page: one prioritized message and its AI draft.
+// Static product object for the sign-in page: one prioritized message and its AI draft.
 export function SignInPreview() {
   return (
     <div
       aria-hidden
-      className="relative mx-auto w-full max-w-md rotate-[-3deg] rounded-[2.5rem] border border-white/10 bg-card/90 p-5 shadow-2xl ring-8 shadow-black/50 ring-black/40 md:p-6"
+      className="relative w-full max-w-md justify-self-center rounded-lg border border-hairline-2 bg-material p-5 md:p-6 lg:justify-self-end"
     >
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <span className="truncate font-semibold">RFI #42: footing detail</span>
+      <div className="mb-5 flex items-center justify-between gap-3 border-b border-hairline pb-4">
+        <span className="truncate text-bright">RFI #42: footing detail</span>
         <PriorityBadge priority="high" />
       </div>
       <div className="flex flex-col gap-4">
@@ -20,9 +20,12 @@ export function SignInPreview() {
           Thanks, we're checking S-201 against the spec and will confirm by Wednesday noon.
         </ChatBubble>
       </div>
-      <div className="mt-5 flex justify-end">
-        <span className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-[11px] font-semibold tracking-wider text-primary-foreground uppercase">
-          <Check className="size-3.5" /> Approve & send
+      <div className="mt-5 flex items-center justify-between gap-3 border-t border-hairline pt-4">
+        <span className="flex items-center gap-2 font-mono text-xs text-meta">
+          <LiveDot /> Waiting for approval
+        </span>
+        <span className="rounded-full bg-bright px-3.5 py-1.5 text-xs font-medium text-inverse-ink">
+          Approve & send
         </span>
       </div>
     </div>
