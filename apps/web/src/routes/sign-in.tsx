@@ -43,7 +43,7 @@ function SignIn() {
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed md:text-xl">
               <span className="text-bright">
-                AI ranks incoming mail by importance and drafts the reply.
+                AI ranks incoming mail by importance, drafts the reply and fills in your forms.
               </span>{' '}
               <span className="text-read">You review and approve before anything is sent.</span>
             </p>
