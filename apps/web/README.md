@@ -56,10 +56,10 @@ src/
     materials/
   components/
     ui/                 shadcn/ui primitives
-    layout/             App shell, page header
+    layout/             App shell (top nav), page header, logo, dismissible banner
     feedback/           Default error, loading and not-found screens
   lib/                  Framework-free helpers: api client, env, cn(), mock delay
-  styles/               Tailwind entry + design tokens (light and dark)
+  styles/               Tailwind entry + design tokens (dark navy theme, blue accent)
   test/                 Test setup
 public/_headers         Cloudflare Pages security and cache headers (set the Pages root directory to apps/web)
 ```
@@ -80,7 +80,7 @@ public/_headers         Cloudflare Pages security and cache headers (set the Pag
 - **One HTTP entry point.** `lib/api-client.ts` is the only place that calls `fetch`. When the backend is running, `npm run gen:api` writes `src/lib/api-schema.gen.ts`; then replace the hand-written shapes in `features/*/types.ts` with the generated ones.
 - **Nothing sends without approval.** The AI only drafts. Any action that sends or finalizes must be an explicit user click (see `DraftReview`).
 - **Tests sit next to the code** as `*.test.ts(x)`. `src/app/app.test.tsx` renders the whole app on mocks; use it as the template for page-level tests.
-- **UI primitives come from shadcn/ui.** Add more with `npx shadcn@latest add dialog` (config in `components.json`). Colors are tokens in `styles/globals.css`.
+- **UI primitives come from shadcn/ui.** Add more with `npx shadcn@latest add dialog` (config in `components.json`). Colors, radius and font (Plus Jakarta Sans, self-hosted via Fontsource) are tokens in `styles/globals.css`: change the look there, not in components. Buttons are uppercase pills and cards are rounded-3xl by default, matching the design reference.
 
 ## Adding a page
 

@@ -17,7 +17,10 @@ function renderApp(url: string) {
   return router
 }
 
-beforeEach(() => resetMockMessages())
+beforeEach(() => {
+  resetMockMessages()
+  localStorage.clear()
+})
 
 describe('app', () => {
   it('redirects / to the inbox, most important first', async () => {
@@ -52,6 +55,13 @@ describe('app', () => {
     const router = renderApp('/sign-in?redirect=%2F%5Cevil.example')
     await screen.findAllByRole('listitem')
     expect(router.state.location.pathname).toBe('/inbox')
+  })
+
+  it('lets the demo banner be dismissed, and remembers it', async () => {
+    renderApp('/inbox')
+    await userEvent.click(await screen.findByRole('button', { name: 'Dismiss announcement' }))
+    expect(screen.queryByRole('region', { name: 'Announcement' })).not.toBeInTheDocument()
+    expect(localStorage.getItem('banner:demo-data')).toBe('1')
   })
 
   it('shows not found for an unknown message', async () => {

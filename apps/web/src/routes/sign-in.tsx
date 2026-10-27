@@ -1,8 +1,9 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { ChevronRight } from 'lucide-react'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { sessionQuery, signInUrl } from '@/features/auth'
+import { Logo } from '@/components/layout/logo'
+import { SignInPreview, sessionQuery, signInUrl } from '@/features/auth'
 import { isSafeRedirectPath } from '@/lib/safe-redirect'
 
 export const Route = createFileRoute('/sign-in')({
@@ -20,23 +21,33 @@ export const Route = createFileRoute('/sign-in')({
 function SignIn() {
   const { redirect: returnTo } = Route.useSearch()
   return (
-    <div className="flex min-h-svh items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Sign in to AI Inbox</CardTitle>
-          <CardDescription>Use your work account.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            className="w-full"
-            onClick={() => {
-              window.location.assign(signInUrl(returnTo ?? '/inbox'))
-            }}
-          >
-            Continue
-          </Button>
-        </CardContent>
-      </Card>
+    <div className="mx-auto flex min-h-svh max-w-6xl flex-col px-4 md:px-8">
+      <header className="py-5 md:py-7">
+        <Logo />
+      </header>
+      <main className="grid flex-1 items-center gap-12 pb-16 md:grid-cols-[1.1fr_1fr] md:gap-8">
+        <div>
+          <h1 className="text-5xl leading-[1.05] font-bold tracking-tight text-balance md:text-7xl">
+            Your inbox, sorted and drafted
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground md:text-xl md:leading-relaxed">
+            AI ranks incoming mail by importance and drafts the reply. You review and approve before
+            anything is sent.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Button
+              size="lg"
+              onClick={() => {
+                window.location.assign(signInUrl(returnTo ?? '/inbox'))
+              }}
+            >
+              Sign in <ChevronRight />
+            </Button>
+            <span className="text-sm text-muted-foreground">Use your work account.</span>
+          </div>
+        </div>
+        <SignInPreview />
+      </main>
     </div>
   )
 }

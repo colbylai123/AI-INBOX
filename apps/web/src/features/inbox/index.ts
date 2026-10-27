@@ -1,5 +1,6 @@
 // Public surface of the inbox feature. Import from '@/features/inbox', not deep paths.
 export { inboxKeys, messageQuery, messagesQuery } from './api/queries'
+export { ChatBubble } from './components/chat-bubble'
 export { DraftReview } from './components/draft-review'
 export { MessageList } from './components/message-list'
 export { PriorityBadge } from './components/priority-badge'
