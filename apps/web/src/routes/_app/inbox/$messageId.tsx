@@ -25,7 +25,7 @@ function MessagePage() {
     <div className="max-w-3xl">
       <Link
         to="/inbox"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        className="mb-6 inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-muted-foreground uppercase hover:text-foreground"
       >
         <ArrowLeft className="size-4" aria-hidden /> Inbox
       </Link>
@@ -34,7 +34,6 @@ function MessagePage() {
         description={`From ${message.from}`}
         actions={<PriorityBadge priority={message.priority} />}
       />
-      <p className="mb-6 text-sm whitespace-pre-wrap">{message.body}</p>
       <DraftReview message={message} />
     </div>
   )

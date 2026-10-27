@@ -7,16 +7,16 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
     return <p className="text-sm text-muted-foreground">No messages yet.</p>
   }
   return (
-    <ul className="divide-y rounded-lg border">
+    <ul className="flex flex-col gap-3">
       {messages.map((m) => (
         <li key={m.id}>
           <Link
             to="/inbox/$messageId"
             params={{ messageId: m.id }}
-            className="flex flex-col gap-1 px-4 py-3 hover:bg-accent"
+            className="flex flex-col gap-1.5 rounded-2xl border bg-card/70 px-5 py-4 transition-colors hover:border-primary/40 hover:bg-card"
           >
-            <div className="flex items-center justify-between gap-2">
-              <span className="truncate font-medium">{m.subject}</span>
+            <div className="flex items-center justify-between gap-3">
+              <span className="truncate font-semibold">{m.subject}</span>
               <PriorityBadge priority={m.priority} />
             </div>
             <span className="truncate text-sm text-muted-foreground">
