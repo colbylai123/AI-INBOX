@@ -1,6 +1,4 @@
-import { Upload } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function MaterialsEmpty() {
   return (
@@ -8,14 +6,10 @@ export function MaterialsEmpty() {
       <CardHeader>
         <CardTitle>No materials yet</CardTitle>
         <CardDescription>
-          Upload forms, templates and reference documents the AI should use when preparing work.
+          Upload the forms and templates you fill out again and again. When an email calls for one,
+          the AI pre-fills it for you to review.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Button disabled>
-          <Upload /> Upload (coming soon)
-        </Button>
-      </CardContent>
     </Card>
   )
 }
