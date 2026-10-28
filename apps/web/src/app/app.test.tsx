@@ -74,6 +74,17 @@ describe('app', () => {
     expect(screen.getByRole('button', { name: 'Approve & send' })).toBeEnabled()
   })
 
+  it('will not save a blank reply', async () => {
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    const reply = screen.getByRole('textbox', { name: 'Reply' })
+    await userEvent.clear(reply)
+    await userEvent.type(reply, '   ')
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    expect(reply).toBeInvalid()
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+  })
+
   it('throws away edits on cancel', async () => {
     renderApp('/inbox/m1')
     await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))

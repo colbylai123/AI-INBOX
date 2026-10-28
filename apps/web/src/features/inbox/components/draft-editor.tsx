@@ -22,8 +22,16 @@ export function DraftEditor({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
+    const draftReply = String(data.get('draftReply') ?? '').trim()
+    if (!draftReply) {
+      // `required` lets spaces through; a blank reply can't be approved later.
+      const reply = event.currentTarget.elements.namedItem('draftReply') as HTMLTextAreaElement
+      reply.setCustomValidity('Write a reply before saving.')
+      reply.reportValidity()
+      return
+    }
     onSubmit({
-      draftReply: String(data.get('draftReply') ?? ''),
+      draftReply,
       formValues: Object.fromEntries(
         fields.map((f) => [f.id, String(data.get(`field.${f.id}`) ?? '')]),
       ),
@@ -34,7 +42,13 @@ export function DraftEditor({
     <form id={id} onSubmit={handleSubmit} className="flex flex-col gap-5">
       <label className="flex flex-col gap-1.5">
         <span className="px-1 font-mono text-xs text-meta">Reply</span>
-        <Textarea name="draftReply" defaultValue={message.draftReply ?? ''} required autoFocus />
+        <Textarea
+          name="draftReply"
+          defaultValue={message.draftReply ?? ''}
+          required
+          autoFocus
+          onInput={(event) => event.currentTarget.setCustomValidity('')}
+        />
       </label>
       {message.filledForm && (
         <fieldset className="rounded-lg border border-hairline">
