@@ -1,6 +1,6 @@
 import { FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useDeleteMaterial } from '../hooks/use-delete-material'
+import { useDeleteMaterial, useRemovingMaterialIds } from '../hooks/use-delete-material'
 import { formatBytes } from '../lib/upload-rules'
 import type { Material } from '../types'
 
@@ -8,6 +8,7 @@ const uploadedOn = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'nu
 
 export function MaterialsList({ materials }: { materials: Material[] }) {
   const remove = useDeleteMaterial()
+  const removing = useRemovingMaterialIds()
 
   return (
     <div className="flex flex-col gap-3">
@@ -26,7 +27,7 @@ export function MaterialsList({ materials }: { materials: Material[] }) {
               variant="ghost"
               size="sm"
               aria-label={`Remove ${m.name}`}
-              disabled={remove.isPending && remove.variables === m.id}
+              disabled={removing.includes(m.id)}
               onClick={() => remove.mutate(m.id)}
             >
               Remove
