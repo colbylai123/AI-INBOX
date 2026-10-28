@@ -1,5 +1,7 @@
 import { X } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 function readDismissed(key: string) {
   try {
@@ -35,17 +37,17 @@ export function DismissibleBanner({
   }
 
   return (
-    <div role="region" aria-label="Announcement" className="border-b border-hairline bg-panel">
+    <div role="region" aria-label="Announcement" className="border-b border-border bg-primary-soft">
       <div className="mx-auto flex max-w-page items-center gap-3 px-gutter py-2.5 text-sm">
         <div className="flex flex-1 flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-center">
-          <span className="text-read">{children}</span>
+          <span>{children}</span>
           {action}
         </div>
         <button
           type="button"
           onClick={dismiss}
           aria-label="Dismiss announcement"
-          className="grid size-8 shrink-0 place-items-center rounded-full text-read transition-colors hover:bg-hairline hover:text-bright"
+          className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-8')}
         >
           <X className="size-4" aria-hidden />
         </button>
