@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { resetMockMessages } from '@/features/inbox/api/mocks'
 import { resetMockMaterials } from '@/features/materials/api/mocks'
+import { ApiError } from '@/lib/api-client'
 import { App } from './app'
 import { createQueryClient } from './query-client'
 import { createAppRouter } from './router'
@@ -15,7 +16,7 @@ function renderApp(url: string) {
     history: createMemoryHistory({ initialEntries: [url] }),
   })
   render(<App queryClient={queryClient} router={router} />)
-  return router
+  return { router, queryClient }
 }
 
 beforeEach(() => {
@@ -26,7 +27,7 @@ beforeEach(() => {
 
 describe('app', () => {
   it('redirects / to the inbox, most important first', async () => {
-    const router = renderApp('/')
+    const { router } = renderApp('/')
     const items = await screen.findAllByRole('listitem')
     expect(router.state.location.pathname).toBe('/inbox')
     expect(items[0]).toHaveTextContent('Quote for 40 units by Friday')
@@ -80,14 +81,28 @@ describe('app', () => {
     )
   })
 
+  it('sends an action that finds the session expired to sign-in', async () => {
+    const { router, queryClient } = renderApp('/inbox/m1')
+    await screen.findByRole('button', { name: 'Approve & send' })
+    // Any mutation answering 401, as Approve & send would once the cookie expires.
+    const expired = queryClient.getMutationCache().build(queryClient, {
+      mutationFn: () => Promise.reject(new ApiError(401, 'Session expired')),
+    })
+    await expired.execute(undefined).catch(() => {})
+
+    await screen.findByRole('button', { name: /Sign in/ })
+    expect(router.state.location.pathname).toBe('/sign-in')
+    expect(router.state.location.search).toEqual({ redirect: '/inbox/m1' })
+  })
+
   it('follows a same-app sign-in redirect', async () => {
-    const router = renderApp('/sign-in?redirect=%2Fsettings')
+    const { router } = renderApp('/sign-in?redirect=%2Fsettings')
     await screen.findByRole('heading', { name: 'Settings' })
     expect(router.state.location.pathname).toBe('/settings')
   })
 
   it('ignores a sign-in redirect that would leave the app', async () => {
-    const router = renderApp('/sign-in?redirect=%2F%5Cevil.example')
+    const { router } = renderApp('/sign-in?redirect=%2F%5Cevil.example')
     await screen.findAllByRole('listitem')
     expect(router.state.location.pathname).toBe('/inbox')
   })

@@ -1,9 +1,27 @@
-import { useQueryErrorResetBoundary } from '@tanstack/react-query'
+import { useQueryClient, useQueryErrorResetBoundary } from '@tanstack/react-query'
 import { type ErrorComponentProps, useRouter } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { expireSession } from '@/features/auth'
+import { isApiError } from '@/lib/api-client'
 
 export function RouteError({ error }: ErrorComponentProps) {
+  return isApiError(error, 401) ? <SessionExpired /> : <ErrorMessage error={error} />
+}
+
+// A loader or page got a 401. Mutations are covered in <App>.
+function SessionExpired() {
+  const queryClient = useQueryClient()
+  const router = useRouter()
+
+  useEffect(() => {
+    void expireSession(queryClient, router)
+  }, [queryClient, router])
+
+  return null
+}
+
+function ErrorMessage({ error }: { error: unknown }) {
   const router = useRouter()
   const queryErrorResetBoundary = useQueryErrorResetBoundary()
 
