@@ -43,8 +43,10 @@ src/
   app/                  App wiring: <App>, router factory, query client factory
   routes/               Pages. File path = URL (TanStack Router file-based routing)
     __root.tsx          Root layout + dev-only devtools
-    _app.tsx            Signed-in area: auth guard + sidebar shell
+    _app.tsx            Signed-in area: auth guard + app shell (top nav)
     _app/inbox/         /inbox (?priority=…) and /inbox/$messageId
+    _app/materials.tsx  /materials
+    _app/settings.tsx   /settings
     sign-in.tsx         Public sign-in page
   features/             One folder per product area
     auth/               Session query, sign-in URL, User type
@@ -77,7 +79,7 @@ public/_headers         Cloudflare Pages security and cache headers (set the Pag
   2. `api/queries.ts`: query keys and `queryOptions`. Routes preload them in `loader` with `ensureQueryData`; components read them with `useSuspenseQuery`.
   3. `hooks/`: `useMutation` hooks that invalidate the right keys on success.
 - **URL state is typed.** Filters and other shareable state go in search params, validated with Zod in `validateSearch` (see `routes/_app/inbox/index.tsx`).
-- **Errors and loading are handled once.** The router's default error, pending and not-found components cover every route. A loader turns an API 404 into `notFound()`.
+- **Errors and loading are handled once.** The router's default error, pending and not-found components cover every route. A loader turns an API 404 into `notFound()`, and any 401 (session expired) sends the user to sign-in and back to the same page.
 - **Auth is a route guard.** `_app.tsx` checks the session in `beforeLoad` and redirects to `/sign-in?redirect=…`. Put any new signed-in page under `routes/_app/`. The browser never holds WorkOS or Microsoft tokens; FastAPI owns them.
 - **One HTTP entry point.** `lib/api-client.ts` is the only place that calls `fetch`. When the backend is running, `npm run gen:api` writes `src/lib/api-schema.gen.ts`; then replace the hand-written shapes in `features/*/types.ts` with the generated ones.
 - **Nothing sends without approval.** The AI only drafts. Any action that sends or finalizes must be an explicit user click (see `DraftReview`).
