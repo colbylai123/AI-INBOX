@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { LiveDot } from '@/components/layout/live-dot'
 import { cn } from '@/lib/utils'
 import { type Priority, priorities } from '../types'
 
@@ -19,16 +18,17 @@ export function PriorityFilter({ value }: { value: Priority | undefined }) {
             key={o.label}
             to="/inbox"
             search={{ priority: o.value }}
-            aria-current={selected ? 'page' : undefined}
+            // The router sets aria-current on the active option. Without this, "All"
+            // (priority: undefined) would also count as active under ?priority=high.
+            activeOptions={{ explicitUndefined: true }}
             className={cn(
-              'inline-flex h-8 items-center gap-2 rounded-full border px-3.5 text-sm transition-colors',
+              'inline-flex h-8 items-center rounded-md border px-3.5 text-interface font-medium transition-colors',
               selected
-                ? 'border-bright text-bright'
-                : 'border-hairline-2 text-read hover:border-dim hover:text-bright',
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground',
             )}
           >
             {o.label}
-            {selected && <LiveDot />}
           </Link>
         )
       })}
