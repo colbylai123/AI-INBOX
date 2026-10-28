@@ -34,7 +34,8 @@ function MessagePage() {
         description={`From ${message.from}`}
         actions={<PriorityBadge priority={message.priority} />}
       />
-      <DraftReview message={message} />
+      {/* Keyed so edit and error state never carry over from another message. */}
+      <DraftReview key={message.id} message={message} />
     </div>
   )
 }
