@@ -15,6 +15,12 @@ export function DraftReview({ message }: { message: Message }) {
         <CardTitle>Conversation</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
+        {message.summary && (
+          <p className="border-b border-hairline pb-5 text-sm">
+            <span className="mr-3 font-mono text-xs text-meta">Summary</span>
+            <span className="text-bright">{message.summary}</span>
+          </p>
+        )}
         <ChatBubble from="incoming" label={message.from}>
           {message.body}
         </ChatBubble>

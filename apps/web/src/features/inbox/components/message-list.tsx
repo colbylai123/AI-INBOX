@@ -19,9 +19,9 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
               <span className="truncate text-bright">{m.subject}</span>
               <PriorityBadge priority={m.priority} />
             </div>
-            <span className="truncate text-sm text-read">
-              {m.from} · {m.preview}
-            </span>
+            <span className="truncate font-mono text-xs text-meta">{m.from}</span>
+            {/* The AI's one-line summary; the raw preview until it has one. */}
+            <span className="truncate text-sm text-read">{m.summary ?? m.preview}</span>
           </Link>
         </li>
       ))}

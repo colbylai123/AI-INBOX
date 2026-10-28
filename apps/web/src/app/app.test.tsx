@@ -27,13 +27,15 @@ describe('app', () => {
     const router = renderApp('/')
     const items = await screen.findAllByRole('listitem')
     expect(router.state.location.pathname).toBe('/inbox')
-    expect(items[0]).toHaveTextContent('RFI #42')
+    expect(items[0]).toHaveTextContent('Quote for 40 units by Friday')
+    // Each row carries the AI's one-line summary.
+    expect(items[0]).toHaveTextContent('Wants a quote for 40 units')
   })
 
   it('filters by priority from the URL', async () => {
     renderApp('/inbox?priority=low')
-    expect(await screen.findByText('This week in construction tech')).toBeInTheDocument()
-    expect(screen.queryByText('RFI #42: footing detail at grid C4')).not.toBeInTheDocument()
+    expect(await screen.findByText('Five ways to close the month faster')).toBeInTheDocument()
+    expect(screen.queryByText('Quote for 40 units by Friday')).not.toBeInTheDocument()
   })
 
   it('approves a draft only after an explicit click', async () => {
@@ -43,6 +45,13 @@ describe('app', () => {
     expect(screen.queryByText('Approved')).not.toBeInTheDocument()
     await userEvent.click(approve)
     expect(await screen.findByText('Approved')).toBeInTheDocument()
+  })
+
+  it('shows the AI summary above the conversation', async () => {
+    renderApp('/inbox/m2')
+    expect(
+      await screen.findByText('Reminder that invoice 1182 ($2,400) is due Nov 3.'),
+    ).toBeInTheDocument()
   })
 
   it('follows a same-app sign-in redirect', async () => {
