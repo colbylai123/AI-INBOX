@@ -1,4 +1,4 @@
-import { LiveDot } from '@/components/layout/live-dot'
+import { CircleCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useApproveDraft } from '../hooks/use-approve-draft'
@@ -16,9 +16,9 @@ export function DraftReview({ message }: { message: Message }) {
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         {message.summary && (
-          <p className="border-b border-hairline pb-5 text-sm">
-            <span className="mr-3 font-mono text-xs text-meta">Summary</span>
-            <span className="text-bright">{message.summary}</span>
+          <p className="border-b border-border pb-5 text-interface">
+            <span className="mr-3 text-label font-semibold text-muted-foreground">Summary</span>
+            <span>{message.summary}</span>
           </p>
         )}
         <ChatBubble from="incoming" label={message.from}>
@@ -29,18 +29,18 @@ export function DraftReview({ message }: { message: Message }) {
             {message.draftReply}
           </ChatBubble>
         ) : (
-          <p className="text-sm text-read">No draft yet.</p>
+          <p className="text-sm text-muted-foreground">No draft yet.</p>
         )}
       </CardContent>
-      <CardFooter className="flex-wrap justify-end gap-3 border-t border-hairline pt-5">
+      <CardFooter className="flex-wrap justify-end gap-3 border-t border-border pt-5">
         {approve.isError && (
           <p role="alert" className="mr-auto text-sm text-destructive">
             Couldn't approve. Please try again.
           </p>
         )}
         {message.approvedAt ? (
-          <p className="flex items-center gap-2 text-sm text-bright">
-            <LiveDot /> Approved
+          <p className="flex items-center gap-2 text-interface font-medium">
+            <CircleCheck className="size-4 text-primary" aria-hidden /> Approved
           </p>
         ) : (
           <>

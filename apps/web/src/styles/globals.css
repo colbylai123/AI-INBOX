@@ -1,85 +1,94 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import '@fontsource-variable/geist';
-@import '@fontsource-variable/geist-mono';
+@import '@fontsource-variable/host-grotesk';
+@import '@fontsource-variable/instrument-sans';
 
 /*
- * Modern Dark design system. The --dp-* values are the system's authoritative
- * tokens; everything else maps onto them. Change the look here, not in components.
- * "Modern Dark Grotesk" / "Modern Dark Mono" are aliases for Geist / Geist Mono.
+ * "Software" design system: light ground, dark bold headings, electric blue for
+ * actions, small icons and selected states. The --dp-* values are the system's
+ * authoritative tokens. Components use the shadcn role colors below (bg-card,
+ * text-muted-foreground, bg-primary…), so a restyle only changes this file.
  */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  --dp-color-ground: #050505;
-  --dp-color-panel: #0e0e0e;
-  --dp-color-hairline: #222222;
-  --dp-color-hairline-2: #303030;
-  --dp-color-bright: #f2f2f2;
-  --dp-color-read: #a6a9ad;
-  --dp-color-meta: #8a8d91;
-  --dp-color-live: #3fd6c6;
-  --dp-color-inverse-ink: #0a0a0a;
-  --dp-color-dim: #96999d;
-  --dp-typography-face:
-    'Geist Variable', 'Modern Dark Grotesk', 'Helvetica Neue', Arial, sans-serif;
-  --dp-typography-mono:
-    'Geist Mono Variable', 'Modern Dark Mono', 'SFMono-Regular', Menlo, monospace;
-  --dp-spacing-gutter: 48px;
-  --dp-spacing-gap: 24px;
-  --dp-spacing-max: 1360px;
-  --dp-radius-panel: 6px;
-  --dp-radius-pill: 999px;
+  --dp-color-ground: #fcfcfd;
+  --dp-color-ink: #16191f;
+  --dp-color-ink-secondary: #454c58;
+  --dp-color-ground-muted: #f3f4f6;
+  --dp-color-rule: #dde0e6;
+  --dp-color-accent: #074ce0;
+  --dp-color-field: #16191f;
+  --dp-color-on-field: #fcfcfd;
+  --dp-color-on-field-secondary: #d0d4dd;
+  --dp-color-panel: #ffffff;
+  --dp-color-on-accent: #ffffff;
+  --dp-typography-display: 'Host Grotesk Variable', 'Host Grotesk', sans-serif;
+  --dp-typography-body: 'Instrument Sans Variable', 'Instrument Sans', sans-serif;
+  --dp-typography-body-size: 16px;
+  --dp-typography-interface-size: 15px;
+  --dp-typography-small-size: 14px;
+  --dp-typography-metadata-size: 13px;
+  --dp-typography-label-size: 12px;
+  --dp-typography-body-leading: 1.6;
+  --dp-spacing-grid-gap: 24px;
+  --dp-radius-panel: 12px;
   --dp-border-hairline: 1px;
-  --dp-motion-duration: 120ms;
-  --dp-motion-ease: ease-out;
+  --dp-motion-interaction: 160ms;
+  --dp-motion-easing: ease-out;
 
   /* shadcn/ui roles, mapped onto the system tokens. */
   --radius: var(--dp-radius-panel);
   --background: var(--dp-color-ground);
-  --foreground: var(--dp-color-bright);
+  --foreground: var(--dp-color-ink);
   --card: var(--dp-color-panel);
-  --card-foreground: var(--dp-color-bright);
-  --primary: var(--dp-color-bright);
-  --primary-foreground: var(--dp-color-inverse-ink);
+  --card-foreground: var(--dp-color-ink);
+  --primary: var(--dp-color-accent);
+  --primary-foreground: var(--dp-color-on-accent);
   --secondary: var(--dp-color-panel);
-  --secondary-foreground: var(--dp-color-bright);
-  --muted: var(--dp-color-panel);
-  --muted-foreground: var(--dp-color-read);
-  --accent: var(--dp-color-hairline);
-  --accent-foreground: var(--dp-color-bright);
-  --destructive: #f07070;
-  --border: var(--dp-color-hairline);
-  --input: var(--dp-color-hairline-2);
-  --ring: var(--dp-color-bright);
+  --secondary-foreground: var(--dp-color-ink);
+  --muted: var(--dp-color-ground-muted);
+  --muted-foreground: var(--dp-color-ink-secondary);
+  --accent: var(--dp-color-ground-muted);
+  --accent-foreground: var(--dp-color-ink);
+  --destructive: #c4321c;
+  --border: var(--dp-color-rule);
+  --input: var(--dp-color-rule);
+  --ring: var(--dp-color-accent);
+
+  /* Derived from the tokens: pressed-in blue for hover, pale blue for AI drafts and the current page. */
+  --primary-hover: color-mix(in oklab, var(--dp-color-accent) 84%, var(--dp-color-ink));
+  --primary-soft: color-mix(in oklab, var(--dp-color-accent) 7%, var(--dp-color-panel));
 }
 
 @theme inline {
-  --font-sans: var(--dp-typography-face);
-  --font-mono: var(--dp-typography-mono);
+  --font-sans: var(--dp-typography-body);
+  --font-display: var(--dp-typography-display);
+
+  /* Type scale from the system: body 16, interface 15, small 14, metadata 13, label 12. */
+  --text-interface: var(--dp-typography-interface-size);
+  --text-interface--line-height: 1.45;
+  --text-metadata: var(--dp-typography-metadata-size);
+  --text-metadata--line-height: 1.45;
+  --text-label: var(--dp-typography-label-size);
+  --text-label--line-height: 1.35;
 
   /* Breakpoints from the system's responsive rules. */
-  --breakpoint-sm: 560px;
-  --breakpoint-md: 900px;
-  --breakpoint-lg: 1180px;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 760px;
+  --breakpoint-lg: 1050px;
 
-  --container-page: var(--dp-spacing-max);
-  --radius-sm: var(--dp-radius-panel);
-  --radius-md: var(--dp-radius-panel);
+  --container-page: 1360px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
   --radius-lg: var(--dp-radius-panel);
-  --default-transition-duration: var(--dp-motion-duration);
-  --default-transition-timing-function: var(--dp-motion-ease);
+  --shadow-panel: 0 1px 2px rgb(22 25 31 / 0.04), 0 8px 24px -12px rgb(22 25 31 / 0.14);
+  --default-transition-duration: var(--dp-motion-interaction);
+  --default-transition-timing-function: var(--dp-motion-easing);
 
-  --color-ground: var(--dp-color-ground);
-  --color-panel: var(--dp-color-panel);
-  --color-hairline: var(--dp-color-hairline);
-  --color-hairline-2: var(--dp-color-hairline-2);
-  --color-bright: var(--dp-color-bright);
-  --color-read: var(--dp-color-read);
-  --color-meta: var(--dp-color-meta);
-  --color-live: var(--dp-color-live);
-  --color-inverse-ink: var(--dp-color-inverse-ink);
-  --color-dim: var(--dp-color-dim);
+  --color-field: var(--dp-color-field);
+  --color-on-field: var(--dp-color-on-field);
+  --color-on-field-secondary: var(--dp-color-on-field-secondary);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -87,6 +96,8 @@
   --color-card-foreground: var(--card-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -99,30 +110,15 @@
   --color-ring: var(--ring);
 }
 
-/* Side gutters: narrow on phones, reduced below 1180px, full above. */
+/* Side gutters: narrow on phones, wider from 480px, full from 1050px. */
 @utility px-gutter {
   padding-inline: 20px;
-  @media (width >= 560px) {
+  @media (width >= 480px) {
     padding-inline: 32px;
   }
-  @media (width >= 1180px) {
-    padding-inline: var(--dp-spacing-gutter);
+  @media (width >= 1050px) {
+    padding-inline: 48px;
   }
-}
-
-/* Subtle grey material for product objects (opaque, no glow). */
-@utility bg-material {
-  background-color: var(--dp-color-panel);
-  background-image: linear-gradient(180deg, var(--dp-color-hairline) 0%, var(--dp-color-panel) 70%);
-}
-
-/* Static pool of white light for the opening and closing fields only. */
-@utility light-pool {
-  background: radial-gradient(
-    closest-side,
-    color-mix(in oklab, var(--dp-color-bright) 13%, transparent),
-    transparent
-  );
 }
 
 @layer base {
@@ -130,10 +126,12 @@
     @apply border-border;
   }
   body {
-    @apply min-h-svh bg-ground font-sans text-read antialiased;
+    @apply min-h-svh bg-background font-sans text-foreground antialiased;
+    font-size: var(--dp-typography-body-size);
+    line-height: var(--dp-typography-body-leading);
   }
   :focus-visible {
-    outline: 2px solid var(--dp-color-bright);
+    outline: 2px solid var(--dp-color-accent);
     outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {

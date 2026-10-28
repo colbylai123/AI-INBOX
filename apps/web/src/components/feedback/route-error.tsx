@@ -32,8 +32,8 @@ function ErrorMessage({ error }: { error: unknown }) {
 
   return (
     <div role="alert" className="flex flex-col items-start gap-3 p-8">
-      <h1 className="text-lg text-bright">Something went wrong</h1>
-      <p className="text-sm text-read">
+      <h1 className="font-display text-lg font-bold">Something went wrong</h1>
+      <p className="text-sm text-muted-foreground">
         {import.meta.env.DEV && error instanceof Error
           ? error.message
           : 'Please try again in a moment.'}

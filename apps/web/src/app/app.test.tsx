@@ -1,5 +1,5 @@
 import { createMemoryHistory } from '@tanstack/react-router'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { resetMockMessages } from '@/features/inbox/api/mocks'
 import { ApiError } from '@/lib/api-client'
@@ -37,6 +37,12 @@ describe('app', () => {
     renderApp('/inbox?priority=low')
     expect(await screen.findByText('Five ways to close the month faster')).toBeInTheDocument()
     expect(screen.queryByText('Quote for 40 units by Friday')).not.toBeInTheDocument()
+    // Only the chosen filter is marked as selected, not "All" as well.
+    const filters = screen.getByRole('navigation', { name: 'Filter by priority' })
+    const selected = within(filters)
+      .getAllByRole('link')
+      .filter((link) => link.getAttribute('aria-current') === 'page')
+    expect(selected.map((link) => link.textContent)).toEqual(['Low'])
   })
 
   it('approves a draft only after an explicit click', async () => {
