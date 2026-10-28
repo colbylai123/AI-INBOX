@@ -49,7 +49,7 @@ src/
     _app/settings.tsx   /settings
     sign-in.tsx         Public sign-in page
   features/             One folder per product area
-    auth/               Session query, sign-in URL, User type
+    auth/               Session query, sign-in URL, session expiry, User type
     inbox/
       api/              inbox-api.ts (HTTP or mocks), queries.ts (keys + queryOptions), mocks.ts
       hooks/            Mutations and other hooks (useApproveDraft)

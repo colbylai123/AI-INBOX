@@ -1,27 +1,22 @@
 import { useQueryClient, useQueryErrorResetBoundary } from '@tanstack/react-query'
-import { type ErrorComponentProps, useNavigate, useRouter } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { type ErrorComponentProps, useRouter } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { sessionQuery } from '@/features/auth'
+import { expireSession } from '@/features/auth'
 import { isApiError } from '@/lib/api-client'
 
 export function RouteError({ error }: ErrorComponentProps) {
   return isApiError(error, 401) ? <SessionExpired /> : <ErrorMessage error={error} />
 }
 
-// The session cookie expired mid-visit. Forget the cached user so the auth guard
-// agrees, then go to sign-in and come back here afterwards.
+// A loader or page got a 401. Mutations are covered in <App>.
 function SessionExpired() {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
   const router = useRouter()
-  // Read once: the location changes as soon as we navigate away.
-  const [returnTo] = useState(() => router.state.location.href)
 
   useEffect(() => {
-    queryClient.setQueryData(sessionQuery().queryKey, null)
-    void navigate({ to: '/sign-in', search: { redirect: returnTo }, replace: true })
-  }, [queryClient, navigate, returnTo])
+    void expireSession(queryClient, router)
+  }, [queryClient, router])
 
   return null
 }
