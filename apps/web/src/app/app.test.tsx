@@ -56,6 +56,20 @@ describe('app', () => {
     expect(await screen.findByText('Approved')).toBeInTheDocument()
   })
 
+  it('shows the form the AI filled in with the draft', async () => {
+    renderApp('/inbox/m1')
+    const form = await screen.findByRole('region', { name: 'Quote form' })
+    expect(within(form).getByText('Quantity').nextSibling).toHaveTextContent('40')
+    // A field the AI couldn't fill is called out, not left blank.
+    expect(within(form).getByText('Unit price').nextSibling).toHaveTextContent('Not filled')
+  })
+
+  it('shows no form when none of the materials fits', async () => {
+    renderApp('/inbox/m2')
+    await screen.findByRole('button', { name: 'Approve & send' })
+    expect(screen.queryByText('Filled by AI')).not.toBeInTheDocument()
+  })
+
   it('shows the AI summary above the conversation', async () => {
     renderApp('/inbox/m2')
     expect(
