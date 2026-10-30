@@ -50,10 +50,11 @@ describe('app', () => {
   it('approves a draft only after an explicit click', async () => {
     renderApp('/inbox/m1')
     const approve = await screen.findByRole('button', { name: 'Approve & send' })
-    expect(screen.getByRole('button', { name: 'Edit (coming soon)' })).toBeDisabled()
     expect(screen.queryByText('Approved')).not.toBeInTheDocument()
     await userEvent.click(approve)
     expect(await screen.findByText('Approved')).toBeInTheDocument()
+    // Once sent, the draft can't be edited any more.
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
   })
 
   it('shows the form the AI filled in with the draft', async () => {
@@ -62,6 +63,49 @@ describe('app', () => {
     expect(within(form).getByText('Quantity').nextSibling).toHaveTextContent('40')
     // A field the AI couldn't fill is called out, not left blank.
     expect(within(form).getByText('Unit price').nextSibling).toHaveTextContent('Not filled')
+  })
+
+  it('saves edits to the reply and form before approval', async () => {
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    // Nothing can be sent while editing.
+    expect(screen.queryByRole('button', { name: 'Approve & send' })).not.toBeInTheDocument()
+
+    const reply = screen.getByRole('textbox', { name: 'Reply' })
+    await userEvent.clear(reply)
+    await userEvent.type(reply, 'Quote attached for 45 units.')
+    const quantity = screen.getByRole('textbox', { name: 'Quantity' })
+    await userEvent.clear(quantity)
+    await userEvent.type(quantity, '45')
+    await userEvent.type(screen.getByRole('textbox', { name: 'Unit price' }), '$18')
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    expect(await screen.findByText('Quote attached for 45 units.')).toBeInTheDocument()
+    const form = screen.getByRole('region', { name: 'Quote form' })
+    expect(within(form).getByText('Quantity').nextSibling).toHaveTextContent('45')
+    expect(within(form).getByText('Unit price').nextSibling).toHaveTextContent('$18')
+    expect(screen.getByRole('button', { name: 'Approve & send' })).toBeEnabled()
+    expect(screen.queryByText('Approved')).not.toBeInTheDocument()
+  })
+
+  it('will not save a blank reply', async () => {
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    const reply = screen.getByRole('textbox', { name: 'Reply' })
+    await userEvent.clear(reply)
+    await userEvent.type(reply, '   ')
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    expect(reply).toBeInvalid()
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+  })
+
+  it('throws away edits on cancel', async () => {
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    await userEvent.type(screen.getByRole('textbox', { name: 'Reply' }), ' Extra words.')
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.queryByText(/Extra words/)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Approve & send' })).toBeEnabled()
   })
 
   it('shows no form when none of the materials fits', async () => {
