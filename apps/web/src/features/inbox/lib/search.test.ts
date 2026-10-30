@@ -20,13 +20,14 @@ const messages = [
   msg('quote', { from: 'orders@brightline.example', subject: 'Quote for 40 units' }),
   msg('invoice', { from: 'billing@harbor.example', summary: 'Invoice 1042 is overdue' }),
   msg('cafe', { subject: 'Lunch at Café Rosa', preview: 'Booked for Friday' }),
+  msg('soren', { from: 'Søren Ærø <soren@example.dk>', subject: 'Straße' }),
 ]
 const ids = (query: string | undefined) => searchMessages(messages, query).map((m) => m.id)
 
 describe('searchMessages', () => {
   it('returns everything for an empty query', () => {
-    expect(ids(undefined)).toEqual(['quote', 'invoice', 'cafe'])
-    expect(ids('   ')).toEqual(['quote', 'invoice', 'cafe'])
+    expect(ids(undefined)).toEqual(['quote', 'invoice', 'cafe', 'soren'])
+    expect(ids('   ')).toEqual(['quote', 'invoice', 'cafe', 'soren'])
   })
 
   it('matches the sender, subject, summary and preview, ignoring case', () => {
@@ -40,7 +41,9 @@ describe('searchMessages', () => {
     expect(ids('quote invoice')).toEqual([])
   })
 
-  it('ignores accents', () => {
+  it('ignores accents, including letters that have no separate accent', () => {
     expect(ids('cafe')).toEqual(['cafe'])
+    expect(ids('soren aero')).toEqual(['soren'])
+    expect(ids('strasse')).toEqual(['soren'])
   })
 })

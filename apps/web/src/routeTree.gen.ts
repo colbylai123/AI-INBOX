@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as AppInboxRouteRouteImport } from './routes/_app/inbox/route'
 import { Route as AppMaterialsRouteImport } from './routes/_app/materials'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppInboxIndexRouteImport } from './routes/_app/inbox/index'
@@ -37,6 +38,11 @@ const SignInRoute = SignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppInboxRouteRoute = AppInboxRouteRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMaterialsRoute = AppMaterialsRouteImport.update({
   id: '/materials',
   path: '/materials',
@@ -48,20 +54,21 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 const AppInboxIndexRoute = AppInboxIndexRouteImport.update({
-  id: '/inbox/',
-  path: '/inbox/',
-  getParentRoute: () => AppRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppInboxRouteRoute,
 } as any)
 const AppInboxMessageIdRoute = AppInboxMessageIdRouteImport.update({
-  id: '/inbox/$messageId',
-  path: '/inbox/$messageId',
-  getParentRoute: () => AppRoute,
+  id: '/$messageId',
+  path: '/$messageId',
+  getParentRoute: () => AppInboxRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
   '/sign-in': typeof SignInRoute
+  '/inbox': typeof AppInboxRouteRouteWithChildren
   '/materials': typeof AppMaterialsRoute
   '/settings': typeof AppSettingsRoute
   '/inbox/$messageId': typeof AppInboxMessageIdRoute
@@ -82,6 +89,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
   '/sign-in': typeof SignInRoute
+  '/_app/inbox': typeof AppInboxRouteRouteWithChildren
   '/_app/materials': typeof AppMaterialsRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/inbox/$messageId': typeof AppInboxMessageIdRoute
@@ -93,6 +101,7 @@ export interface FileRouteTypes {
     | '/'
     | '/demo'
     | '/sign-in'
+    | '/inbox'
     | '/materials'
     | '/settings'
     | '/inbox/$messageId'
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/demo'
     | '/sign-in'
+    | '/_app/inbox'
     | '/_app/materials'
     | '/_app/settings'
     | '/_app/inbox/$messageId'
@@ -155,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/inbox': {
+      id: '/_app/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AppInboxRouteRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/materials': {
       id: '/_app/materials'
       path: '/materials'
@@ -171,33 +188,45 @@ declare module '@tanstack/react-router' {
     }
     '/_app/inbox/': {
       id: '/_app/inbox/'
-      path: '/inbox'
+      path: '/'
       fullPath: '/inbox/'
       preLoaderRoute: typeof AppInboxIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppInboxRouteRoute
     }
     '/_app/inbox/$messageId': {
       id: '/_app/inbox/$messageId'
-      path: '/inbox/$messageId'
+      path: '/$messageId'
       fullPath: '/inbox/$messageId'
       preLoaderRoute: typeof AppInboxMessageIdRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppInboxRouteRoute
     }
   }
 }
 
-interface AppRouteChildren {
-  AppMaterialsRoute: typeof AppMaterialsRoute
-  AppSettingsRoute: typeof AppSettingsRoute
+interface AppInboxRouteRouteChildren {
   AppInboxMessageIdRoute: typeof AppInboxMessageIdRoute
   AppInboxIndexRoute: typeof AppInboxIndexRoute
 }
 
-const AppRouteChildren: AppRouteChildren = {
-  AppMaterialsRoute: AppMaterialsRoute,
-  AppSettingsRoute: AppSettingsRoute,
+const AppInboxRouteRouteChildren: AppInboxRouteRouteChildren = {
   AppInboxMessageIdRoute: AppInboxMessageIdRoute,
   AppInboxIndexRoute: AppInboxIndexRoute,
+}
+
+const AppInboxRouteRouteWithChildren = AppInboxRouteRoute._addFileChildren(
+  AppInboxRouteRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppInboxRouteRoute: typeof AppInboxRouteRouteWithChildren
+  AppMaterialsRoute: typeof AppMaterialsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppInboxRouteRoute: AppInboxRouteRouteWithChildren,
+  AppMaterialsRoute: AppMaterialsRoute,
+  AppSettingsRoute: AppSettingsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

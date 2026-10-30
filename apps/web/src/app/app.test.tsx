@@ -475,6 +475,24 @@ describe('app', () => {
     expect(await screen.findByText('No messages match “units”.')).toBeInTheDocument()
   })
 
+  it('keeps the search when you open a message and go back', async () => {
+    const { router } = renderApp('/inbox?q=units&priority=high')
+    await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
+    await screen.findByRole('button', { name: 'Approve & send' })
+    expect(router.state.location.search).toEqual({ q: 'units', priority: 'high' })
+
+    await userEvent.click(screen.getByRole('link', { name: 'Inbox', current: false }))
+    expect(await screen.findByRole('searchbox', { name: 'Search the inbox' })).toHaveValue('units')
+    expect(router.state.location.search).toEqual({ q: 'units', priority: 'high' })
+
+    // Escape goes back the same way.
+    await userEvent.click(await screen.findByRole('link', { name: /12 units arrived/ }))
+    await screen.findByRole('heading', { name: '12 units arrived damaged' })
+    await userEvent.keyboard('{Escape}')
+    expect(await screen.findByRole('searchbox', { name: 'Search the inbox' })).toHaveValue('units')
+    expect(screen.getByText('2 of 3 messages match')).toBeInTheDocument()
+  })
+
   it('jumps to search with / and clears it with Escape', async () => {
     renderApp('/inbox?q=packright')
     const search = await screen.findByRole('searchbox', { name: 'Search the inbox' })

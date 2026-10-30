@@ -1,13 +1,11 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod/mini'
 import { PageHeader } from '@/components/layout/page-header'
 import { ConnectPrompt, connectionsQuery, ReconnectAlert } from '@/features/connections'
 import {
   MessageList,
   messagesQuery,
   PriorityFilter,
-  priorities,
   SearchBox,
   searchMessages,
   WeeklySummary,
@@ -18,12 +16,7 @@ import { materialsQuery } from '@/features/materials'
 import { GettingStarted } from '@/features/onboarding'
 
 export const Route = createFileRoute('/_app/inbox/')({
-  // Typed, validated URL state. Unknown values fall back to "all".
-  validateSearch: z.object({
-    priority: z.catch(z.optional(z.enum(priorities)), undefined),
-    // Search words. The loaded list is filtered in the browser, so they aren't a loader dep.
-    q: z.catch(z.optional(z.string()), undefined),
-  }),
+  // ?priority and ?q are declared on the parent route (./route.tsx).
   loaderDeps: ({ search }) => ({ priority: search.priority }),
   loader: ({ context, deps }) => {
     // Only for the checklist and the stats card, so they're fetched alongside but never hold up the inbox.
@@ -64,7 +57,7 @@ function InboxPage() {
               nextDraftId={messages.find((m) => m.hasDraft && !m.approvedAt)?.id}
             />
           )}
-          <div className="mb-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <PriorityFilter value={filters.priority} />
             <SearchBox
               query={q}
