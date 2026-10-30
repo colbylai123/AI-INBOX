@@ -37,8 +37,8 @@ export function GettingStarted({
   const steps: { done: boolean; title: string; body: string; action?: ReactNode }[] = [
     {
       done: connected,
-      title: 'Connect Outlook',
-      body: 'New mail arrives here ranked and summed up.',
+      title: 'Connect your email',
+      body: 'Outlook or Gmail. New mail arrives here ranked and summed up.',
       action: (
         <Link to="/settings" className={action}>
           Open Settings
