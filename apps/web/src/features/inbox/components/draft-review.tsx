@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { useApproveDraft } from '../hooks/use-approve-draft'
 import type { Message } from '../types'
 import { ChatBubble } from './chat-bubble'
+import { FilledFormView } from './filled-form'
 
 // Human-in-the-loop rule: the AI only drafts. Sending requires this explicit click.
 export function DraftReview({ message }: { message: Message }) {
@@ -25,9 +26,12 @@ export function DraftReview({ message }: { message: Message }) {
           {message.body}
         </ChatBubble>
         {message.draftReply ? (
-          <ChatBubble from="draft" label="AI draft">
-            {message.draftReply}
-          </ChatBubble>
+          <>
+            <ChatBubble from="draft" label="AI draft">
+              {message.draftReply}
+            </ChatBubble>
+            {message.filledForm && <FilledFormView form={message.filledForm} />}
+          </>
         ) : (
           <p className="text-sm text-muted-foreground">No draft yet.</p>
         )}

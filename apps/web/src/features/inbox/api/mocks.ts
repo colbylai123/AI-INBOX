@@ -12,6 +12,19 @@ const seed: Message[] = [
     body: "Hi, we'd like a quote for 40 units of the standard package, delivered to our Austin office by November 14. Could you send pricing and lead time by Friday?\n\nThanks,\nMaya",
     draftReply:
       "Hi Maya,\n\nThanks for reaching out. I've attached a quote for 40 units of the standard package with delivery to your Austin office by November 14. Let me know if you'd like to change the quantity.\n\nBest,",
+    filledForm: {
+      materialId: 'mat-quote',
+      name: 'Quote form',
+      fields: [
+        { id: 'customer', label: 'Customer', value: 'Brightline' },
+        { id: 'contact', label: 'Contact', value: 'Maya, orders@brightline.example' },
+        { id: 'item', label: 'Item', value: 'Standard package' },
+        { id: 'quantity', label: 'Quantity', value: '40' },
+        { id: 'deliver-to', label: 'Deliver to', value: 'Austin office' },
+        { id: 'deliver-by', label: 'Deliver by', value: 'November 14, 2026' },
+        { id: 'unit-price', label: 'Unit price', value: '' },
+      ],
+    },
     approvedAt: null,
   },
   {
@@ -25,6 +38,7 @@ const seed: Message[] = [
     body: 'A reminder that invoice 1182 for $2,400 is due on November 3. Reply to this email if you need another copy.',
     draftReply:
       'Thanks for the reminder. We have invoice 1182 on file and will pay it by November 3.',
+    filledForm: null,
     approvedAt: null,
   },
   {
@@ -37,6 +51,7 @@ const seed: Message[] = [
     priority: 'low',
     body: 'This week: what small teams are doing to speed up month-end.',
     draftReply: null,
+    filledForm: null,
     approvedAt: null,
   },
 ]

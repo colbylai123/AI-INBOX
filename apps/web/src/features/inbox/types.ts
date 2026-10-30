@@ -14,9 +14,25 @@ export interface MessageSummary {
   priority: Priority
 }
 
+export interface FormField {
+  id: string
+  label: string
+  /** Empty when the AI couldn't fill it in. */
+  value: string
+}
+
+/** A form from Materials that the AI picked and pre-filled for this reply. */
+export interface FilledForm {
+  materialId: string
+  name: string
+  fields: FormField[]
+}
+
 export interface Message extends MessageSummary {
   body: string
   draftReply: string | null
+  /** Null when none of the user's materials fits this email. */
+  filledForm: FilledForm | null
   /** Set once the user approves the draft. Nothing is sent before this. */
   approvedAt: string | null
 }
