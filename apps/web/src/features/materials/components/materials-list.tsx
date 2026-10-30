@@ -12,12 +12,12 @@ export function MaterialsList({ materials }: { materials: Material[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card shadow-panel">
+      <ul className="divide-y divide-border overflow-hidden rounded-lg border border-white/65 bg-card shadow-panel">
         {materials.map((m) => (
           <li key={m.id} className="flex items-center gap-4 px-5 py-4">
-            <FileText className="size-4 shrink-0 text-primary" aria-hidden />
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <span className="truncate text-interface font-semibold">{m.name}</span>
+            <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="truncate text-interface font-medium tracking-tight">{m.name}</span>
               <span className="text-metadata text-muted-foreground">
                 {m.fileName} · {formatBytes(m.sizeBytes)} ·{' '}
                 {uploadedOn.format(new Date(m.uploadedAt))}

@@ -120,7 +120,7 @@ export function DraftReview({ message }: { message: Message }) {
         </span>
         {approved ? (
           <p className="flex items-center gap-2 text-interface font-medium">
-            <CircleCheck className="size-4 text-primary" aria-hidden /> Approved
+            <CircleCheck className="size-4" aria-hidden /> Approved
           </p>
         ) : editing ? (
           <>
@@ -151,7 +151,9 @@ export function DraftReview({ message }: { message: Message }) {
             >
               Undo
             </Button>
-            <Button disabled>{held ? `Sends in ${seconds}s` : 'Sending…'}</Button>
+            <Button variant="approve" disabled>
+              {held ? `Sends in ${seconds}s` : 'Sending…'}
+            </Button>
           </>
         ) : (
           <>
@@ -164,6 +166,7 @@ export function DraftReview({ message }: { message: Message }) {
               Edit
             </Button>
             <Button
+              variant="approve"
               disabled={!message.draftReply}
               onClick={() => holdSend(message.id, message.from)}
             >

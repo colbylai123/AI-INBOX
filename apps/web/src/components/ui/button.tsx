@@ -2,20 +2,21 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type * as React from 'react'
 import { cn } from '@/lib/utils'
 
-// Blue filled primary, pale outlined secondary. Hover lifts a pixel and changes
-// the fill; pressing returns to rest. With reduced motion there's no movement.
-// Focus uses the global offset outline from globals.css.
+// The amber pill is the one bright action. Everything else is a white or quiet button.
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-interface font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,translate] disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-y-px motion-safe:active:translate-y-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 text-interface font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,translate] disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-y-px motion-safe:active:translate-y-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary-hover',
-        destructive: 'bg-destructive text-white shadow-xs hover:bg-destructive/90',
-        outline: 'border border-border bg-card text-foreground shadow-xs hover:bg-muted',
-        secondary: 'border border-border bg-card text-foreground shadow-xs hover:bg-muted',
-        ghost: 'text-muted-foreground hover:bg-muted hover:text-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
+        default:
+          'rounded-full bg-approve font-semibold text-approve-foreground shadow-glow hover:bg-approve-hover',
+        approve:
+          'rounded-full bg-approve font-semibold text-approve-foreground shadow-glow hover:bg-approve-hover',
+        destructive: 'rounded-full bg-destructive text-white hover:bg-destructive/90',
+        outline: 'rounded-xl border border-white/65 bg-card text-foreground hover:bg-muted',
+        secondary: 'rounded-xl border border-white/65 bg-card text-foreground hover:bg-muted',
+        ghost: 'rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground',
+        link: 'text-foreground underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-9 px-4',

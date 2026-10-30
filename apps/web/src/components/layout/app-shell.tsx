@@ -1,4 +1,4 @@
-import { Link, type LinkProps } from '@tanstack/react-router'
+import { Link, type LinkProps, useRouterState } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { User } from '@/features/auth'
@@ -18,10 +18,17 @@ const nav: { to: LinkProps['to']; label: string }[] = [
   { to: '/settings', label: 'Settings' },
 ]
 
+function surfaceFor(pathname: string) {
+  if (pathname.startsWith('/materials')) return 'materials'
+  if (pathname.startsWith('/settings')) return 'settings'
+  return 'inbox'
+}
+
 export function AppShell({ user, children }: { user: User; children: ReactNode }) {
   const demo = useDemoMode()
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
   return (
-    <div className="min-h-svh">
+    <div className="min-h-svh" data-surface={surfaceFor(pathname)}>
       {demo && <DemoBar />}
       {/* Development on mocks; a visitor in the demo sees the demo bar instead. */}
       {env.VITE_USE_MOCKS && !demo && (
@@ -37,7 +44,7 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
         </DismissibleBanner>
       )}
 
-      <header className="border-b border-border bg-card">
+      <header className="border-b border-border/80 bg-card/80 backdrop-blur-md">
         <div className="mx-auto grid max-w-page grid-cols-[1fr_auto] items-center gap-x-6 gap-y-3 px-gutter py-4 md:grid-cols-[1fr_auto_1fr] md:py-5">
           <Link to="/inbox" className="justify-self-start rounded-md">
             <Logo />
@@ -54,9 +61,9 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
                 to={to}
                 // The router marks the current page with aria-current="page".
                 className={cn(
-                  'rounded-md px-3 py-1.5 text-interface font-medium whitespace-nowrap text-muted-foreground transition-colors',
+                  'rounded-full px-3 py-1.5 text-interface font-medium whitespace-nowrap text-muted-foreground transition-colors',
                   'hover:bg-muted hover:text-foreground',
-                  'aria-[current=page]:bg-primary-soft aria-[current=page]:text-primary',
+                  'aria-[current=page]:bg-muted aria-[current=page]:text-foreground',
                 )}
               >
                 {label}
@@ -66,7 +73,7 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
 
           <Link
             to="/settings"
-            className="flex items-center gap-2 justify-self-end rounded-md border border-border bg-card py-1 pr-2.5 pl-1 text-interface shadow-xs transition-colors hover:bg-muted md:col-start-3"
+            className="flex items-center gap-2 justify-self-end rounded-md border border-white/65 bg-card py-1 pr-2.5 pl-1 text-interface shadow-xs transition-colors hover:bg-muted md:col-start-3"
           >
             <span
               aria-hidden

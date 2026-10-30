@@ -58,10 +58,7 @@ export function highlight(text: string, phrases: string[]): ReactNode {
   for (const { start, end } of spans) {
     parts.push(text.slice(at, start))
     parts.push(
-      <mark
-        key={start}
-        className="rounded-sm bg-primary/12 px-0.5 text-foreground ring-1 ring-primary/30"
-      >
+      <mark key={start} className="rounded-sm bg-draft px-0.5 text-foreground ring-1 ring-border">
         {text.slice(start, end)}
       </mark>,
     )

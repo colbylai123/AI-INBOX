@@ -81,13 +81,13 @@ export function GettingStarted({
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-8 rounded-lg border border-border bg-card p-5 shadow-panel md:p-6"
+      className="mb-8 rounded-lg border border-white/65 bg-card p-5 shadow-panel md:p-6"
     >
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2
             id={headingId}
-            className="font-display text-lg leading-tight font-bold tracking-tight"
+            className="font-display text-base leading-tight font-semibold tracking-tight"
           >
             Get set up
           </h2>
@@ -117,7 +117,7 @@ export function GettingStarted({
           <li
             key={step.title}
             className={cn(
-              'flex gap-3 rounded-md border border-border p-4',
+              'flex gap-3 rounded-md border border-white/65 p-4',
               step.done && 'bg-muted/60',
             )}
           >

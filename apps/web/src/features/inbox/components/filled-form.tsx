@@ -19,7 +19,7 @@ export function FilledFormView({
   onShowSourcesChange?: (show: boolean) => void
 }) {
   return (
-    <section aria-label={form.name} className="rounded-lg border border-border">
+    <section aria-label={form.name} className="rounded-lg border border-white/65">
       <FilledFormHeader
         name={form.name}
         action={
@@ -30,7 +30,7 @@ export function FilledFormView({
               onClick={() => onShowSourcesChange(!showSources)}
               className={cn(
                 buttonVariants({ variant: 'ghost', size: 'sm' }),
-                'h-7 px-2 aria-pressed:bg-primary-soft aria-pressed:text-primary',
+                'h-7 px-2 aria-pressed:bg-muted aria-pressed:text-foreground',
               )}
             >
               <TextQuote aria-hidden /> Show sources
@@ -69,7 +69,7 @@ export function FilledFormHeader({ name, action }: { name: string; action?: Reac
   return (
     <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-t-lg border-b border-border bg-muted px-4 py-3">
       <span className="flex min-w-0 items-center gap-2 text-interface font-semibold">
-        <FileText className="size-4 shrink-0 text-primary" aria-hidden />
+        <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         <span className="truncate">{name}</span>
       </span>
       <span className="flex items-center gap-2 text-metadata whitespace-nowrap text-muted-foreground">

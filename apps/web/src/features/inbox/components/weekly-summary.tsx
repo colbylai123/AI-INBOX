@@ -9,7 +9,7 @@ export function WeeklySummary({ stats }: { stats: WeeklyStats }) {
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-8 rounded-lg border border-border bg-card px-5 py-4 shadow-panel md:px-6"
+      className="mb-8 rounded-lg border border-white/65 bg-card px-5 py-4 shadow-panel md:px-6"
     >
       <h2
         id={headingId}
@@ -33,9 +33,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex min-w-0 flex-col-reverse justify-end gap-0.5">
       <dt className="text-metadata text-muted-foreground">{label}</dt>
-      <dd className="font-display text-2xl leading-tight font-bold tracking-tight md:text-3xl">
-        {value}
-      </dd>
+      <dd className="font-display text-xl leading-tight font-semibold tracking-tight">{value}</dd>
     </div>
   )
 }
