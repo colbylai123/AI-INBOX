@@ -1,21 +1,11 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import { signInUrl } from '@/features/auth'
+import { signInUrl, useSignOut } from '@/features/auth'
 import { Button } from '@/components/ui/button'
 import { setDemoMode } from '@/lib/demo-mode'
 
 /** Shown on every page during "Try the demo", so nobody mistakes sample mail for theirs. */
 export function DemoBar() {
-  const queryClient = useQueryClient()
-  const navigate = useNavigate()
-
-  const exit = async () => {
-    // Leave the app pages first so nothing refetches from the real API, then
-    // forget the sample session.
-    await navigate({ to: '/' })
-    setDemoMode(false)
-    queryClient.clear()
-  }
+  // In the demo, signing out means leaving it for the landing page.
+  const exit = useSignOut()
 
   const signIn = () => {
     setDemoMode(false)
@@ -39,7 +29,8 @@ export function DemoBar() {
             size="sm"
             variant="ghost"
             className="text-on-field-secondary hover:bg-on-field/10 hover:text-on-field"
-            onClick={() => void exit()}
+            disabled={exit.isPending}
+            onClick={() => exit.mutate()}
           >
             Exit demo
           </Button>

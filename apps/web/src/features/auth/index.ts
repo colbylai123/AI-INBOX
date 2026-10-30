@@ -1,3 +1,5 @@
 export { sessionQuery, signInUrl } from './api/session'
+export { AccountCard } from './components/account-card'
+export { useSignOut } from './hooks/use-sign-out'
 export { expireSession } from './lib/expire-session'
 export type { User } from './types'

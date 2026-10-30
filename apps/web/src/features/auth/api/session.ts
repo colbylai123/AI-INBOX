@@ -24,3 +24,9 @@ export const sessionQuery = () =>
 /** Where the sign-in button sends the browser. FastAPI redirects to WorkOS. */
 export const signInUrl = (returnTo: string) =>
   `${env.VITE_API_URL}/auth/login?return_to=${encodeURIComponent(returnTo)}`
+
+/** Ends the session: FastAPI clears the cookie and the WorkOS session. Outlook stays connected. */
+export async function signOut(): Promise<void> {
+  if (mocksEnabled()) return
+  await apiFetch<void>('/auth/logout', { method: 'POST' })
+}

@@ -134,7 +134,7 @@ Fields left out of `formValues` keep their value. Return `422` for a field id th
 
 ## Step 5: connect Outlook and sign out
 
-The Settings page lets the user connect their Outlook account, see that it's connected, and disconnect it. The account menu gets a Sign out button. Nothing in steps 0 to 4 changes.
+The Settings page lets the user connect their Outlook account, see that it's connected, and disconnect it, and has a Sign out button. Until an account is connected, the inbox shows a Connect Outlook prompt instead of the message list. Nothing in steps 0 to 4 changes.
 
 | Method | Path                                     | Returns                                             |
 | ------ | ---------------------------------------- | --------------------------------------------------- |

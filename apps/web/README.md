@@ -58,6 +58,7 @@ src/
     sign-in.tsx         Public sign-in page (ends a demo)
   features/             One folder per product area
     auth/               Session query, sign-in URL, session expiry, User type
+    connections/        Connected email accounts: connect, reconnect, disconnect (step 5)
     marketing/          Landing page and the public site header
     inbox/
       api/              inbox-api.ts (HTTP or mocks), queries.ts (keys + queryOptions), mocks.ts

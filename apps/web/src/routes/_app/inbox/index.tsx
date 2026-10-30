@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { PageHeader } from '@/components/layout/page-header'
+import { ConnectPrompt, connectionsQuery, ReconnectAlert } from '@/features/connections'
 import { MessageList, messagesQuery, PriorityFilter, priorities } from '@/features/inbox'
 
 export const Route = createFileRoute('/_app/inbox/')({
@@ -10,18 +11,30 @@ export const Route = createFileRoute('/_app/inbox/')({
     priority: z.enum(priorities).optional().catch(undefined),
   }),
   loaderDeps: ({ search }) => ({ priority: search.priority }),
-  loader: ({ context, deps }) => context.queryClient.ensureQueryData(messagesQuery(deps)),
+  loader: ({ context, deps }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(messagesQuery(deps)),
+      context.queryClient.ensureQueryData(connectionsQuery()),
+    ]),
   component: InboxPage,
 })
 
 function InboxPage() {
   const filters = Route.useLoaderDeps()
   const { data: messages } = useSuspenseQuery(messagesQuery(filters))
+  const { data: connections } = useSuspenseQuery(connectionsQuery())
   return (
     <>
       <PageHeader title="Inbox" description="Incoming messages, most important first." />
-      <PriorityFilter value={filters.priority} />
-      <MessageList messages={messages} />
+      {connections.length === 0 ? (
+        <ConnectPrompt />
+      ) : (
+        <>
+          <ReconnectAlert connections={connections} />
+          <PriorityFilter value={filters.priority} />
+          <MessageList messages={messages} />
+        </>
+      )}
     </>
   )
 }
