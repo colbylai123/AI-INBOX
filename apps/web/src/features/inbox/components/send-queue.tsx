@@ -28,7 +28,8 @@ export function SendQueue() {
   useEffect(() => connectSender((messageId) => latest.current(messageId)), [])
 
   const replies = useOutgoingReplies()
-  const anyHeld = replies.some((r) => r.status === 'held')
+  // Demo replies are samples, so leaving the demo needn't ask.
+  const anyHeld = replies.some((r) => r.status === 'held' && !r.demo)
   useEffect(() => {
     if (!anyHeld) return
     // Closing the tab drops a held reply, so the browser asks first.

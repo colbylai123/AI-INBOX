@@ -6,6 +6,7 @@ import {
   useOutgoingReplies,
 } from './outgoing-replies'
 import { act, renderHook } from '@testing-library/react'
+import { setDemoMode } from '@/lib/demo-mode'
 
 describe('outgoing replies', () => {
   let disconnect: () => void
@@ -18,6 +19,7 @@ describe('outgoing replies', () => {
   })
   afterEach(() => {
     disconnect()
+    setDemoMode(false)
     vi.useRealTimers()
   })
 
@@ -50,6 +52,15 @@ describe('outgoing replies', () => {
     expect(result.current).toHaveLength(1)
     act(() => disconnect())
     expect(result.current).toHaveLength(0)
+    vi.advanceTimersByTime(UNDO_SECONDS * 1000)
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  it('drops a demo reply if the demo ends before it sends', () => {
+    setDemoMode(true)
+    holdSend('m1', 'a@example.com')
+    // As "Sign in to use your inbox" does before it leaves the page.
+    setDemoMode(false)
     vi.advanceTimersByTime(UNDO_SECONDS * 1000)
     expect(send).not.toHaveBeenCalled()
   })

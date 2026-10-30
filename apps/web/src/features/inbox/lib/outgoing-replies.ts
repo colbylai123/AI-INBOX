@@ -1,4 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
+import { isDemoMode } from '@/lib/demo-mode'
 
 // Approve & send holds a reply this long before sending it, so it can be taken back.
 export const UNDO_SECONDS = 10
@@ -10,6 +11,8 @@ export type OutgoingReply = {
   to: string
   sendAt: number
   status: 'held' | 'sending' | 'sent' | 'failed'
+  /** Approved in the demo, on sample mail. It may only ever reach the mocks. */
+  demo: boolean
 }
 
 let replies: readonly OutgoingReply[] = []
@@ -43,10 +46,13 @@ export function holdSend(messageId: string, to: string) {
     to,
     sendAt: Date.now() + UNDO_SECONDS * 1000,
     status: 'held',
+    demo: isDemoMode(),
   }
   set(messageId, held)
   later(messageId, UNDO_SECONDS * 1000, () => {
-    if (!send) return set(messageId, null)
+    // Dropped if the demo started or ended meanwhile, so a sample reply never reaches
+    // the real API and a real one never goes to the mocks.
+    if (!send || held.demo !== isDemoMode()) return set(messageId, null)
     const sending = { ...held, status: 'sending' as const }
     set(messageId, sending)
     // A reply dropped meanwhile (the user left the app) stays dropped.
