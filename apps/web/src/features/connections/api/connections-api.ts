@@ -2,7 +2,7 @@ import { ApiError, apiFetch } from '@/lib/api-client'
 import { mocksEnabled } from '@/lib/demo-mode'
 import { env } from '@/lib/env'
 import { mockDelay } from '@/lib/mock'
-import type { Connection } from '../types'
+import type { Connection, Provider } from '../types'
 
 // Transport only: HTTP calls, or the in-memory mocks in development and in the demo.
 
@@ -18,18 +18,20 @@ export async function getConnections(): Promise<Connection[]> {
 }
 
 /**
- * Sends the browser to Microsoft (a full page load, like sign-in), which comes
- * back to Settings with ?connection=connected|failed. The mocks connect at once.
+ * Sends the browser to Microsoft or Google (a full page load, like sign-in), which
+ * comes back to Settings with ?provider=…&connection=connected|failed. The mocks
+ * connect at once.
  */
-export async function connectOutlook(): Promise<void> {
+export async function connect(provider: Provider): Promise<void> {
   if (mocksEnabled()) {
-    const { connectMockOutlook } = await import('./mocks')
+    const { connectMockAccount } = await import('./mocks')
     await mockDelay()
-    connectMockOutlook()
+    connectMockAccount(provider)
     return
   }
+  const returnTo = `/settings?provider=${provider}`
   window.location.assign(
-    `${env.VITE_API_URL}/connections/outlook/start?return_to=${encodeURIComponent('/settings')}`,
+    `${env.VITE_API_URL}/connections/${provider}/start?return_to=${encodeURIComponent(returnTo)}`,
   )
   // The page is unloading. Never settle, so the button stays busy until it's gone.
   return new Promise(() => {})

@@ -240,7 +240,7 @@ describe('app', () => {
   it('disconnects Outlook only after confirming, and connects it again', async () => {
     renderApp('/settings')
     await userEvent.click(await screen.findByRole('button', { name: 'Disconnect' }))
-    const confirm = screen.getByRole('group', { name: 'Disconnect Outlook?' })
+    const confirm = screen.getByRole('group', { name: 'Disconnect demo@example.com?' })
     expect(mockConnections).toHaveLength(1)
     await userEvent.click(within(confirm).getByRole('button', { name: 'Disconnect' }))
     expect(await screen.findByText(/No email connected yet/)).toBeInTheDocument()
@@ -251,14 +251,46 @@ describe('app', () => {
   })
 
   it('explains a failed connection', async () => {
-    renderApp('/settings?connection=failed')
-    expect(await screen.findByRole('alert')).toHaveTextContent("Outlook wasn't connected")
+    renderApp('/settings?provider=gmail&connection=failed')
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      "Gmail wasn't connected. You may have cancelled, or Google refused access.",
+    )
+  })
+
+  it('connects a Gmail account alongside Outlook', async () => {
+    const { router } = renderApp('/settings')
+    await screen.findByText(/demo@example.com · Synced/)
+    await userEvent.click(screen.getByRole('button', { name: 'Connect Gmail' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Gmail is connected')
+    expect(await screen.findByText(/demo@gmail.example · Synced/)).toBeInTheDocument()
+    expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
+    expect(mockConnections.map((c) => c.provider)).toEqual(['outlook', 'gmail'])
+    expect(router.state.location.search).toEqual({ provider: 'gmail', connection: 'connected' })
+  })
+
+  it('reconnects the account that needs it, with its own provider', async () => {
+    mockConnections.push({
+      id: 'con-gmail',
+      provider: 'gmail',
+      accountEmail: 'sales@gmail.example',
+      status: 'reconnect_needed',
+      connectedAt: '2026-10-20T16:00:00Z',
+      lastSyncedAt: null,
+    })
+    renderApp('/inbox')
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Gmail needs reconnecting. New mail for sales@gmail.example')
+    await userEvent.click(within(alert).getByRole('button', { name: /Reconnect/ }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Gmail is connected')
+    expect(mockConnections.find((c) => c.id === 'con-gmail')?.status).toBe('connected')
   })
 
   it('asks to connect Outlook before showing the inbox', async () => {
     mockConnections.splice(0)
     renderApp('/inbox')
-    expect(await screen.findByText('Connect Outlook to fill your inbox')).toBeInTheDocument()
+    expect(await screen.findByText('Connect your email to fill your inbox')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Connect Outlook' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Connect Gmail' })).toBeInTheDocument()
     expect(screen.queryByRole('navigation', { name: 'Filter by priority' })).not.toBeInTheDocument()
   })
 
