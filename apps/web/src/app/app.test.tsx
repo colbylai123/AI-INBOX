@@ -310,6 +310,52 @@ describe('app', () => {
     expect(localStorage.getItem('getting-started:hidden')).toBe('1')
   })
 
+  it('says why the AI ranked a message', async () => {
+    renderApp('/inbox/m1')
+    expect(await screen.findByText('Why high')).toBeInTheDocument()
+    expect(
+      screen.getByText('A customer is asking for a quote with a Friday deadline.'),
+    ).toBeInTheDocument()
+  })
+
+  it('shows which words of the email each form value came from', async () => {
+    renderApp('/inbox/m4')
+    const form = await screen.findByRole('region', { name: 'Purchase order' })
+    const toggle = within(form).getByRole('button', { name: 'Show sources' })
+    expect(toggle).toHaveAttribute('aria-pressed', 'false')
+    expect(document.querySelector('mark')).toBeNull()
+
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    expect(within(form).getByText('From the email: “$1.85 each”')).toBeInTheDocument()
+    // A value the AI worked out itself is flagged for checking.
+    expect(within(form).getByText('Total').nextSibling).toHaveTextContent(
+      'Not taken from the email, so check it.',
+    )
+    // The same words are marked in the email itself.
+    const marked = [...document.querySelectorAll('mark')].map((mark) => mark.textContent)
+    expect(marked).toContain('$1.85 each')
+    expect(marked).toContain('the week of November 10')
+  })
+
+  it('stops citing the email for a value the user changed', async () => {
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    const quantity = screen.getByRole('textbox', { name: 'Quantity' })
+    await userEvent.clear(quantity)
+    await userEvent.type(quantity, '45')
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    const form = await screen.findByRole('region', { name: 'Quote form' })
+    await userEvent.click(within(form).getByRole('button', { name: 'Show sources' }))
+    expect(within(form).getByText('Quantity').nextSibling).toHaveTextContent(
+      'Not taken from the email',
+    )
+    expect(within(form).getByText('Item').nextSibling).toHaveTextContent(
+      'From the email: “the standard package”',
+    )
+  })
+
   it('shows not found for an unknown message', async () => {
     renderApp('/inbox/does-not-exist')
     expect(await screen.findByText('Not found')).toBeInTheDocument()

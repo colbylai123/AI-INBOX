@@ -38,7 +38,10 @@ export async function saveDraft(id: string, update: DraftUpdate): Promise<Messag
     if (message.approvedAt) throw new ApiError(409, 'This draft was already approved')
     message.draftReply = update.draftReply
     for (const field of message.filledForm?.fields ?? []) {
-      field.value = update.formValues?.[field.id] ?? field.value
+      const value = update.formValues?.[field.id] ?? field.value
+      // A value the user changed no longer comes from the email.
+      if (value !== field.value) field.source = null
+      field.value = value
     }
     return structuredClone(message)
   }

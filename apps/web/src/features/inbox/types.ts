@@ -12,6 +12,8 @@ export interface MessageSummary {
   summary: string | null
   receivedAt: string
   priority: Priority
+  /** One line from the AI on why it ranked the message this way. Null until ranked. */
+  priorityReason: string | null
   /** Set once the user approves the draft. Nothing is sent before this. */
   approvedAt: string | null
 }
@@ -21,6 +23,12 @@ export interface FormField {
   label: string
   /** Empty when the AI couldn't fill it in. */
   value: string
+  /**
+   * The words in the email the value came from, copied exactly so the app can
+   * highlight them. Null when it didn't come from the email (worked out, or from
+   * the user's documents), and after the user changes the value.
+   */
+  source: string | null
 }
 
 /** A form from Materials that the AI picked and pre-filled for this reply. */

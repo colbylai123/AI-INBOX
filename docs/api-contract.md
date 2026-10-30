@@ -178,6 +178,30 @@ New users see three steps at the top of the inbox until they're done: connect Ou
 
 No new endpoints.
 
+## Step 7: say why the AI ranked and filled things
+
+So people can trust a draft before they approve it, the app shows why each message got its priority, and which words of the email each form value came from. Two new fields, no new endpoints:
+
+```jsonc
+// MessageSummary (in GET /messages and GET /messages/{id})
+{
+  // …the fields from earlier steps…
+  "priorityReason": "A customer is asking for a quote with a Friday deadline.", // one line; null until ranked
+}
+
+// FormField (in filledForm.fields)
+{
+  "id": "quantity",
+  "label": "Quantity",
+  "value": "40",
+  "source": "40 units", // the words in the email the value came from; null if it didn't come from the email
+}
+```
+
+- **`source` is copied exactly** from the email body (or the sender's address), character for character, so the app can find and highlight it in the message. Don't paraphrase it.
+- **`null` means the value didn't come from the email**: the AI worked it out (a total, say) or took it from the user's documents. The app tells the user to check those.
+- **When `PATCH /messages/{id}/draft` changes a field's value, set its `source` to `null`.** The user's own value no longer comes from the email.
+
 ## Trying the app against the real API
 
 Create `apps/web/.env.development.local` (it's gitignored):
