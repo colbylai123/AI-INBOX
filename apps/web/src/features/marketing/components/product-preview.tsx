@@ -7,7 +7,7 @@ export function ProductPreview() {
   return (
     <div
       aria-hidden
-      className="mx-auto w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-panel md:p-6"
+      className="mx-auto w-full max-w-md rounded-lg border border-white/65 bg-card p-5 shadow-panel md:p-6"
     >
       <div className="mb-5 border-b border-border pb-4">
         <div className="flex items-center justify-between gap-3">
@@ -28,7 +28,7 @@ export function ProductPreview() {
         <ChatBubble from="draft" label="AI draft">
           Thanks, Maya. The quote for 40 units is attached, with delivery by November 14.
         </ChatBubble>
-        <div className="flex items-center gap-2 self-end rounded-md border border-border bg-card px-3 py-2 text-metadata font-medium shadow-xs">
+        <div className="flex items-center gap-2 self-end rounded-md border border-white/65 bg-card px-3 py-2 text-metadata font-medium shadow-xs">
           <FileText className="size-3.5 text-muted-foreground" />
           Quote form
           <span className="font-normal text-muted-foreground">· filled by AI</span>

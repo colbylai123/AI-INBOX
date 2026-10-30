@@ -27,10 +27,10 @@ export const Route = createFileRoute('/sign-in')({
 function SignIn() {
   const { redirect: returnTo } = Route.useSearch()
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex min-h-svh flex-col" data-surface="sign-in">
       <SiteHeader page="sign-in" />
       <main className="grid flex-1 place-items-center px-gutter py-16">
-        <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-panel md:p-10">
+        <div className="w-full max-w-md rounded-lg border border-white/65 bg-card p-8 shadow-panel md:p-10">
           <h1 className="font-display text-2xl leading-tight font-semibold tracking-[-0.02em]">
             Sign in
           </h1>

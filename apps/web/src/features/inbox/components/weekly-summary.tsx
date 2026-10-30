@@ -9,7 +9,7 @@ export function WeeklySummary({ stats }: { stats: WeeklyStats }) {
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-8 rounded-lg border border-border bg-card px-5 py-4 shadow-panel md:px-6"
+      className="mb-8 rounded-lg border border-white/65 bg-card px-5 py-4 shadow-panel md:px-6"
     >
       <h2
         id={headingId}

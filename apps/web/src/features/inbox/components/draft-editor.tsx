@@ -51,7 +51,7 @@ export function DraftEditor({
         />
       </label>
       {message.filledForm && (
-        <fieldset className="rounded-lg border border-border">
+        <fieldset className="rounded-lg border border-white/65">
           <legend className="sr-only">{message.filledForm.name}</legend>
           <FilledFormHeader name={message.filledForm.name} />
           <div className="grid gap-4 px-4 py-4 sm:grid-cols-2">

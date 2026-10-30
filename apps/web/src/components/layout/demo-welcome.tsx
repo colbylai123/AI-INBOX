@@ -6,7 +6,7 @@ export function DemoWelcome() {
   return (
     <section
       aria-label="About this sample mailbox"
-      className="mb-6 rounded-lg border border-border bg-card px-5 py-4 shadow-panel md:px-6"
+      className="mb-6 rounded-lg border border-white/65 bg-card px-5 py-4 shadow-panel md:px-6"
     >
       <p className="text-label font-medium tracking-[0.12em] text-muted-foreground uppercase">
         Sample Friday

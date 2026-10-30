@@ -1,4 +1,4 @@
-import { Link, type LinkProps } from '@tanstack/react-router'
+import { Link, type LinkProps, useRouterState } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { User } from '@/features/auth'
@@ -18,10 +18,17 @@ const nav: { to: LinkProps['to']; label: string }[] = [
   { to: '/settings', label: 'Settings' },
 ]
 
+function surfaceFor(pathname: string) {
+  if (pathname.startsWith('/materials')) return 'materials'
+  if (pathname.startsWith('/settings')) return 'settings'
+  return 'inbox'
+}
+
 export function AppShell({ user, children }: { user: User; children: ReactNode }) {
   const demo = useDemoMode()
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
   return (
-    <div className="min-h-svh">
+    <div className="min-h-svh" data-surface={surfaceFor(pathname)}>
       {demo && <DemoBar />}
       {/* Development on mocks; a visitor in the demo sees the demo bar instead. */}
       {env.VITE_USE_MOCKS && !demo && (
@@ -66,7 +73,7 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
 
           <Link
             to="/settings"
-            className="flex items-center gap-2 justify-self-end rounded-md border border-border bg-card py-1 pr-2.5 pl-1 text-interface shadow-xs transition-colors hover:bg-muted md:col-start-3"
+            className="flex items-center gap-2 justify-self-end rounded-md border border-white/65 bg-card py-1 pr-2.5 pl-1 text-interface shadow-xs transition-colors hover:bg-muted md:col-start-3"
           >
             <span
               aria-hidden

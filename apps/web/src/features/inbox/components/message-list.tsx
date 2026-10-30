@@ -24,7 +24,7 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
     <ul
       ref={listRef}
       aria-label="Messages"
-      className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card shadow-panel"
+      className="divide-y divide-border overflow-hidden rounded-lg border border-white/65 bg-card shadow-panel"
     >
       {messages.map((m) => (
         <li key={m.id}>
