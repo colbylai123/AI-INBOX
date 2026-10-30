@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { mockConnections, resetMockConnections } from '@/features/connections/api/mocks'
 import { mockMessages, resetMockMessages } from '@/features/inbox/api/mocks'
 import { mockMaterials, resetMockMaterials } from '@/features/materials/api/mocks'
+import * as sessionApi from '@/features/auth/api/session'
 import * as inboxApi from '@/features/inbox/api/inbox-api'
 import { UNDO_SECONDS } from '@/features/inbox/lib/outgoing-replies'
 import * as materialsApi from '@/features/materials/api/materials-api'
@@ -178,16 +179,37 @@ describe('app', () => {
     expect(await screen.findByText('Approved')).toBeInTheDocument()
   })
 
-  it('drops a held reply when you sign out', async () => {
+  it('drops a held reply as soon as you sign out, even if signing out is slow', async () => {
     const approve = vi.spyOn(inboxApi, 'approveDraft')
     fakeClock()
+    // Logout takes longer than the rest of the undo window.
+    vi.spyOn(sessionApi, 'signOut').mockImplementation(
+      () => new Promise((resolve) => setTimeout(resolve, UNDO_SECONDS * 2000)),
+    )
     const { router } = renderApp('/inbox/m1')
     await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
     await router.navigate({ to: '/settings' })
     await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
-    await screen.findByRole('heading', { name: 'Sign in' })
     await waitOutUndo()
     expect(approve).not.toHaveBeenCalled()
+    await act(() => vi.advanceTimersByTimeAsync(UNDO_SECONDS * 1000))
+    await screen.findByRole('heading', { name: 'Sign in' })
+    expect(approve).not.toHaveBeenCalled()
+  })
+
+  it('never offers Approve again for a reply that sent while you were away', async () => {
+    fakeClock()
+    const { router } = renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await router.navigate({ to: '/inbox' })
+    await waitOutUndo()
+    await screen.findByText(/Reply sent to/)
+
+    // The draft page was cached before the send. It must come back already approved.
+    await router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } })
+    await screen.findByRole('heading', { name: 'Quote for 40 units by Friday' })
+    expect(screen.queryByRole('button', { name: 'Approve & send' })).not.toBeInTheDocument()
+    expect(screen.getByText('Approved')).toBeInTheDocument()
   })
 
   it('shows the form the AI filled in with the draft', async () => {

@@ -1,11 +1,14 @@
+import { useIsMutating } from '@tanstack/react-query'
 import { Link, useParams } from '@tanstack/react-router'
 import { CircleAlert, CircleCheck, Clock, LoaderCircle } from 'lucide-react'
 import { type ReactNode, useEffect, useRef } from 'react'
 import { Button, buttonVariants } from '@/components/ui/button'
+import { signOutKey } from '@/features/auth'
 import { useApproveDraft } from '../hooks/use-approve-draft'
 import {
   connectSender,
   dismissReply,
+  dropHeldReplies,
   type OutgoingReply,
   UNDO_SECONDS,
   undoSend,
@@ -26,6 +29,13 @@ export function SendQueue() {
   })
   // Replies only reach this after a click on Approve & send and the undo window.
   useEffect(() => connectSender((messageId) => latest.current(messageId)), [])
+
+  // Signing out drops held replies as soon as it starts, not when the page finally
+  // changes, so a slow sign-out can't let one send.
+  const signingOut = useIsMutating({ mutationKey: signOutKey }) > 0
+  useEffect(() => {
+    if (signingOut) dropHeldReplies()
+  }, [signingOut])
 
   const replies = useOutgoingReplies()
   // Demo replies are samples, so leaving the demo needn't ask.

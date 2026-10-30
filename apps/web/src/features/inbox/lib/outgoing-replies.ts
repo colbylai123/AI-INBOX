@@ -76,6 +76,11 @@ export function undoSend(messageId: string) {
   set(messageId, null)
 }
 
+/** Takes back every held reply, as when the user signs out. Replies already sending go on. */
+export function dropHeldReplies() {
+  for (const reply of replies) undoSend(reply.messageId)
+}
+
 /** Clears a "sent" or "couldn't send" notice. */
 export function dismissReply(messageId: string) {
   const status = replies.find((r) => r.messageId === messageId)?.status
