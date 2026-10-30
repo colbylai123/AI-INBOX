@@ -36,6 +36,12 @@ To run the dev server against a real API, put `VITE_USE_MOCKS=false` in `.env.de
 
 Every variable is declared and validated in `src/lib/env.ts`. `VITE_*` values ship to the browser, so never put secrets in them. In Cloudflare Pages, set `VITE_API_URL` to the production API.
 
+## Demo mode
+
+Visitors can click **Try the demo** on the landing page to use the app on the sample data in `features/*/api/mocks.ts` without signing in. `/demo` resets the sample data, clears the query cache and turns demo mode on for this browser tab (`lib/demo-mode.ts`, kept in `sessionStorage`). While it's on, every API function answers from the mocks, exactly as in development, so a demo never calls the real API and nothing is sent. A dark bar on every page says so, with **Sign in to use your inbox** and **Exit demo**. Visiting `/sign-in` also ends the demo.
+
+Because the demo runs on the mocks, keep them realistic: they are what prospects see.
+
 ## Folder structure
 
 ```
@@ -43,13 +49,16 @@ src/
   app/                  App wiring: <App>, router factory, query client factory
   routes/               Pages. File path = URL (TanStack Router file-based routing)
     __root.tsx          Root layout + dev-only devtools
+    index.tsx           Public landing page (makes no API calls)
+    demo.tsx            /demo: starts "Try the demo" and opens the inbox
     _app.tsx            Signed-in area: auth guard + app shell (top nav)
     _app/inbox/         /inbox (?priority=…) and /inbox/$messageId
     _app/materials.tsx  /materials
     _app/settings.tsx   /settings
-    sign-in.tsx         Public sign-in page
+    sign-in.tsx         Public sign-in page (ends a demo)
   features/             One folder per product area
     auth/               Session query, sign-in URL, session expiry, User type
+    marketing/          Landing page and the public site header
     inbox/
       api/              inbox-api.ts (HTTP or mocks), queries.ts (keys + queryOptions), mocks.ts
       hooks/            Mutations and other hooks (useApproveDraft)
@@ -60,9 +69,9 @@ src/
     materials/
   components/
     ui/                 shadcn/ui primitives
-    layout/             App shell (top nav), page header, logo, dismissible banner, live dot
+    layout/             App shell (top nav), demo bar, page header, logo, dismissible banner
     feedback/           Default error, loading and not-found screens
-  lib/                  Framework-free helpers: api client, env, cn(), mock delay
+  lib/                  Framework-free helpers: api client, env, demo mode, cn(), mock delay
   styles/               Tailwind entry + Software design tokens (--dp-*)
   test/                 Test setup
 public/_headers         Cloudflare Pages security and cache headers (set the Pages root directory to apps/web)

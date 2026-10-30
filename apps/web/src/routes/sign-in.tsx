@@ -1,9 +1,10 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
-import { Logo } from '@/components/layout/logo'
-import { SignInPreview, sessionQuery, signInUrl } from '@/features/auth'
+import { sessionQuery, signInUrl } from '@/features/auth'
+import { SiteHeader } from '@/features/marketing'
+import { isDemoMode, setDemoMode } from '@/lib/demo-mode'
 import { isSafeRedirectPath } from '@/lib/safe-redirect'
 
 export const Route = createFileRoute('/sign-in')({
@@ -11,7 +12,12 @@ export const Route = createFileRoute('/sign-in')({
     // Only allow paths on this app, so the link can't bounce users to another site.
     redirect: z.string().refine(isSafeRedirectPath).optional().catch(undefined),
   }),
-  beforeLoad: async ({ context, search }) => {
+  beforeLoad: async ({ context, search, preload }) => {
+    // Going to sign in ends a demo, so the sample user can't stand in for a real one.
+    if (isDemoMode() && !preload) {
+      setDemoMode(false)
+      context.queryClient.clear()
+    }
     const user = await context.queryClient.ensureQueryData(sessionQuery())
     if (user) throw redirect({ to: search.redirect ?? '/inbox' })
   },
@@ -21,40 +27,35 @@ export const Route = createFileRoute('/sign-in')({
 function SignIn() {
   const { redirect: returnTo } = Route.useSearch()
   return (
-    <div className="min-h-svh">
-      <div className="mx-auto flex min-h-svh max-w-page flex-col px-gutter">
-        <header className="border-b border-border py-4 md:py-5">
-          <Logo />
-        </header>
-        {/* Hero split about 1.45 : 1, copy first, stacked below 1050px. */}
-        <main className="grid flex-1 content-center items-center gap-12 py-16 lg:grid-cols-[1.45fr_1fr] lg:gap-16">
-          <div className="min-w-0">
-            <h1 className="font-display text-[clamp(40px,6.4vw,84px)] leading-[1.02] font-bold tracking-[-0.03em] text-balance">
-              Your inbox, sorted and drafted
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed md:text-xl">
-              AI ranks incoming mail by importance, drafts the reply and fills in your forms.{' '}
-              <span className="text-muted-foreground">
-                You review and approve before anything is sent.
-              </span>
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Button
-                size="lg"
-                onClick={() => {
-                  window.location.assign(signInUrl(returnTo ?? '/inbox'))
-                }}
-              >
-                Sign in <ChevronRight />
-              </Button>
-              <span className="text-metadata text-muted-foreground">Use your work account.</span>
-            </div>
-          </div>
-          <div className="min-w-0">
-            <SignInPreview />
-          </div>
-        </main>
-      </div>
+    <div className="flex min-h-svh flex-col">
+      <SiteHeader page="sign-in" />
+      <main className="grid flex-1 place-items-center px-gutter py-16">
+        <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-panel md:p-10">
+          <h1 className="font-display text-4xl leading-[1.05] font-bold tracking-[-0.03em]">
+            Sign in
+          </h1>
+          <p className="mt-3 text-muted-foreground">Use your work account to open your inbox.</p>
+          <Button
+            size="lg"
+            className="mt-8 w-full"
+            onClick={() => {
+              window.location.assign(signInUrl(returnTo ?? '/inbox'))
+            }}
+          >
+            Sign in <ChevronRight />
+          </Button>
+          <p className="mt-8 border-t border-border pt-6 text-sm text-muted-foreground">
+            New here?{' '}
+            <Link
+              to="/demo"
+              preload={false}
+              className="rounded-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Try the demo with sample emails
+            </Link>
+          </p>
+        </div>
+      </main>
     </div>
   )
 }
