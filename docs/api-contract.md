@@ -235,6 +235,24 @@ Settings lets the user connect several email accounts: more than one Outlook acc
 - **Permissions to ask Google for:** `https://www.googleapis.com/auth/gmail.readonly` (read the inbox), `https://www.googleapis.com/auth/gmail.send` (send the reply only when the user approves) and `openid email` (the account's address), with `access_type=offline` so syncing continues without asking again.
 - **Before launch:** `gmail.readonly` is a restricted scope. Until Google verifies the app, which includes an independent security assessment and takes weeks, only up to 100 test users you list in the Google Cloud console can connect Gmail. Start that early.
 
+## Step 11: one inbox across accounts
+
+With more than one account connected (step 9), the inbox shows mail from all of them in one list, says which account each email came to, and can show one account at a time. One new field on `MessageSummary`, no new endpoints:
+
+```jsonc
+// MessageSummary (in GET /messages and GET /messages/{id})
+{
+  // …the fields from earlier steps…
+  "account": { "id": "con-2", "email": "demo@gmail.example" }, // the connection the email came to
+}
+```
+
+- **`account.id` is the `Connection.id`** from `GET /connections`, and `account.email` its `accountEmail`, so the app can match them.
+- **The reply goes out from that same account**, in the same conversation, when the user approves it. Never from a different account, even if the user has a "main" one.
+- **No filter parameter.** The app filters the list it already has (`/inbox?account=con-2`), so `GET /messages` keeps returning every account's mail. If `/messages` is ever paged, add `?account=` then.
+- **Disconnecting an account** (step 5) stops returning its messages, since nothing can be sent from it any more.
+- An older response without `account` still shows, just without the account.
+
 ## Trying the app against the real API
 
 Create `apps/web/.env.development.local` (it's gitignored):
