@@ -202,6 +202,22 @@ So people can trust a draft before they approve it, the app shows why each messa
 - **`null` means the value didn't come from the email**: the AI worked it out (a total, say) or took it from the user's documents. The app tells the user to check those.
 - **When `PATCH /messages/{id}/draft` changes a field's value, set its `source` to `null`.** The user's own value no longer comes from the email.
 
+## Step 8: time saved this week
+
+Once the user has approved something, the inbox shows the last 7 days: drafts approved, forms filled, and an estimate of the time saved. The app works out the minutes itself (4 per reply, 6 per form, shown to the user as an estimate), so the backend only counts:
+
+| Method | Path          | Returns           |
+| ------ | ------------- | ----------------- |
+| GET    | `/stats/week` | `200` WeeklyStats |
+
+```jsonc
+// WeeklyStats: the signed-in user's own approvals in the last 7 days
+{
+  "draftsApproved": 18,
+  "formsApproved": 7, // approved drafts that came with a filled form
+}
+```
+
 ## Trying the app against the real API
 
 Create `apps/web/.env.development.local` (it's gitignored):

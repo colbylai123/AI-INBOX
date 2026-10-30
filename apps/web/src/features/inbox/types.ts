@@ -55,3 +55,10 @@ export interface DraftUpdate {
 export interface MessageFilters {
   priority?: Priority
 }
+
+/** The user's own activity over the last 7 days. */
+export interface WeeklyStats {
+  draftsApproved: number
+  /** Approved drafts that came with a filled form. */
+  formsApproved: number
+}

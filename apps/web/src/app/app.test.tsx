@@ -356,6 +356,23 @@ describe('app', () => {
     )
   })
 
+  it('shows the time saved once drafts are approved', async () => {
+    const { router } = renderApp('/inbox')
+    await screen.findByRole('list', { name: 'Messages' })
+    expect(screen.queryByRole('region', { name: 'Last 7 days' })).not.toBeInTheDocument()
+
+    await router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } })
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await screen.findByText('Approved')
+    await router.navigate({ to: '/inbox' })
+
+    const week = await screen.findByRole('region', { name: 'Last 7 days' })
+    // One reply with a form: 4 + 6 minutes.
+    expect(within(week).getByText('Drafts approved').nextSibling).toHaveTextContent('1')
+    expect(within(week).getByText('Forms filled').nextSibling).toHaveTextContent('1')
+    expect(within(week).getByText('Time saved (est.)').nextSibling).toHaveTextContent('10 min')
+  })
+
   it('shows not found for an unknown message', async () => {
     renderApp('/inbox/does-not-exist')
     expect(await screen.findByText('Not found')).toBeInTheDocument()

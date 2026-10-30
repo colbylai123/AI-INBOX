@@ -3,7 +3,14 @@ import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { PageHeader } from '@/components/layout/page-header'
 import { ConnectPrompt, connectionsQuery, ReconnectAlert } from '@/features/connections'
-import { MessageList, messagesQuery, PriorityFilter, priorities } from '@/features/inbox'
+import {
+  MessageList,
+  messagesQuery,
+  PriorityFilter,
+  priorities,
+  WeeklySummary,
+  weeklyStatsQuery,
+} from '@/features/inbox'
 import { materialsQuery } from '@/features/materials'
 import { GettingStarted } from '@/features/onboarding'
 
@@ -18,6 +25,7 @@ export const Route = createFileRoute('/_app/inbox/')({
       context.queryClient.ensureQueryData(messagesQuery(deps)),
       context.queryClient.ensureQueryData(connectionsQuery()),
       context.queryClient.ensureQueryData(materialsQuery()),
+      context.queryClient.ensureQueryData(weeklyStatsQuery()),
     ]),
   component: InboxPage,
 })
@@ -27,6 +35,7 @@ function InboxPage() {
   const { data: messages } = useSuspenseQuery(messagesQuery(filters))
   const { data: connections } = useSuspenseQuery(connectionsQuery())
   const { data: materials } = useSuspenseQuery(materialsQuery())
+  const { data: stats } = useSuspenseQuery(weeklyStatsQuery())
   return (
     <>
       <PageHeader title="Inbox" description="Incoming messages, most important first." />
@@ -35,6 +44,7 @@ function InboxPage() {
       ) : (
         <>
           <ReconnectAlert connections={connections} />
+          <WeeklySummary stats={stats} />
           {/* Only on the unfiltered list, where "approved any yet?" sees every message. */}
           {!filters.priority && (
             <GettingStarted
