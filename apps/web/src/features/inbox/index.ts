@@ -18,6 +18,7 @@ export type {
   DraftUpdate,
   FilledForm,
   FormField,
+  MessageAccount,
   Message,
   MessageFilters,
   MessageSummary,

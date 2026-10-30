@@ -1,8 +1,13 @@
-import type { Message } from '../types'
+import type { Message, MessageAccount } from '../types'
+
+// The two accounts connected in the demo (see features/connections/api/mocks.ts).
+const outlook: MessageAccount = { id: 'con-1', email: 'demo@example.com' }
+const gmail: MessageAccount = { id: 'con-2', email: 'demo@gmail.example' }
 
 const seed: Message[] = [
   {
     id: 'm1',
+    account: gmail,
     from: 'orders@brightline.example',
     subject: 'Quote for 40 units by Friday',
     preview: "Hi, we'd like a quote for 40 units of the standard package…",
@@ -51,6 +56,7 @@ const seed: Message[] = [
   },
   {
     id: 'm2',
+    account: outlook,
     from: 'billing@harborsupply.example',
     subject: 'Invoice 1182 due next week',
     preview: 'A reminder that invoice 1182 for $2,400 is due on November 3…',
@@ -67,6 +73,7 @@ const seed: Message[] = [
   },
   {
     id: 'm3',
+    account: outlook,
     from: 'newsletter@example.com',
     subject: 'Five ways to close the month faster',
     preview: 'This week: what small teams are doing to speed up month-end…',
@@ -82,6 +89,7 @@ const seed: Message[] = [
   },
   {
     id: 'm4',
+    account: outlook,
     from: 'sales@packright.example',
     subject: 'PO needed for 200 shipping boxes',
     preview: 'Following up on our call: to hold the 200 boxes at $1.85 each…',
@@ -136,6 +144,7 @@ const seed: Message[] = [
   },
   {
     id: 'm5',
+    account: gmail,
     from: 'ops@lakeviewcafe.example',
     subject: '12 units arrived damaged',
     preview: 'Our delivery came in this morning and 12 of the 50 units were damaged…',
@@ -152,6 +161,7 @@ const seed: Message[] = [
   },
   {
     id: 'm6',
+    account: gmail,
     from: 'sam@fieldnotes.example',
     subject: "Can we move Thursday's call?",
     preview: 'Something came up on Thursday. Could we move our 2pm call…',
@@ -168,6 +178,7 @@ const seed: Message[] = [
   },
   {
     id: 'm7',
+    account: outlook,
     from: 'accounts@greenleaf.example',
     subject: 'Updated price list for 2027',
     preview: 'Attached is our price list for 2027. Prices go up 4% on January 1…',
@@ -184,6 +195,7 @@ const seed: Message[] = [
   },
   {
     id: 'm8',
+    account: outlook,
     from: 'statements@firstbank.example',
     subject: 'Your October statement is ready',
     preview: 'Your statement for the account ending 4410 is ready to view…',

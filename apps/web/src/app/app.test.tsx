@@ -231,13 +231,15 @@ describe('app', () => {
     expect(localStorage.getItem('banner:demo-data')).toBe('1')
   })
 
-  it('shows the connected Outlook account in Settings', async () => {
+  it('shows the connected accounts in Settings', async () => {
     renderApp('/settings')
-    expect(await screen.findByText('Connected')).toBeInTheDocument()
-    expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
+    expect(await screen.findByText(/demo@example.com · Synced/)).toBeInTheDocument()
+    expect(screen.getByText(/demo@gmail.example · Synced/)).toBeInTheDocument()
+    expect(screen.getAllByText('Connected')).toHaveLength(2)
   })
 
   it('disconnects Outlook only after confirming, and connects it again', async () => {
+    mockConnections.splice(1)
     renderApp('/settings')
     await userEvent.click(await screen.findByRole('button', { name: 'Disconnect' }))
     const confirm = screen.getByRole('group', { name: 'Disconnect demo@example.com?' })
@@ -258,6 +260,7 @@ describe('app', () => {
   })
 
   it('connects a Gmail account alongside Outlook', async () => {
+    mockConnections.splice(1)
     const { router } = renderApp('/settings')
     await screen.findByText(/demo@example.com · Synced/)
     await userEvent.click(screen.getByRole('button', { name: 'Connect Gmail' }))
@@ -269,6 +272,7 @@ describe('app', () => {
   })
 
   it('adds a second account from the same provider', async () => {
+    mockConnections.splice(1)
     renderApp('/settings')
     await screen.findByText(/demo@example.com · Synced/)
     await userEvent.click(screen.getByRole('button', { name: 'Connect Outlook' }))
@@ -281,20 +285,13 @@ describe('app', () => {
   })
 
   it('reconnects the account that needs it, with its own provider', async () => {
-    mockConnections.push({
-      id: 'con-gmail',
-      provider: 'gmail',
-      accountEmail: 'sales@gmail.example',
-      status: 'reconnect_needed',
-      connectedAt: '2026-10-20T16:00:00Z',
-      lastSyncedAt: null,
-    })
+    mockConnections[1]!.status = 'reconnect_needed'
     renderApp('/inbox')
     const alert = await screen.findByRole('alert')
-    expect(alert).toHaveTextContent('Gmail needs reconnecting. New mail for sales@gmail.example')
+    expect(alert).toHaveTextContent('Gmail needs reconnecting. New mail for demo@gmail.example')
     await userEvent.click(within(alert).getByRole('button', { name: /Reconnect/ }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Gmail is connected')
-    expect(mockConnections.find((c) => c.id === 'con-gmail')?.status).toBe('connected')
+    expect(await screen.findByText(/Gmail is connected/)).toBeInTheDocument()
+    expect(mockConnections.map((c) => c.status)).toEqual(['connected', 'connected'])
   })
 
   it('asks to connect Outlook before showing the inbox', async () => {
@@ -559,6 +556,54 @@ describe('app', () => {
     const nav = screen.getByRole('navigation', { name: 'Main' })
     await userEvent.click(within(nav).getByRole('link', { name: 'Inbox' }))
     await waitFor(() => expect(search).toHaveValue(''))
+  })
+
+  it('shows one account at a time, and says which account each email came to', async () => {
+    const { router } = renderApp('/inbox')
+    const list = await screen.findByRole('list', { name: 'Messages' })
+    expect(within(list).getByRole('link', { name: /Quote for 40 units/ })).toHaveTextContent(
+      'orders@brightline.example to demo@gmail.example',
+    )
+
+    await userEvent.selectOptions(
+      screen.getByRole('combobox', { name: 'Account' }),
+      'demo@gmail.example (Gmail)',
+    )
+    await waitFor(() => expect(router.state.location.search).toEqual({ account: 'con-2' }))
+    const rows = within(screen.getByRole('list', { name: 'Messages' })).getAllByRole('listitem')
+    expect(rows).toHaveLength(3)
+    // They all came to the same account, so the rows don't repeat it.
+    expect(rows[0]).not.toHaveTextContent('to demo@gmail.example')
+
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Account' }), 'All accounts')
+    await waitFor(() => expect(router.state.location.search).toEqual({}))
+  })
+
+  it('keeps the account when you open a message and go back', async () => {
+    const { router } = renderApp('/inbox?account=con-2')
+    await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
+    expect(
+      await screen.findByText('From orders@brightline.example to demo@gmail.example'),
+    ).toBeInTheDocument()
+    expect(router.state.location.search).toEqual({ account: 'con-2' })
+
+    await userEvent.click(screen.getByRole('link', { name: 'Inbox', current: false }))
+    expect(await screen.findByRole('combobox', { name: 'Account' })).toHaveValue('con-2')
+  })
+
+  it('shows every account when the link names one that is not connected', async () => {
+    renderApp('/inbox?account=con-gone')
+    const list = await screen.findByRole('list', { name: 'Messages' })
+    expect(within(list).getAllByRole('listitem')).toHaveLength(8)
+    expect(screen.getByRole('combobox', { name: 'Account' })).toHaveValue('')
+  })
+
+  it('has no account picker with only one account connected', async () => {
+    mockConnections.splice(1)
+    renderApp('/inbox')
+    const list = await screen.findByRole('list', { name: 'Messages' })
+    expect(screen.queryByRole('combobox', { name: 'Account' })).not.toBeInTheDocument()
+    expect(list).not.toHaveTextContent('to demo@')
   })
 
   it('shows not found for an unknown message', async () => {
