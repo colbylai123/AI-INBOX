@@ -122,7 +122,7 @@ function ConnectionRow({ connection }: { connection: Connection }) {
       ) : (
         <div key="actions" className="flex gap-2">
           {needsReconnect && (
-            <ConnectButton provider={connection.provider} size="sm">
+            <ConnectButton provider={connection.provider} connectionId={connection.id} size="sm">
               Reconnect
             </ConnectButton>
           )}
@@ -151,14 +151,22 @@ export function ConnectButtons(props: Omit<ConnectButtonProps, 'provider' | 'chi
 
 type ConnectButtonProps = {
   provider: Provider
+  /** Set when this button reconnects one row, so that account is the one updated. */
+  connectionId?: string
   children: string
   size?: 'sm' | 'default'
   variant?: 'default' | 'outline'
 }
 
 /** Starts the provider's sign-in, to connect an account or reconnect one. */
-export function ConnectButton({ provider, children, size, variant }: ConnectButtonProps) {
-  const connect = useConnect(provider)
+export function ConnectButton({
+  provider,
+  connectionId,
+  children,
+  size,
+  variant,
+}: ConnectButtonProps) {
+  const connect = useConnect(provider, connectionId)
   return (
     <Button
       size={size}

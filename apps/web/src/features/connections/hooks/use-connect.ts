@@ -5,11 +5,11 @@ import { connectionsKeys } from '../api/queries'
 import type { Provider } from '../types'
 
 /** Connect or reconnect an account. Only the mocks get here on success; real use leaves the page. */
-export function useConnect(provider: Provider) {
+export function useConnect(provider: Provider, connectionId?: string) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   return useMutation({
-    mutationFn: () => connect(provider),
+    mutationFn: () => connect(provider, connectionId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: connectionsKeys.all })
       // Land where the provider's redirect would: Settings, with the result.

@@ -386,6 +386,26 @@ describe('app', () => {
     ])
   })
 
+  it('reconnects the Outlook row that was clicked when two need reconnecting', async () => {
+    mockConnections[0]!.status = 'reconnect_needed'
+    mockConnections.push({
+      id: 'con-9',
+      provider: 'outlook',
+      accountEmail: 'other@example.com',
+      status: 'reconnect_needed',
+      connectedAt: '2026-10-21T16:00:00Z',
+      lastSyncedAt: null,
+    })
+    renderApp('/settings')
+    await screen.findByText(/other@example.com/)
+    const reconnect = screen.getAllByRole('button', { name: 'Reconnect' })
+    expect(reconnect).toHaveLength(2)
+    await userEvent.click(reconnect[1]!)
+    expect(await screen.findByText(/Outlook is connected/)).toBeInTheDocument()
+    expect(mockConnections.find((c) => c.id === 'con-1')?.status).toBe('reconnect_needed')
+    expect(mockConnections.find((c) => c.id === 'con-9')?.status).toBe('connected')
+  })
+
   it('reconnects the account that needs it, with its own provider', async () => {
     mockConnections[1]!.status = 'reconnect_needed'
     renderApp('/inbox')
