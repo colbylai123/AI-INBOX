@@ -1,7 +1,7 @@
 import { ApiError, apiFetch } from '@/lib/api-client'
 import { mocksEnabled } from '@/lib/demo-mode'
 import { mockDelay } from '@/lib/mock'
-import type { DraftUpdate, Message, MessageFilters, MessageSummary } from '../types'
+import type { DraftUpdate, Message, MessageFilters, MessageSummary, WeeklyStats } from '../types'
 
 // Transport only: HTTP calls, or the in-memory mocks in development and in the
 // demo. Mocks are imported lazily so a signed-in production session never loads them.
@@ -61,6 +61,20 @@ export async function approveDraft(id: string): Promise<void> {
     return
   }
   return apiFetch<void>(`/messages/${encodeURIComponent(id)}/approve`, { method: 'POST' })
+}
+
+export async function getWeeklyStats(): Promise<WeeklyStats> {
+  if (mocksEnabled()) {
+    const { mockMessages } = await import('./mocks')
+    await mockDelay()
+    const since = Date.now() - 7 * 24 * 60 * 60_000
+    const approved = mockMessages.filter((m) => m.approvedAt && Date.parse(m.approvedAt) >= since)
+    return {
+      draftsApproved: approved.length,
+      formsApproved: approved.filter((m) => m.filledForm).length,
+    }
+  }
+  return apiFetch<WeeklyStats>('/stats/week')
 }
 
 /** Puts the sample inbox back to how it started, so each demo begins fresh. */

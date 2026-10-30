@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { mockConnections, resetMockConnections } from '@/features/connections/api/mocks'
 import { mockMessages, resetMockMessages } from '@/features/inbox/api/mocks'
 import { mockMaterials, resetMockMaterials } from '@/features/materials/api/mocks'
+import * as inboxApi from '@/features/inbox/api/inbox-api'
 import * as materialsApi from '@/features/materials/api/materials-api'
 import { ApiError } from '@/lib/api-client'
 import { isDemoMode, setDemoMode } from '@/lib/demo-mode'
@@ -382,6 +383,31 @@ describe('app', () => {
     expect(within(form).getByText('Item').nextSibling).toHaveTextContent(
       'From the email: “the standard package”',
     )
+  })
+
+  it('shows the time saved once drafts are approved', async () => {
+    const { router } = renderApp('/inbox')
+    await screen.findByRole('list', { name: 'Messages' })
+    expect(screen.queryByRole('region', { name: 'Last 7 days' })).not.toBeInTheDocument()
+
+    await router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } })
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await screen.findByText('Approved')
+    await router.navigate({ to: '/inbox' })
+
+    const week = await screen.findByRole('region', { name: 'Last 7 days' })
+    // One reply with a form: 4 + 6 minutes.
+    expect(within(week).getByText('Drafts approved').nextSibling).toHaveTextContent('1')
+    expect(within(week).getByText('Forms filled').nextSibling).toHaveTextContent('1')
+    expect(within(week).getByText('Time saved (est.)').nextSibling).toHaveTextContent('10 min')
+  })
+
+  it('still shows the inbox when the weekly stats fail to load', async () => {
+    vi.spyOn(inboxApi, 'getWeeklyStats').mockRejectedValue(new ApiError(500, 'Down'))
+    renderApp('/inbox')
+    expect(await screen.findByText('Quote for 40 units by Friday')).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Last 7 days' })).not.toBeInTheDocument()
+    vi.restoreAllMocks()
   })
 
   it('shows not found for an unknown message', async () => {
