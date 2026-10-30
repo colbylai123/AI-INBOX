@@ -19,6 +19,7 @@ export type {
   FilledForm,
   FormField,
   MaterialRef,
+  MessageAccount,
   Message,
   MessageFilters,
   MessageSummary,

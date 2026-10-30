@@ -259,6 +259,24 @@ The AI fills forms from the email and from the user's own documents, like a unit
 - **Materials can be reference documents as well as forms**, such as a price list or a rate sheet. No change to `/materials`: the AI decides which uploads are forms to fill and which are documents to fill them from.
 - An older response without `sourceMaterial` reads as `null`, so this can ship after the front end.
 
+## Step 11: one inbox across accounts
+
+With more than one account connected (step 9), the inbox shows mail from all of them in one list, says which account each email came to, and can show one account at a time. One new field on `MessageSummary`, no new endpoints:
+
+```jsonc
+// MessageSummary (in GET /messages and GET /messages/{id})
+{
+  // …the fields from earlier steps…
+  "account": { "id": "con-2", "email": "demo@gmail.example" }, // the connection the email came to
+}
+```
+
+- **`account.id` is the `Connection.id`** from `GET /connections`, and `account.email` its `accountEmail`, so the app can match them.
+- **The reply goes out from that same account**, in the same conversation, when the user approves it. Never from a different account, even if the user has a "main" one.
+- **No filter parameter.** The app filters the list it already has (`/inbox?account=con-2`), so `GET /messages` keeps returning every account's mail. If `/messages` is ever paged, add `?account=` then.
+- **Disconnecting an account** (step 5) stops returning its messages, since nothing can be sent from it any more.
+- An older response without `account` still shows, just without the account.
+
 ## Trying the app against the real API
 
 Create `apps/web/.env.development.local` (it's gitignored):

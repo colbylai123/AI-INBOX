@@ -35,7 +35,7 @@ function MessagePage() {
       </Link>
       <PageHeader
         title={message.subject}
-        description={`From ${message.from}`}
+        description={`From ${message.from}${message.account ? ` to ${message.account.email}` : ''}`}
         actions={<PriorityBadge priority={message.priority} />}
       />
       {/* Keyed so edit and error state never carry over from another message. */}
