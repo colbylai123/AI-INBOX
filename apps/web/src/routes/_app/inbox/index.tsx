@@ -56,6 +56,10 @@ function InboxPage() {
           )}
           <PriorityFilter value={filters.priority} />
           <MessageList messages={messages} />
+          <p className="mt-4 text-metadata text-muted-foreground max-md:hidden">
+            Press <kbd className="rounded-sm border border-border bg-muted px-1.5">?</kbd> for
+            keyboard shortcuts.
+          </p>
         </>
       )}
     </>

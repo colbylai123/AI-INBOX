@@ -373,6 +373,46 @@ describe('app', () => {
     expect(within(week).getByText('Time saved (est.)').nextSibling).toHaveTextContent('10 min')
   })
 
+  it('moves through the inbox with j and k', async () => {
+    renderApp('/inbox')
+    const list = await screen.findByRole('list', { name: 'Messages' })
+    const links = within(list).getAllByRole('link')
+    await userEvent.keyboard('j')
+    expect(links[0]).toHaveFocus()
+    await userEvent.keyboard('jj')
+    expect(links[2]).toHaveFocus()
+    await userEvent.keyboard('k')
+    expect(links[1]).toHaveFocus()
+  })
+
+  it('edits with e and goes back with Escape, but never approves from the keyboard', async () => {
+    const { router } = renderApp('/inbox/m1')
+    await screen.findByRole('button', { name: 'Approve & send' })
+    await userEvent.keyboard('e')
+    expect(screen.getByRole('textbox', { name: 'Reply' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    await userEvent.keyboard('as')
+    expect(screen.queryByText('Approved')).not.toBeInTheDocument()
+
+    await userEvent.keyboard('{Escape}')
+    await screen.findByRole('list', { name: 'Messages' })
+    expect(router.state.location.pathname).toBe('/inbox')
+  })
+
+  it('lists the shortcuts on ?', async () => {
+    const { router } = renderApp('/inbox/m1')
+    await screen.findByRole('button', { name: 'Approve & send' })
+    await userEvent.keyboard('?')
+    const help = screen.getByRole('dialog', { name: 'Keyboard shortcuts' })
+    expect(help).toHaveTextContent('Edit the draft')
+    expect(within(help).getByRole('button', { name: 'Close' })).toHaveFocus()
+    // Escape closes the list without also leaving the page.
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/inbox/m1')
+  })
+
   it('shows not found for an unknown message', async () => {
     renderApp('/inbox/does-not-exist')
     expect(await screen.findByText('Not found')).toBeInTheDocument()

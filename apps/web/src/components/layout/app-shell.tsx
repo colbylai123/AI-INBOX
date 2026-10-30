@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { DemoBar } from './demo-bar'
 import { DismissibleBanner } from './dismissible-banner'
 import { Logo } from './logo'
+import { ShortcutsHelp } from './shortcuts-help'
 
 // Add a nav entry here when you add a top-level page under routes/_app/.
 const nav: { to: LinkProps['to']; label: string }[] = [
@@ -80,6 +81,7 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
       </header>
 
       <main className="mx-auto max-w-page px-gutter pt-10 pb-24 md:pt-14">{children}</main>
+      <ShortcutsHelp />
     </div>
   )
 }

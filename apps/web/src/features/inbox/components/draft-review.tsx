@@ -1,7 +1,9 @@
+import { useNavigate } from '@tanstack/react-router'
 import { CircleCheck } from 'lucide-react'
 import { useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useShortcuts } from '@/lib/use-shortcuts'
 import { useApproveDraft } from '../hooks/use-approve-draft'
 import { highlight } from '../lib/highlight'
 import { useSaveDraft } from '../hooks/use-save-draft'
@@ -19,6 +21,21 @@ export function DraftReview({ message }: { message: Message }) {
   const [showSources, setShowSources] = useState(false)
   const editorId = useId()
   const sources = showSources && !editing ? (message.filledForm?.fields ?? []) : []
+  const navigate = useNavigate()
+
+  const canEdit = !message.approvedAt && !!message.draftReply && !approve.isPending
+  const startEditing = () => {
+    approve.reset()
+    setEditing(true)
+  }
+  // No shortcut approves: sending always takes a click on Approve & send.
+  useShortcuts(
+    {
+      ...(canEdit && { e: startEditing }),
+      Escape: () => void navigate({ to: '/inbox' }),
+    },
+    !editing,
+  )
 
   return (
     <Card>
@@ -76,7 +93,8 @@ export function DraftReview({ message }: { message: Message }) {
           <p className="text-sm text-muted-foreground">No draft yet.</p>
         )}
       </CardContent>
-      <CardFooter className="flex-wrap justify-end gap-3 border-t border-border pt-5">
+      {/* On phones the actions stay on screen while you read a long email. */}
+      <CardFooter className="flex-wrap justify-end gap-3 border-t border-border pt-5 max-md:sticky max-md:bottom-0 max-md:z-10 max-md:-mb-6 max-md:rounded-b-lg max-md:bg-card max-md:pb-4">
         {(approve.isError || save.isError) && (
           <p role="alert" className="mr-auto text-sm text-destructive">
             {save.isError ? "Couldn't save your changes." : "Couldn't approve."} Please try again.
@@ -107,10 +125,7 @@ export function DraftReview({ message }: { message: Message }) {
             <Button
               variant="secondary"
               disabled={!message.draftReply || approve.isPending}
-              onClick={() => {
-                approve.reset()
-                setEditing(true)
-              }}
+              onClick={startEditing}
             >
               Edit
             </Button>
