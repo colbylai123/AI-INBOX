@@ -12,6 +12,8 @@ export interface MessageSummary {
   summary: string | null
   receivedAt: string
   priority: Priority
+  /** True when the AI has drafted a reply (draftReply isn't null). */
+  hasDraft: boolean
   /** Set once the user approves the draft. Nothing is sent before this. */
   approvedAt: string | null
 }
