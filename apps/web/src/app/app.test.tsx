@@ -2,8 +2,10 @@ import { createMemoryHistory } from '@tanstack/react-router'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockConnections, resetMockConnections } from '@/features/connections/api/mocks'
-import { resetMockMessages } from '@/features/inbox/api/mocks'
+import { mockMessages, resetMockMessages } from '@/features/inbox/api/mocks'
 import { mockMaterials, resetMockMaterials } from '@/features/materials/api/mocks'
+import * as inboxApi from '@/features/inbox/api/inbox-api'
+import * as materialsApi from '@/features/materials/api/materials-api'
 import { ApiError } from '@/lib/api-client'
 import { isDemoMode, setDemoMode } from '@/lib/demo-mode'
 import { App } from './app'
@@ -281,7 +283,7 @@ describe('app', () => {
     expect(setup).toHaveTextContent('2 of 3 done')
     expect(within(setup).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2')
 
-    await userEvent.click(within(setup).getByRole('link', { name: 'Open top email' }))
+    await userEvent.click(within(setup).getByRole('link', { name: 'Open the next draft' }))
     await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
     await screen.findByText('Approved')
 
@@ -292,6 +294,25 @@ describe('app', () => {
       expect(within(list).getAllByRole('listitem')[0]).toHaveTextContent('Approved'),
     )
     expect(screen.queryByRole('region', { name: 'Get set up' })).not.toBeInTheDocument()
+  })
+
+  it('points the approval step at an email that has a draft', async () => {
+    // The most important email has no draft, so the step skips to the next one that does.
+    Object.assign(mockMessages[0]!, { draftReply: null, hasDraft: false, filledForm: null })
+    renderApp('/inbox')
+    const setup = await screen.findByRole('region', { name: 'Get set up' })
+    await userEvent.click(within(setup).getByRole('link', { name: 'Open the next draft' }))
+    expect(
+      await screen.findByRole('heading', { name: 'PO needed for 200 shipping boxes' }),
+    ).toBeInTheDocument()
+  })
+
+  it('still shows the inbox when the checklist data fails to load', async () => {
+    vi.spyOn(materialsApi, 'getMaterials').mockRejectedValue(new ApiError(500, 'Down'))
+    renderApp('/inbox?priority=high')
+    expect(await screen.findByText('Quote for 40 units by Friday')).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Get set up' })).not.toBeInTheDocument()
+    vi.restoreAllMocks()
   })
 
   it('asks for a form when nothing is uploaded yet', async () => {
@@ -336,6 +357,14 @@ describe('app', () => {
     const marked = [...document.querySelectorAll('mark')].map((mark) => mark.textContent)
     expect(marked).toContain('$1.85 each')
     expect(marked).toContain('the week of November 10')
+  })
+
+  it("marks a value taken from the sender's address", async () => {
+    renderApp('/inbox/m1')
+    const form = await screen.findByRole('region', { name: 'Quote form' })
+    await userEvent.click(within(form).getByRole('button', { name: 'Show sources' }))
+    const marked = [...document.querySelectorAll('mark')].map((mark) => mark.textContent)
+    expect(marked).toContain('orders@brightline.example')
   })
 
   it('stops citing the email for a value the user changed', async () => {
@@ -411,6 +440,14 @@ describe('app', () => {
     await userEvent.keyboard('{Escape}')
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/inbox/m1')
+  })
+
+  it('still shows the inbox when the weekly stats fail to load', async () => {
+    vi.spyOn(inboxApi, 'getWeeklyStats').mockRejectedValue(new ApiError(500, 'Down'))
+    renderApp('/inbox')
+    expect(await screen.findByText('Quote for 40 units by Friday')).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Last 7 days' })).not.toBeInTheDocument()
+    vi.restoreAllMocks()
   })
 
   it('shows not found for an unknown message', async () => {

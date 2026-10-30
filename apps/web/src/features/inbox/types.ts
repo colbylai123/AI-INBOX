@@ -14,6 +14,8 @@ export interface MessageSummary {
   priority: Priority
   /** One line from the AI on why it ranked the message this way. Null until ranked. */
   priorityReason: string | null
+  /** True when the AI has drafted a reply (draftReply isn't null). */
+  hasDraft: boolean
   /** Set once the user approves the draft. Nothing is sent before this. */
   approvedAt: string | null
 }

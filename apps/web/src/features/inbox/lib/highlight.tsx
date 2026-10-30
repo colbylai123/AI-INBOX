@@ -1,13 +1,45 @@
 import type { ReactNode } from 'react'
 
+const wordChar = /[\p{L}\p{N}]/u
+const digit = /\p{N}/u
+
+/** Whether text[at] continues the word or number that ends just before `from`. */
+function continues(text: string, at: number, from: number): boolean {
+  const char = text[at]
+  if (char === undefined) return false
+  if (wordChar.test(char)) return true
+  // "1,200" and "11.85": a separator between digits is still the same number.
+  const beyond = text[at + (at < from ? -1 : 1)]
+  return /[.,]/.test(char) && beyond !== undefined && digit.test(beyond)
+}
+
 /**
- * Where each phrase first appears in the text, left to right, skipping any that
- * overlap an earlier match. Phrases that aren't in the text are ignored.
+ * Where the phrase first appears as a whole, not inside a longer word or number,
+ * so "200" doesn't match the end of "1200".
+ */
+function indexOfWhole(text: string, phrase: string): number {
+  const startsWord = wordChar.test(phrase[0]!)
+  const endsWord = wordChar.test(phrase.at(-1)!)
+  for (let at = text.indexOf(phrase); at !== -1; at = text.indexOf(phrase, at + 1)) {
+    const end = at + phrase.length
+    if (startsWord && continues(text, at - 1, at)) continue
+    if (endsWord && continues(text, end, end - 1)) continue
+    return at
+  }
+  return -1
+}
+
+/**
+ * Where each phrase first appears in the text as a whole, left to right, skipping
+ * any that overlap an earlier match. Phrases that aren't in the text are ignored.
  */
 export function findSpans(text: string, phrases: string[]): { start: number; end: number }[] {
   const spans = phrases
     .filter((phrase) => phrase.trim() !== '')
-    .map((phrase) => ({ start: text.indexOf(phrase), end: text.indexOf(phrase) + phrase.length }))
+    .map((phrase) => {
+      const start = indexOfWhole(text, phrase)
+      return { start, end: start + phrase.length }
+    })
     .filter((span) => span.start !== -1)
     .toSorted((a, b) => a.start - b.start || b.end - a.end)
   const kept: typeof spans = []

@@ -36,6 +36,7 @@ export function DraftReview({ message }: { message: Message }) {
     },
     !editing,
   )
+  const phrases = sources.flatMap((field) => (field.source ? [field.source] : []))
 
   return (
     <Card>
@@ -63,12 +64,10 @@ export function DraftReview({ message }: { message: Message }) {
             )}
           </dl>
         )}
-        <ChatBubble from="incoming" label={message.from}>
-          {/* With sources on, mark the words the form's values came from. */}
-          {highlight(
-            message.body,
-            sources.flatMap((field) => (field.source ? [field.source] : [])),
-          )}
+        {/* With sources on, mark the words the form's values came from, in the
+            sender's address as well as the body. */}
+        <ChatBubble from="incoming" label={highlight(message.from, phrases)}>
+          {highlight(message.body, phrases)}
         </ChatBubble>
         {editing ? (
           <DraftEditor
