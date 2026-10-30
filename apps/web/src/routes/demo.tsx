@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { resetSampleConnections } from '@/features/connections'
 import { resetSampleInbox } from '@/features/inbox'
 import { resetSampleMaterials } from '@/features/materials'
 import { setDemoMode } from '@/lib/demo-mode'
@@ -8,7 +9,7 @@ import { setDemoMode } from '@/lib/demo-mode'
 export const Route = createFileRoute('/demo')({
   beforeLoad: async ({ context, preload }) => {
     if (preload) return
-    await Promise.all([resetSampleInbox(), resetSampleMaterials()])
+    await Promise.all([resetSampleInbox(), resetSampleMaterials(), resetSampleConnections()])
     // Forget anything cached from a real session before the sample one starts.
     context.queryClient.clear()
     setDemoMode(true)

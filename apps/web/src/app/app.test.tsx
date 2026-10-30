@@ -1,6 +1,7 @@
 import { createMemoryHistory } from '@tanstack/react-router'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { mockConnections, resetMockConnections } from '@/features/connections/api/mocks'
 import { resetMockMessages } from '@/features/inbox/api/mocks'
 import { resetMockMaterials } from '@/features/materials/api/mocks'
 import { ApiError } from '@/lib/api-client'
@@ -23,6 +24,7 @@ function renderApp(url: string) {
 beforeEach(() => {
   resetMockMessages()
   resetMockMaterials()
+  resetMockConnections()
   localStorage.clear()
   setDemoMode(false)
 })
@@ -223,6 +225,52 @@ describe('app', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Dismiss announcement' }))
     expect(screen.queryByRole('region', { name: 'Announcement' })).not.toBeInTheDocument()
     expect(localStorage.getItem('banner:demo-data')).toBe('1')
+  })
+
+  it('shows the connected Outlook account in Settings', async () => {
+    renderApp('/settings')
+    expect(await screen.findByText('Connected')).toBeInTheDocument()
+    expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
+  })
+
+  it('disconnects Outlook only after confirming, and connects it again', async () => {
+    renderApp('/settings')
+    await userEvent.click(await screen.findByRole('button', { name: 'Disconnect' }))
+    const confirm = screen.getByRole('group', { name: 'Disconnect Outlook?' })
+    expect(mockConnections).toHaveLength(1)
+    await userEvent.click(within(confirm).getByRole('button', { name: 'Disconnect' }))
+    expect(await screen.findByText(/No email connected yet/)).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Connect Outlook' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Outlook is connected')
+    expect(await screen.findByText('Connected')).toBeInTheDocument()
+  })
+
+  it('explains a failed connection', async () => {
+    renderApp('/settings?connection=failed')
+    expect(await screen.findByRole('alert')).toHaveTextContent("Outlook wasn't connected")
+  })
+
+  it('asks to connect Outlook before showing the inbox', async () => {
+    mockConnections.splice(0)
+    renderApp('/inbox')
+    expect(await screen.findByText('Connect Outlook to fill your inbox')).toBeInTheDocument()
+    expect(screen.queryByRole('navigation', { name: 'Filter by priority' })).not.toBeInTheDocument()
+  })
+
+  it('warns when Outlook needs reconnecting', async () => {
+    mockConnections[0]!.status = 'reconnect_needed'
+    renderApp('/inbox')
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Outlook needs reconnecting.')
+    expect(within(alert).getByRole('button', { name: /Reconnect/ })).toBeEnabled()
+  })
+
+  it('signs out to the sign-in page', async () => {
+    const { router } = renderApp('/settings')
+    await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
+    expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/sign-in')
   })
 
   it('shows not found for an unknown message', async () => {

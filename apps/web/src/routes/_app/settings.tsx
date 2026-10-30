@@ -1,21 +1,30 @@
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
 import { PageHeader } from '@/components/layout/page-header'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AccountCard } from '@/features/auth'
+import { ConnectedAccounts, connectionsQuery } from '@/features/connections'
 
 export const Route = createFileRoute('/_app/settings')({
-  component: () => (
-    <>
-      <PageHeader title="Settings" description="Accounts and preferences." />
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>Connected accounts</CardTitle>
-          <CardDescription>Connect your Outlook account to start.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button disabled>Connect Outlook (coming soon)</Button>
-        </CardContent>
-      </Card>
-    </>
-  ),
+  // Microsoft's redirect comes back here with ?connection=connected|failed.
+  validateSearch: z.object({
+    connection: z.enum(['connected', 'failed']).optional().catch(undefined),
+  }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(connectionsQuery()),
+  component: SettingsPage,
 })
+
+function SettingsPage() {
+  const { connection } = Route.useSearch()
+  const { user } = Route.useRouteContext()
+  const { data: connections } = useSuspenseQuery(connectionsQuery())
+  return (
+    <>
+      <PageHeader title="Settings" description="Your connected email and your account." />
+      <div className="grid max-w-2xl gap-6">
+        <ConnectedAccounts connections={connections} result={connection} />
+        <AccountCard user={user} />
+      </div>
+    </>
+  )
+}
