@@ -1,0 +1,186 @@
+<!doctype html>
+<!-- Source for the icons and the link preview image. Render with scripts/render-share-images.mjs. -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: 'Host Grotesk';
+        src: url('../node_modules/@fontsource-variable/host-grotesk/files/host-grotesk-latin-wght-normal.woff2');
+        font-weight: 300 800;
+      }
+      @font-face {
+        font-family: 'Instrument Sans';
+        src: url('../node_modules/@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2');
+        font-weight: 400 700;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        background: transparent;
+      }
+      .glyph {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* App icons: a full-bleed square for home screens (the phone rounds it), glyph inside the safe zone. */
+      #icon {
+        width: 512px;
+        height: 512px;
+        background: #074ce0;
+        display: grid;
+        place-items: center;
+      }
+      #icon svg {
+        width: 52%;
+        height: 52%;
+      }
+
+      /* Link preview, 1200 x 630. */
+      #og {
+        width: 1200px;
+        height: 630px;
+        padding: 72px 80px;
+        overflow: hidden;
+        position: relative;
+        background: #fcfcfd;
+        color: #16191f;
+        font-family: 'Instrument Sans', sans-serif;
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 56px;
+        align-items: center;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font: 700 28px 'Host Grotesk';
+        letter-spacing: -0.01em;
+      }
+      .brand i {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: #074ce0;
+        display: grid;
+        place-items: center;
+      }
+      .brand svg {
+        width: 26px;
+        height: 26px;
+      }
+      h1 {
+        text-wrap: balance;
+        margin-top: 44px;
+        font: 700 76px/1.02 'Host Grotesk';
+        letter-spacing: -0.03em;
+      }
+      p {
+        text-wrap: pretty;
+        margin-top: 24px;
+        font-size: 26px;
+        line-height: 1.45;
+        color: #454c58;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #dde0e6;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow:
+          0 1px 2px rgb(22 25 31 / 0.04),
+          0 18px 40px -16px rgb(22 25 31 / 0.22);
+        font-size: 17px;
+        line-height: 1.5;
+      }
+      .label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #454c58;
+      }
+      .bubble {
+        margin-top: 8px;
+        padding: 14px 16px;
+        border-radius: 12px;
+      }
+      .in {
+        background: #f3f4f6;
+      }
+      .draft {
+        margin-top: 18px;
+        background: color-mix(in oklab, #074ce0 7%, #fff);
+        border: 1px solid color-mix(in oklab, #074ce0 22%, #fff);
+      }
+      .row {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      .btn {
+        height: 40px;
+        padding: 0 18px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        font-weight: 600;
+        font-size: 16px;
+      }
+      .secondary {
+        border: 1px solid #dde0e6;
+      }
+      .primary {
+        background: #074ce0;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute">
+      <symbol id="inbox" viewBox="0 0 24 24">
+        <polyline class="glyph" points="22 12 16 12 14 15 10 15 8 12 2 12" />
+        <path
+          class="glyph"
+          d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+        />
+      </symbol>
+    </svg>
+
+    <div id="icon">
+      <svg><use href="#inbox" /></svg>
+    </div>
+
+    <div id="og">
+      <div>
+        <div class="brand">
+          <i
+            ><svg><use href="#inbox" /></svg></i
+          >ai inbox
+        </div>
+        <h1>Your inbox, sorted and drafted</h1>
+        <p>
+          Ranks your Outlook email, drafts the replies and fills in your forms. Nothing sends until
+          you approve.
+        </p>
+      </div>
+      <div class="card">
+        <div class="label">orders@brightline.example</div>
+        <div class="bubble in">Could you send pricing for 40 units by Friday?</div>
+        <div class="label" style="margin-top: 18px; text-align: right">AI draft</div>
+        <div class="bubble draft" style="margin-top: 8px">
+          Hi Maya, I've attached a quote for 40 units, delivered by November 14.
+        </div>
+        <div class="row">
+          <span class="btn secondary">Edit</span><span class="btn primary">Approve &amp; send</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
