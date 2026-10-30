@@ -15,6 +15,13 @@ const seed: Material[] = [
     sizeBytes: 52_224,
     uploadedAt: '2026-10-20T16:02:00Z',
   },
+  {
+    id: 'mat-prices',
+    name: 'Price list',
+    fileName: 'price-list.xlsx',
+    sizeBytes: 31_744,
+    uploadedAt: '2026-10-20T16:05:00Z',
+  },
 ]
 
 // In-memory "database" so uploads and removals behave realistically during development.

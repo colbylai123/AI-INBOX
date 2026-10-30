@@ -16,6 +16,7 @@ export type {
   DraftUpdate,
   FilledForm,
   FormField,
+  MaterialRef,
   Message,
   MessageFilters,
   MessageSummary,

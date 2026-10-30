@@ -6,7 +6,8 @@ import type { FilledForm } from '../types'
 
 /**
  * The form the AI pre-filled from Materials, shown as label/value pairs. With
- * sources on, each value says which words of the email it came from.
+ * sources on, each value quotes the words it came from, in the email or in one
+ * of the user's documents.
  */
 export function FilledFormView({
   form,
@@ -45,10 +46,14 @@ export function FilledFormView({
               {field.value || <span className="text-muted-foreground italic">Not filled</span>}
               {showSources && field.value && (
                 <span className="mt-1 block text-metadata text-muted-foreground">
-                  {field.source ? (
-                    <>From the email: “{field.source}”</>
+                  {!field.source ? (
+                    'Not from the email or your documents, so check it.'
+                  ) : field.sourceMaterial ? (
+                    <>
+                      From {field.sourceMaterial.name}: “{field.source}”
+                    </>
                   ) : (
-                    'Not taken from the email, so check it.'
+                    <>From the email: “{field.source}”</>
                   )}
                 </span>
               )}

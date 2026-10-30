@@ -36,7 +36,10 @@ export function DraftReview({ message }: { message: Message }) {
     },
     !editing,
   )
-  const phrases = sources.flatMap((field) => (field.source ? [field.source] : []))
+  // Only words from the email are marked in it; a document's words are quoted under the value.
+  const phrases = sources.flatMap((field) =>
+    field.source && !field.sourceMaterial ? [field.source] : [],
+  )
 
   return (
     <Card>

@@ -28,7 +28,7 @@ const steps = [
   {
     icon: Upload,
     title: 'Upload your forms',
-    body: 'Add the quote sheets, order forms and templates you fill in over and over. PDF, Word or Excel.',
+    body: 'Add the quote sheets and order forms you fill in over and over, and the price lists to fill them from. PDF, Word or Excel.',
   },
   {
     icon: Send,
