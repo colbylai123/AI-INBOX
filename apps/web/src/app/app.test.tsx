@@ -268,6 +268,18 @@ describe('app', () => {
     expect(router.state.location.search).toEqual({ provider: 'gmail', connection: 'connected' })
   })
 
+  it('adds a second account from the same provider', async () => {
+    renderApp('/settings')
+    await screen.findByText(/demo@example.com · Synced/)
+    await userEvent.click(screen.getByRole('button', { name: 'Connect Outlook' }))
+    expect(await screen.findByText(/demo2@example.com · Synced/)).toBeInTheDocument()
+    expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
+    expect(mockConnections.map((c) => c.accountEmail)).toEqual([
+      'demo@example.com',
+      'demo2@example.com',
+    ])
+  })
+
   it('reconnects the account that needs it, with its own provider', async () => {
     mockConnections.push({
       id: 'con-gmail',
