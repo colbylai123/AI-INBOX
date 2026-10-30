@@ -4,18 +4,27 @@ import { useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useShortcuts } from '@/lib/use-shortcuts'
-import { useApproveDraft } from '../hooks/use-approve-draft'
-import { highlight } from '../lib/highlight'
 import { useSaveDraft } from '../hooks/use-save-draft'
+import { highlight } from '../lib/highlight'
+import {
+  dismissReply,
+  holdSend,
+  UNDO_SECONDS,
+  undoSend,
+  useOutgoingReply,
+  useSecondsLeft,
+} from '../lib/outgoing-replies'
 import type { Message } from '../types'
 import { ChatBubble } from './chat-bubble'
 import { DraftEditor } from './draft-editor'
 import { FilledFormView } from './filled-form'
 
 // Human-in-the-loop rule: the AI only drafts. The user can edit the reply and its
-// filled form, and nothing is sent until they click Approve & send.
+// filled form, and nothing is sent until they click Approve & send. Even then the
+// reply waits UNDO_SECONDS before it goes, so the click can be taken back.
 export function DraftReview({ message }: { message: Message }) {
-  const approve = useApproveDraft()
+  const reply = useOutgoingReply(message.id)
+  const seconds = useSecondsLeft(reply)
   const save = useSaveDraft(message.id)
   const [editing, setEditing] = useState(false)
   const [showSources, setShowSources] = useState(false)
@@ -23,9 +32,13 @@ export function DraftReview({ message }: { message: Message }) {
   const sources = showSources && !editing ? (message.filledForm?.fields ?? []) : []
   const navigate = useNavigate()
 
-  const canEdit = !message.approvedAt && !!message.draftReply && !approve.isPending
+  // The send waits for the inbox to refetch, so approvedAt is already set once it's sent.
+  const approved = !!message.approvedAt
+  const held = reply?.status === 'held'
+  const busy = held || reply?.status === 'sending'
+  const canEdit = !approved && !!message.draftReply && !busy
   const startEditing = () => {
-    approve.reset()
+    dismissReply(message.id)
     setEditing(true)
   }
   // No shortcut approves: sending always takes a click on Approve & send.
@@ -94,12 +107,15 @@ export function DraftReview({ message }: { message: Message }) {
       </CardContent>
       {/* On phones the actions stay on screen while you read a long email. */}
       <CardFooter className="flex-wrap justify-end gap-3 border-t border-border pt-5 max-md:sticky max-md:bottom-0 max-md:z-10 max-md:-mb-6 max-md:rounded-b-lg max-md:bg-card max-md:pb-4">
-        {(approve.isError || save.isError) && (
+        {(reply?.status === 'failed' || save.isError) && (
           <p role="alert" className="mr-auto text-sm text-destructive">
-            {save.isError ? "Couldn't save your changes." : "Couldn't approve."} Please try again.
+            {save.isError ? "Couldn't save your changes." : "Couldn't send."} Please try again.
           </p>
         )}
-        {message.approvedAt ? (
+        <span role="status" className="sr-only">
+          {held && `Your reply sends in ${UNDO_SECONDS} seconds unless you undo it.`}
+        </span>
+        {approved ? (
           <p className="flex items-center gap-2 text-interface font-medium">
             <CircleCheck className="size-4 text-primary" aria-hidden /> Approved
           </p>
@@ -119,20 +135,36 @@ export function DraftReview({ message }: { message: Message }) {
               {save.isPending ? 'Saving…' : 'Save changes'}
             </Button>
           </>
+        ) : busy ? (
+          <>
+            {/* Undo takes Edit's place, not Approve's, so a double click can't undo.
+                Focus moves to it from the button that was just disabled. */}
+            <Button
+              key="undo"
+              variant="secondary"
+              autoFocus
+              disabled={!held}
+              onClick={() => undoSend(message.id)}
+            >
+              Undo
+            </Button>
+            <Button disabled>{held ? `Sends in ${seconds}s` : 'Sending…'}</Button>
+          </>
         ) : (
           <>
             <Button
+              key="edit"
               variant="secondary"
-              disabled={!message.draftReply || approve.isPending}
+              disabled={!message.draftReply}
               onClick={startEditing}
             >
               Edit
             </Button>
             <Button
-              disabled={!message.draftReply || approve.isPending}
-              onClick={() => approve.mutate(message.id)}
+              disabled={!message.draftReply}
+              onClick={() => holdSend(message.id, message.from)}
             >
-              {approve.isPending ? 'Approving…' : 'Approve & send'}
+              Approve & send
             </Button>
           </>
         )}

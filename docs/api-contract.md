@@ -50,6 +50,8 @@ Until an endpoint exists, the web app runs on demo data (mocks in `apps/web/src/
 
 **The approval rule:** nothing is ever sent except by `POST /messages/{id}/approve`, which only runs when the user clicks Approve & send.
 
+After the click, the app holds the reply for 10 seconds so the user can undo, and calls `approve` only when that window ends. No API change is needed for this: send as soon as `approve` is called.
+
 ## Step 1: a one-line summary on each email
 
 Adds `summary` to every message: one plain sentence from the AI on what the sender wants. `null` until the AI has read the message. The inbox shows the raw `preview` until then.

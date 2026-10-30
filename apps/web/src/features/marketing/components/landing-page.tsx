@@ -62,6 +62,7 @@ const features = [
 
 const promises = [
   'Every reply and form waits for your approval. There is no auto-send.',
+  'After you approve, you have 10 seconds to undo before it sends.',
   'Forms are filled only from the email in front of you and the documents you uploaded.',
   'Disconnect Outlook at any time and its access is deleted.',
 ]

@@ -1,10 +1,11 @@
 import { createMemoryHistory } from '@tanstack/react-router'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockConnections, resetMockConnections } from '@/features/connections/api/mocks'
 import { mockMessages, resetMockMessages } from '@/features/inbox/api/mocks'
 import { mockMaterials, resetMockMaterials } from '@/features/materials/api/mocks'
 import * as inboxApi from '@/features/inbox/api/inbox-api'
+import { UNDO_SECONDS } from '@/features/inbox/lib/outgoing-replies'
 import * as materialsApi from '@/features/materials/api/materials-api'
 import { ApiError } from '@/lib/api-client'
 import { isDemoMode, setDemoMode } from '@/lib/demo-mode'
@@ -22,6 +23,27 @@ function renderApp(url: string) {
   render(<App queryClient={queryClient} router={router} />)
   return { router, queryClient }
 }
+
+// Approve & send holds a reply for the undo window, so tests that send skip past it.
+// Fake timers that still run in real time, so everything else waits as normal.
+function fakeClock() {
+  vi.useFakeTimers({
+    shouldAdvanceTime: true,
+    toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'],
+  })
+}
+const waitOutUndo = () => act(() => vi.advanceTimersByTimeAsync(UNDO_SECONDS * 1000))
+
+async function approveAndSend() {
+  fakeClock()
+  await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+  await waitOutUndo()
+}
+
+afterEach(() => {
+  vi.useRealTimers()
+  vi.restoreAllMocks()
+})
 
 beforeEach(() => {
   resetMockMessages()
@@ -63,7 +85,7 @@ describe('app', () => {
   it('starts every demo on fresh sample data', async () => {
     const { router } = renderApp('/demo')
     await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
-    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await approveAndSend()
     await screen.findByText('Approved')
 
     await router.navigate({ to: '/demo' })
@@ -101,13 +123,71 @@ describe('app', () => {
   })
 
   it('approves a draft only after an explicit click', async () => {
+    const approve = vi.spyOn(inboxApi, 'approveDraft')
     renderApp('/inbox/m1')
-    const approve = await screen.findByRole('button', { name: 'Approve & send' })
+    await screen.findByRole('button', { name: 'Approve & send' })
     expect(screen.queryByText('Approved')).not.toBeInTheDocument()
-    await userEvent.click(approve)
+    await approveAndSend()
     expect(await screen.findByText('Approved')).toBeInTheDocument()
+    expect(approve).toHaveBeenCalledTimes(1)
     // Once sent, the draft can't be edited any more.
     expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
+  })
+
+  it('holds a reply for the undo window, and undo means it never sends', async () => {
+    const approve = vi.spyOn(inboxApi, 'approveDraft')
+    fakeClock()
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    expect(screen.getByRole('button', { name: 'Sends in 10s' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Undo' })).toHaveFocus()
+    expect(approve).not.toHaveBeenCalled()
+
+    await act(() => vi.advanceTimersByTimeAsync(4000))
+    expect(screen.getByRole('button', { name: 'Sends in 6s' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Undo' }))
+    await waitOutUndo()
+    expect(approve).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Approve & send' })).toBeEnabled()
+    expect(screen.queryByText('Approved')).not.toBeInTheDocument()
+  })
+
+  it('keeps the undo window while you move on, then sends', async () => {
+    fakeClock()
+    const { router } = renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await router.navigate({ to: '/inbox' })
+    const notice = await screen.findByText(/sends in/)
+    expect(notice).toHaveTextContent('Reply to orders@brightline.example sends in')
+    expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument()
+
+    await waitOutUndo()
+    expect(await screen.findByText(/Reply sent to/)).toHaveTextContent(
+      'Reply sent to orders@brightline.example',
+    )
+    const list = screen.getByRole('list', { name: 'Messages' })
+    await waitFor(() => expect(within(list).getAllByText('Approved')).toHaveLength(1))
+  })
+
+  it('says when a reply could not be sent, and lets you try again', async () => {
+    vi.spyOn(inboxApi, 'approveDraft').mockRejectedValueOnce(new ApiError(500, 'Down'))
+    renderApp('/inbox/m1')
+    await approveAndSend()
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't send. Please try again.")
+    await approveAndSend()
+    expect(await screen.findByText('Approved')).toBeInTheDocument()
+  })
+
+  it('drops a held reply when you sign out', async () => {
+    const approve = vi.spyOn(inboxApi, 'approveDraft')
+    fakeClock()
+    const { router } = renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await router.navigate({ to: '/settings' })
+    await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
+    await screen.findByRole('heading', { name: 'Sign in' })
+    await waitOutUndo()
+    expect(approve).not.toHaveBeenCalled()
   })
 
   it('shows the form the AI filled in with the draft', async () => {
@@ -246,7 +326,7 @@ describe('app', () => {
     expect(await screen.findByText(/No email connected yet/)).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Connect Outlook' }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Outlook is connected')
+    expect(await screen.findByText(/Outlook is connected/)).toBeInTheDocument()
     expect(await screen.findByText('Connected')).toBeInTheDocument()
   })
 
@@ -284,7 +364,7 @@ describe('app', () => {
     expect(within(setup).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2')
 
     await userEvent.click(within(setup).getByRole('link', { name: 'Open the next draft' }))
-    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await approveAndSend()
     await screen.findByText('Approved')
 
     await router.navigate({ to: '/inbox' })
@@ -391,7 +471,7 @@ describe('app', () => {
     expect(screen.queryByRole('region', { name: 'Last 7 days' })).not.toBeInTheDocument()
 
     await router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } })
-    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await approveAndSend()
     await screen.findByText('Approved')
     await router.navigate({ to: '/inbox' })
 
