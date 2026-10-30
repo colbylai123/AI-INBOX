@@ -22,13 +22,13 @@ export function GettingStarted({
   connected,
   hasMaterials,
   hasApproved,
-  topMessageId,
+  nextDraftId,
 }: {
   connected: boolean
   hasMaterials: boolean
   hasApproved: boolean
-  /** The first message in the inbox, for the "approve a draft" step. */
-  topMessageId?: string
+  /** The most important email with a draft waiting, for the "approve a draft" step. */
+  nextDraftId?: string
 }) {
   const [hidden, setHidden] = useState(readHidden)
   const headingId = useId()
@@ -58,10 +58,10 @@ export function GettingStarted({
     {
       done: hasApproved,
       title: 'Approve your first draft',
-      body: 'Open your top email, check the reply and the form, then approve it.',
-      action: topMessageId && (
-        <Link to="/inbox/$messageId" params={{ messageId: topMessageId }} className={action}>
-          Open top email
+      body: 'Open an email with a drafted reply, check the reply and the form, then approve it.',
+      action: nextDraftId && (
+        <Link to="/inbox/$messageId" params={{ messageId: nextDraftId }} className={action}>
+          Open the next draft
         </Link>
       ),
     },

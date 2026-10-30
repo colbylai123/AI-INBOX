@@ -46,6 +46,7 @@ const seed: Message[] = [
         { id: 'unit-price', label: 'Unit price', value: '', source: null },
       ],
     },
+    hasDraft: true,
     approvedAt: null,
   },
   {
@@ -61,6 +62,7 @@ const seed: Message[] = [
     draftReply:
       'Thanks for the reminder. We have invoice 1182 on file and will pay it by November 3.',
     filledForm: null,
+    hasDraft: true,
     approvedAt: null,
   },
   {
@@ -75,6 +77,7 @@ const seed: Message[] = [
     body: 'This week: what small teams are doing to speed up month-end.',
     draftReply: null,
     filledForm: null,
+    hasDraft: false,
     approvedAt: null,
   },
   {
@@ -128,6 +131,7 @@ const seed: Message[] = [
         },
       ],
     },
+    hasDraft: true,
     approvedAt: null,
   },
   {
@@ -143,6 +147,7 @@ const seed: Message[] = [
     draftReply:
       "Hi Priya,\n\nI'm sorry the units arrived damaged, and thanks for the photos. We'll get 12 replacements out to you this week and send tracking as soon as they ship.\n\nBest,",
     filledForm: null,
+    hasDraft: true,
     approvedAt: null,
   },
   {
@@ -158,6 +163,7 @@ const seed: Message[] = [
     draftReply:
       "Hi Sam,\n\nNo problem. Friday at 10am works for me, and I'll send an updated invite.\n\nBest,",
     filledForm: null,
+    hasDraft: true,
     approvedAt: null,
   },
   {
@@ -173,6 +179,7 @@ const seed: Message[] = [
     draftReply:
       "Thanks for the heads-up. We've received the 2027 price list and will review it before our next order.",
     filledForm: null,
+    hasDraft: true,
     approvedAt: null,
   },
   {
@@ -187,6 +194,7 @@ const seed: Message[] = [
     body: 'Your statement for the account ending 4410 is ready to view in online banking.',
     draftReply: null,
     filledForm: null,
+    hasDraft: false,
     approvedAt: null,
   },
 ]
