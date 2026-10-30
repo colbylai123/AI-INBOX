@@ -62,7 +62,7 @@ export function MessageList({
               {showAccount && m.account && <> to {m.account.email}</>}
             </span>
             {/* The AI's one-line summary; the raw preview until it has one. Quieter than the subject. */}
-            <span className="truncate text-metadata text-muted-foreground/80">
+            <span className="truncate text-metadata text-muted-foreground">
               {m.summary ?? m.preview}
             </span>
           </Link>
