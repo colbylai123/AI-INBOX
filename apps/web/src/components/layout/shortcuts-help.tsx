@@ -45,7 +45,7 @@ export function ShortcutsHelp() {
       className="fixed right-4 bottom-4 left-4 z-20 rounded-lg border border-border bg-card p-5 shadow-panel sm:left-auto sm:w-80"
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 id={headingId} className="font-display text-lg font-bold tracking-tight">
+        <h2 id={headingId} className="font-display text-base font-semibold tracking-tight">
           Keyboard shortcuts
         </h2>
         <button

@@ -13,25 +13,23 @@ export function DemoBar() {
   }
 
   return (
-    <div role="region" aria-label="Demo" className="bg-field text-on-field">
+    <div
+      role="region"
+      aria-label="Demo"
+      className="border-b border-border bg-card text-foreground"
+    >
       <div className="mx-auto flex max-w-page flex-wrap items-center justify-center gap-x-4 gap-y-2 px-gutter py-2.5 text-sm">
         <p className="text-center">
-          <span className="font-semibold">You're trying the demo.</span>{' '}
-          <span className="text-on-field-secondary">
+          <span className="font-medium">You’re trying the demo.</span>{' '}
+          <span className="text-muted-foreground">
             These are sample emails, and nothing you approve is sent.
           </span>
         </p>
         <div className="flex items-center gap-2">
-          <Button size="sm" onClick={signIn}>
+          <Button size="sm" variant="outline" onClick={signIn}>
             Sign in to use your inbox
           </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-on-field-secondary hover:bg-on-field/10 hover:text-on-field"
-            disabled={exit.isPending}
-            onClick={() => exit.mutate()}
-          >
+          <Button size="sm" variant="ghost" disabled={exit.isPending} onClick={() => exit.mutate()}>
             Exit demo
           </Button>
         </div>

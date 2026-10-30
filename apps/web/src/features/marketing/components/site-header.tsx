@@ -12,7 +12,7 @@ const sections = [
 /** Header for the public pages. The landing page also links to its own sections. */
 export function SiteHeader({ page }: { page: 'landing' | 'sign-in' }) {
   return (
-    <header className="sticky top-0 z-10 border-b border-border bg-background">
+    <header className="sticky top-0 z-10 border-b border-border/80 bg-card/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-page items-center gap-6 px-gutter py-3.5">
         <Link to="/" className="rounded-md">
           <Logo />

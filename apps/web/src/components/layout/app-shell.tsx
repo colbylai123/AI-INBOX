@@ -37,7 +37,7 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
         </DismissibleBanner>
       )}
 
-      <header className="border-b border-border bg-card">
+      <header className="border-b border-border/80 bg-card/80 backdrop-blur-md">
         <div className="mx-auto grid max-w-page grid-cols-[1fr_auto] items-center gap-x-6 gap-y-3 px-gutter py-4 md:grid-cols-[1fr_auto_1fr] md:py-5">
           <Link to="/inbox" className="justify-self-start rounded-md">
             <Logo />
@@ -54,9 +54,9 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
                 to={to}
                 // The router marks the current page with aria-current="page".
                 className={cn(
-                  'rounded-md px-3 py-1.5 text-interface font-medium whitespace-nowrap text-muted-foreground transition-colors',
+                  'rounded-full px-3 py-1.5 text-interface font-medium whitespace-nowrap text-muted-foreground transition-colors',
                   'hover:bg-muted hover:text-foreground',
-                  'aria-[current=page]:bg-primary-soft aria-[current=page]:text-primary',
+                  'aria-[current=page]:bg-muted aria-[current=page]:text-foreground',
                 )}
               >
                 {label}

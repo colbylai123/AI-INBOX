@@ -87,7 +87,7 @@ export function GettingStarted({
         <div>
           <h2
             id={headingId}
-            className="font-display text-lg leading-tight font-bold tracking-tight"
+            className="font-display text-base leading-tight font-semibold tracking-tight"
           >
             Get set up
           </h2>

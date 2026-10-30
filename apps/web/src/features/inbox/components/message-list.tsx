@@ -31,14 +31,16 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
           <Link
             to="/inbox/$messageId"
             params={{ messageId: m.id }}
-            className="flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-muted focus-visible:-outline-offset-2"
+            className="flex flex-col gap-0.5 px-5 py-3.5 transition-colors hover:bg-muted focus-visible:-outline-offset-2"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="truncate text-interface font-semibold">{m.subject}</span>
+              <span className="truncate text-interface font-medium tracking-tight">
+                {m.subject}
+              </span>
               <span className="flex shrink-0 items-center gap-2">
                 {m.approvedAt && (
                   <span className="flex items-center gap-1 text-label font-medium text-muted-foreground">
-                    <CircleCheck className="size-3.5 text-primary" aria-hidden />
+                    <CircleCheck className="size-3.5" aria-hidden />
                     {/* Icon only on phones, where the subject needs the room. */}
                     <span className="max-sm:sr-only">Approved</span>
                   </span>
@@ -47,8 +49,10 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
               </span>
             </div>
             <span className="truncate text-metadata text-muted-foreground">{m.from}</span>
-            {/* The AI's one-line summary; the raw preview until it has one. */}
-            <span className="truncate text-sm text-muted-foreground">{m.summary ?? m.preview}</span>
+            {/* The AI's one-line summary; the raw preview until it has one. Quieter than the subject. */}
+            <span className="truncate text-metadata text-muted-foreground/80">
+              {m.summary ?? m.preview}
+            </span>
           </Link>
         </li>
       ))}

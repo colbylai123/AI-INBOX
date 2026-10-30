@@ -11,13 +11,13 @@ export function ProductPreview() {
     >
       <div className="mb-5 border-b border-border pb-4">
         <div className="flex items-center justify-between gap-3">
-          <span className="truncate text-interface font-semibold">
+          <span className="truncate text-interface font-medium tracking-tight">
             Quote for 40 units by Friday
           </span>
           <PriorityBadge priority="high" />
         </div>
         <p className="mt-2 flex items-start gap-2 text-metadata text-muted-foreground">
-          <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" />
+          <Sparkles className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
           Wants a quote for 40 units, delivered by Nov 14.
         </p>
       </div>
@@ -29,16 +29,16 @@ export function ProductPreview() {
           Thanks, Maya. The quote for 40 units is attached, with delivery by November 14.
         </ChatBubble>
         <div className="flex items-center gap-2 self-end rounded-md border border-border bg-card px-3 py-2 text-metadata font-medium shadow-xs">
-          <FileText className="size-3.5 text-primary" />
+          <FileText className="size-3.5 text-muted-foreground" />
           Quote form
           <span className="font-normal text-muted-foreground">· filled by AI</span>
         </div>
       </div>
       <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
         <span className="flex items-center gap-2 text-metadata text-muted-foreground">
-          <Clock className="size-3.5 text-primary" /> Waiting for approval
+          <Clock className="size-3.5" /> Waiting for approval
         </span>
-        <span className="rounded-md bg-primary px-3.5 py-1.5 text-metadata font-medium whitespace-nowrap text-primary-foreground">
+        <span className="rounded-full bg-approve px-3.5 py-1.5 text-metadata font-semibold whitespace-nowrap text-approve-foreground shadow-glow">
           Approve & send
         </span>
       </div>

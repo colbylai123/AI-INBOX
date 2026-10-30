@@ -1,7 +1,9 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod/mini'
+import { DemoWelcome } from '@/components/layout/demo-welcome'
 import { PageHeader } from '@/components/layout/page-header'
+import { useDemoMode } from '@/lib/demo-mode'
 import { ConnectPrompt, connectionsQuery, ReconnectAlert } from '@/features/connections'
 import {
   MessageList,
@@ -33,6 +35,7 @@ export const Route = createFileRoute('/_app/inbox/')({
 })
 
 function InboxPage() {
+  const demo = useDemoMode()
   const filters = Route.useLoaderDeps()
   const { data: messages } = useSuspenseQuery(messagesQuery(filters))
   const { data: connections } = useSuspenseQuery(connectionsQuery())
@@ -41,7 +44,15 @@ function InboxPage() {
   const stats = useQuery(weeklyStatsQuery())
   return (
     <>
-      <PageHeader title="Inbox" description="Incoming messages, most important first." />
+      <PageHeader
+        title="Inbox"
+        description={
+          demo
+            ? 'Three sample messages, most important first.'
+            : 'Incoming messages, most important first.'
+        }
+      />
+      {demo && <DemoWelcome />}
       {connections.length === 0 ? (
         <ConnectPrompt />
       ) : (

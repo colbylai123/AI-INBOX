@@ -31,10 +31,12 @@ function SignIn() {
       <SiteHeader page="sign-in" />
       <main className="grid flex-1 place-items-center px-gutter py-16">
         <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-panel md:p-10">
-          <h1 className="font-display text-4xl leading-[1.05] font-bold tracking-[-0.03em]">
+          <h1 className="font-display text-2xl leading-tight font-semibold tracking-[-0.02em]">
             Sign in
           </h1>
-          <p className="mt-3 text-muted-foreground">Use your work account to open your inbox.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Use your work account to open your inbox.
+          </p>
           <Button
             size="lg"
             className="mt-8 w-full"
@@ -49,7 +51,7 @@ function SignIn() {
             <Link
               to="/demo"
               preload={false}
-              className="rounded-sm font-medium text-primary underline-offset-4 hover:underline"
+              className="rounded-sm font-medium text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
             >
               Try the demo with sample emails
             </Link>

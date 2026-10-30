@@ -2,8 +2,8 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 /**
- * Message text as a framed panel: incoming mail on the left in pale grey,
- * the AI's draft on the right in pale blue.
+ * Message text as a framed panel: incoming mail on the left in warm grey,
+ * the AI's draft on the right on a honey panel. Neither uses the approve green.
  */
 export function ChatBubble({
   from,
@@ -21,7 +21,7 @@ export function ChatBubble({
       <div
         className={cn(
           'max-w-[min(36rem,92%)] rounded-lg border px-4 py-3 text-interface leading-relaxed whitespace-pre-wrap',
-          draft ? 'border-primary/20 bg-primary-soft' : 'border-border bg-muted',
+          draft ? 'border-border bg-draft' : 'border-border bg-muted',
         )}
       >
         {children}
