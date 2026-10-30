@@ -41,6 +41,8 @@ Until an endpoint exists, the web app runs on demo data (mocks in `apps/web/src/
 
 `return_to` must be validated on the server: accept only a path on the app (one leading `/`, no `//`, no backslashes), otherwise use `/inbox`.
 
+The inbox re-fetches `GET /messages` once a minute while it's open, and again when the tab regains focus, so new mail shows up without a reload. Search filters the loaded list in the browser, so it needs no endpoint.
+
 ```jsonc
 // User
 { "id": "u1", "name": "Maya Lee", "email": "maya@example.com" }

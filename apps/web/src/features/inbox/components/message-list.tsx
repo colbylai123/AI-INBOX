@@ -31,6 +31,8 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
           <Link
             to="/inbox/$messageId"
             params={{ messageId: m.id }}
+            // Carries the filter and search, so the way back keeps them.
+            search
             className="flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-muted focus-visible:-outline-offset-2"
           >
             <div className="flex items-center justify-between gap-3">

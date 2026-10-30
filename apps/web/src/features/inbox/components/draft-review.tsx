@@ -32,7 +32,7 @@ export function DraftReview({ message }: { message: Message }) {
   useShortcuts(
     {
       ...(canEdit && { e: startEditing }),
-      Escape: () => void navigate({ to: '/inbox' }),
+      Escape: () => void navigate({ to: '/inbox', search: true }),
     },
     !editing,
   )
