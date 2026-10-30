@@ -1,6 +1,6 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { z } from 'zod/mini'
 import { PageHeader } from '@/components/layout/page-header'
 import { ConnectPrompt, connectionsQuery, ReconnectAlert } from '@/features/connections'
 import {
@@ -17,7 +17,7 @@ import { GettingStarted } from '@/features/onboarding'
 export const Route = createFileRoute('/_app/inbox/')({
   // Typed, validated URL state. Unknown values fall back to "all".
   validateSearch: z.object({
-    priority: z.enum(priorities).optional().catch(undefined),
+    priority: z.catch(z.optional(z.enum(priorities)), undefined),
   }),
   loaderDeps: ({ search }) => ({ priority: search.priority }),
   loader: ({ context, deps }) => {

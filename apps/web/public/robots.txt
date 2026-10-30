@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /demo
+Disallow: /inbox
+Disallow: /materials
+Disallow: /settings

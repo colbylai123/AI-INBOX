@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { z } from 'zod/mini'
 import { PageHeader } from '@/components/layout/page-header'
 import { AccountCard } from '@/features/auth'
 import { ConnectedAccounts, connectionsQuery } from '@/features/connections'
@@ -8,7 +8,7 @@ import { ConnectedAccounts, connectionsQuery } from '@/features/connections'
 export const Route = createFileRoute('/_app/settings')({
   // Microsoft's redirect comes back here with ?connection=connected|failed.
   validateSearch: z.object({
-    connection: z.enum(['connected', 'failed']).optional().catch(undefined),
+    connection: z.catch(z.optional(z.enum(['connected', 'failed'])), undefined),
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(connectionsQuery()),
   component: SettingsPage,

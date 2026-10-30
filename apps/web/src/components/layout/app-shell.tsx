@@ -74,7 +74,8 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
             >
               {user.name.charAt(0)}
             </span>
-            <span className="hidden sm:inline">{user.name}</span>
+            {/* Read out at every width, so the link keeps a name when phones show only the initial. */}
+            <span className="max-sm:sr-only">{user.name}</span>
             <ChevronRight className="size-3.5 text-muted-foreground" aria-hidden />
           </Link>
         </div>
