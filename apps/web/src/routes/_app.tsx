@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { AppShell } from '@/components/layout/app-shell'
 import { sessionQuery } from '@/features/auth'
+import { SendQueue } from '@/features/inbox'
 
 // Pathless layout: every route under routes/_app/ requires a signed-in user
 // and renders inside the app shell.
@@ -21,6 +22,8 @@ function AppLayout() {
   return (
     <AppShell user={user}>
       <Outlet />
+      {/* Here, not on the draft page, so an approved reply keeps its undo window on any page. */}
+      <SendQueue />
     </AppShell>
   )
 }
