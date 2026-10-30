@@ -1,12 +1,13 @@
 import { queryOptions } from '@tanstack/react-query'
 import { apiFetch, isApiError } from '@/lib/api-client'
+import { mocksEnabled } from '@/lib/demo-mode'
 import { env } from '@/lib/env'
 import type { User } from '../types'
 
 // Login is WorkOS AuthKit, verified by FastAPI. The browser only asks FastAPI
 // "who am I?"; it never sees WorkOS or Microsoft tokens.
 async function fetchSession(): Promise<User | null> {
-  if (env.VITE_USE_MOCKS) {
+  if (mocksEnabled()) {
     return { id: 'u1', name: 'Demo User', email: 'demo@example.com' }
   }
   try {

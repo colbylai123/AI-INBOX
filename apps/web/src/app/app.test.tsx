@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { resetMockMessages } from '@/features/inbox/api/mocks'
 import { resetMockMaterials } from '@/features/materials/api/mocks'
 import { ApiError } from '@/lib/api-client'
+import { isDemoMode, setDemoMode } from '@/lib/demo-mode'
 import { App } from './app'
 import { createQueryClient } from './query-client'
 import { createAppRouter } from './router'
@@ -23,13 +24,59 @@ beforeEach(() => {
   resetMockMessages()
   resetMockMaterials()
   localStorage.clear()
+  setDemoMode(false)
 })
 
 describe('app', () => {
-  it('redirects / to the inbox, most important first', async () => {
+  it('shows the landing page at /', async () => {
+    renderApp('/')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Your inbox, sorted and drafted' }),
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /Try the demo/ }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Sign in' }).length).toBeGreaterThan(0)
+  })
+
+  it('opens the demo from the landing page and exits back to it', async () => {
     const { router } = renderApp('/')
-    const items = await screen.findAllByRole('listitem')
+    const [tryDemo] = await screen.findAllByRole('link', { name: /Try the demo/ })
+    await userEvent.click(tryDemo!)
+
+    const bar = await screen.findByRole('region', { name: 'Demo' })
+    expect(await screen.findByText('Quote for 40 units by Friday')).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/inbox')
+    expect(isDemoMode()).toBe(true)
+    expect(bar).toHaveTextContent('nothing you approve is sent')
+    // The development banner doesn't stack on top of the demo bar.
+    expect(screen.queryByRole('region', { name: 'Announcement' })).not.toBeInTheDocument()
+
+    await userEvent.click(within(bar).getByRole('button', { name: 'Exit demo' }))
+    await screen.findByRole('heading', { level: 1, name: 'Your inbox, sorted and drafted' })
+    expect(router.state.location.pathname).toBe('/')
+    expect(isDemoMode()).toBe(false)
+  })
+
+  it('starts every demo on fresh sample data', async () => {
+    const { router } = renderApp('/demo')
+    await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await screen.findByText('Approved')
+
+    await router.navigate({ to: '/demo' })
+    await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
+    expect(await screen.findByRole('button', { name: 'Approve & send' })).toBeEnabled()
+  })
+
+  it('ends the demo when you go to sign in', async () => {
+    setDemoMode(true)
+    renderApp('/sign-in')
+    await screen.findAllByRole('listitem')
+    expect(isDemoMode()).toBe(false)
+  })
+
+  it('lists the inbox most important first', async () => {
+    renderApp('/inbox')
+    const items = await screen.findAllByRole('listitem')
     expect(items[0]).toHaveTextContent('Quote for 40 units by Friday')
     // Each row carries the AI's one-line summary.
     expect(items[0]).toHaveTextContent('Wants a quote for 40 units')

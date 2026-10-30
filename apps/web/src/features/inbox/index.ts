@@ -1,4 +1,5 @@
 // Public surface of the inbox feature. Import from '@/features/inbox', not deep paths.
+export { resetSampleInbox } from './api/inbox-api'
 export { inboxKeys, messageQuery, messagesQuery } from './api/queries'
 export { ChatBubble } from './components/chat-bubble'
 export { DraftReview } from './components/draft-review'

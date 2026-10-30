@@ -1,12 +1,12 @@
 import { ApiError, apiFetch } from '@/lib/api-client'
-import { env } from '@/lib/env'
+import { mocksEnabled } from '@/lib/demo-mode'
 import { mockDelay } from '@/lib/mock'
 import type { Material } from '../types'
 
-// Transport only: HTTP calls, or the in-memory mocks when VITE_USE_MOCKS=true.
+// Transport only: HTTP calls, or the in-memory mocks in development and in the demo.
 
 export async function getMaterials(): Promise<Material[]> {
-  if (env.VITE_USE_MOCKS) {
+  if (mocksEnabled()) {
     const { mockMaterials } = await import('./mocks')
     await mockDelay()
     return structuredClone(mockMaterials)
@@ -15,7 +15,7 @@ export async function getMaterials(): Promise<Material[]> {
 }
 
 export async function uploadMaterial(file: File): Promise<Material> {
-  if (env.VITE_USE_MOCKS) {
+  if (mocksEnabled()) {
     const mocks = await import('./mocks')
     await mockDelay()
     const material: Material = {
@@ -34,7 +34,7 @@ export async function uploadMaterial(file: File): Promise<Material> {
 }
 
 export async function deleteMaterial(id: string): Promise<void> {
-  if (env.VITE_USE_MOCKS) {
+  if (mocksEnabled()) {
     const mocks = await import('./mocks')
     await mockDelay()
     const index = mocks.mockMaterials.findIndex((m) => m.id === id)
@@ -43,4 +43,10 @@ export async function deleteMaterial(id: string): Promise<void> {
     return
   }
   return apiFetch<void>(`/materials/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+/** Puts the sample materials back to how they started, so each demo begins fresh. */
+export async function resetSampleMaterials(): Promise<void> {
+  const { resetMockMaterials } = await import('./mocks')
+  resetMockMaterials()
 }

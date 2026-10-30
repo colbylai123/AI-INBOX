@@ -2,9 +2,11 @@ import { Link, type LinkProps } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { User } from '@/features/auth'
+import { useDemoMode } from '@/lib/demo-mode'
 import { env } from '@/lib/env'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { DemoBar } from './demo-bar'
 import { DismissibleBanner } from './dismissible-banner'
 import { Logo } from './logo'
 
@@ -16,9 +18,12 @@ const nav: { to: LinkProps['to']; label: string }[] = [
 ]
 
 export function AppShell({ user, children }: { user: User; children: ReactNode }) {
+  const demo = useDemoMode()
   return (
     <div className="min-h-svh">
-      {env.VITE_USE_MOCKS && (
+      {demo && <DemoBar />}
+      {/* Development on mocks; a visitor in the demo sees the demo bar instead. */}
+      {env.VITE_USE_MOCKS && !demo && (
         <DismissibleBanner
           storageKey="banner:demo-data"
           action={

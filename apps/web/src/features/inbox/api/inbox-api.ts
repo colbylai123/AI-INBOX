@@ -1,13 +1,13 @@
 import { ApiError, apiFetch } from '@/lib/api-client'
-import { env } from '@/lib/env'
+import { mocksEnabled } from '@/lib/demo-mode'
 import { mockDelay } from '@/lib/mock'
 import type { DraftUpdate, Message, MessageFilters, MessageSummary } from '../types'
 
-// Transport only: HTTP calls, or the in-memory mocks when VITE_USE_MOCKS=true.
-// Mocks are imported lazily so they never load in a production session.
+// Transport only: HTTP calls, or the in-memory mocks in development and in the
+// demo. Mocks are imported lazily so a signed-in production session never loads them.
 
 export async function getMessages(filters: MessageFilters): Promise<MessageSummary[]> {
-  if (env.VITE_USE_MOCKS) {
+  if (mocksEnabled()) {
     const { mockMessages } = await import('./mocks')
     await mockDelay()
     return structuredClone(
@@ -19,7 +19,7 @@ export async function getMessages(filters: MessageFilters): Promise<MessageSumma
 }
 
 export async function getMessage(id: string): Promise<Message> {
-  if (env.VITE_USE_MOCKS) {
+  if (mocksEnabled()) {
     const { mockMessages } = await import('./mocks')
     await mockDelay()
     const message = mockMessages.find((m) => m.id === id)
@@ -30,7 +30,7 @@ export async function getMessage(id: string): Promise<Message> {
 }
 
 export async function saveDraft(id: string, update: DraftUpdate): Promise<Message> {
-  if (env.VITE_USE_MOCKS) {
+  if (mocksEnabled()) {
     const { mockMessages } = await import('./mocks')
     await mockDelay()
     const message = mockMessages.find((m) => m.id === id)
@@ -49,7 +49,7 @@ export async function saveDraft(id: string, update: DraftUpdate): Promise<Messag
 }
 
 export async function approveDraft(id: string): Promise<void> {
-  if (env.VITE_USE_MOCKS) {
+  if (mocksEnabled()) {
     const { mockMessages } = await import('./mocks')
     await mockDelay()
     const message = mockMessages.find((m) => m.id === id)
@@ -58,4 +58,10 @@ export async function approveDraft(id: string): Promise<void> {
     return
   }
   return apiFetch<void>(`/messages/${encodeURIComponent(id)}/approve`, { method: 'POST' })
+}
+
+/** Puts the sample inbox back to how it started, so each demo begins fresh. */
+export async function resetSampleInbox(): Promise<void> {
+  const { resetMockMessages } = await import('./mocks')
+  resetMockMessages()
 }
