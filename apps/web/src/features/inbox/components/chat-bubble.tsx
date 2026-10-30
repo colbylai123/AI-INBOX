@@ -11,7 +11,7 @@ export function ChatBubble({
   children,
 }: {
   from: 'incoming' | 'draft'
-  label?: string
+  label?: ReactNode
   children: ReactNode
 }) {
   const draft = from === 'draft'

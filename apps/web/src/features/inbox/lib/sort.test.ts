@@ -10,6 +10,7 @@ const msg = (id: string, priority: MessageSummary['priority'], receivedAt: strin
     subject: '',
     preview: '',
     summary: null,
+    priorityReason: null,
     hasDraft: false,
     approvedAt: null,
   }) satisfies MessageSummary

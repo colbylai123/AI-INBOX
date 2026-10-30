@@ -3,6 +3,7 @@ import { useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useApproveDraft } from '../hooks/use-approve-draft'
+import { highlight } from '../lib/highlight'
 import { useSaveDraft } from '../hooks/use-save-draft'
 import type { Message } from '../types'
 import { ChatBubble } from './chat-bubble'
@@ -15,7 +16,10 @@ export function DraftReview({ message }: { message: Message }) {
   const approve = useApproveDraft()
   const save = useSaveDraft(message.id)
   const [editing, setEditing] = useState(false)
+  const [showSources, setShowSources] = useState(false)
   const editorId = useId()
+  const sources = showSources && !editing ? (message.filledForm?.fields ?? []) : []
+  const phrases = sources.flatMap((field) => (field.source ? [field.source] : []))
 
   return (
     <Card>
@@ -23,14 +27,30 @@ export function DraftReview({ message }: { message: Message }) {
         <CardTitle>Conversation</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
-        {message.summary && (
-          <p className="border-b border-border pb-5 text-interface">
-            <span className="mr-3 text-label font-semibold text-muted-foreground">Summary</span>
-            <span>{message.summary}</span>
-          </p>
+        {(message.summary || message.priorityReason) && (
+          <dl className="grid gap-x-4 gap-y-2 border-b border-border pb-5 text-interface sm:grid-cols-[auto_1fr]">
+            {message.summary && (
+              <>
+                <dt className="text-label font-semibold text-muted-foreground sm:pt-0.5">
+                  Summary
+                </dt>
+                <dd>{message.summary}</dd>
+              </>
+            )}
+            {message.priorityReason && (
+              <>
+                <dt className="text-label font-semibold text-muted-foreground sm:pt-0.5">
+                  Why {message.priority}
+                </dt>
+                <dd>{message.priorityReason}</dd>
+              </>
+            )}
+          </dl>
         )}
-        <ChatBubble from="incoming" label={message.from}>
-          {message.body}
+        {/* With sources on, mark the words the form's values came from, in the
+            sender's address as well as the body. */}
+        <ChatBubble from="incoming" label={highlight(message.from, phrases)}>
+          {highlight(message.body, phrases)}
         </ChatBubble>
         {editing ? (
           <DraftEditor
@@ -43,7 +63,13 @@ export function DraftReview({ message }: { message: Message }) {
             <ChatBubble from="draft" label="AI draft">
               {message.draftReply}
             </ChatBubble>
-            {message.filledForm && <FilledFormView form={message.filledForm} />}
+            {message.filledForm && (
+              <FilledFormView
+                form={message.filledForm}
+                showSources={showSources}
+                onShowSourcesChange={setShowSources}
+              />
+            )}
           </>
         ) : (
           <p className="text-sm text-muted-foreground">No draft yet.</p>
