@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fcfcfd" />
     <meta
@@ -10,6 +12,23 @@
       content="AI Inbox ranks your Outlook email, drafts the replies and fills in your forms. You approve before anything is sent."
     />
     <title>AI Inbox</title>
+
+    <!-- Link previews (Slack, iMessage, LinkedIn, X). og:url and og:image need absolute
+         URLs, so vite.config.ts adds them when the build knows the site's address. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AI Inbox" />
+    <meta property="og:title" content="AI Inbox: your email, sorted and drafted" />
+    <meta
+      property="og:description"
+      content="Ranks your Outlook email, drafts the replies and fills in your forms. Nothing sends until you approve."
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="AI Inbox: an email asking for a quote, with the AI's draft reply and an Approve & send button."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <div id="root"></div>
