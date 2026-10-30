@@ -132,6 +132,37 @@ Field `id`s must be stable for a given form, since step 4 edits fields by id. A 
 
 Fields left out of `formValues` keep their value. Return `422` for a field id that isn't on the form and `409` if the draft was already approved. Saving never sends anything. Only `POST /messages/{id}/approve` sends.
 
+## Step 5: connect Outlook and sign out
+
+The Settings page lets the user connect their Outlook account, see that it's connected, and disconnect it. The account menu gets a Sign out button. Nothing in steps 0 to 4 changes.
+
+| Method | Path                                     | Returns                                             |
+| ------ | ---------------------------------------- | --------------------------------------------------- |
+| GET    | `/connections`                           | `200` Connection[] (empty until the user connects)  |
+| GET    | `/connections/outlook/start?return_to=…` | Redirect to Microsoft, then back to `return_to`     |
+| DELETE | `/connections/{id}`                      | `204`, or `404`. Disconnects and deletes the tokens |
+| POST   | `/auth/logout`                           | `204`. Clears the session cookie                    |
+
+```jsonc
+// Connection
+{
+  "id": "con-1",
+  "provider": "outlook", // more providers later (Gmail, Slack…), so the app never assumes Outlook only
+  "accountEmail": "maya@brightline.example",
+  "status": "connected", // or "reconnect_needed" when Microsoft rejects the stored token
+  "connectedAt": "2026-10-30T16:00:00Z",
+  "lastSyncedAt": "2026-10-30T17:40:00Z", // null until the first sync finishes
+}
+```
+
+**Connecting.** The app sends the browser (a full page load, not a fetch) to `/connections/outlook/start?return_to=/settings`, the same way sign-in works. FastAPI runs the Microsoft OAuth flow, keeps the tokens on the server, and redirects back to `return_to` with `?connection=connected`, or `?connection=failed` if the user cancelled or Microsoft refused. Validate `return_to` exactly like `/auth/login` (a path on the app, otherwise `/settings`). The browser never sees Microsoft tokens.
+
+- **Permissions to ask Microsoft for:** `Mail.Read` (read the inbox), `Mail.Send` (send the reply only when the user clicks Approve & send), `User.Read` (the account's email address) and `offline_access` (keep syncing without asking again).
+- **Before the user connects,** `GET /messages` returns `[]`, not an error. The app shows an empty inbox with a link to Settings.
+- **`reconnect_needed`** tells the app to show a Reconnect button, which goes through the same `/start` link.
+
+**Signing out.** `POST /auth/logout` clears the session cookie, and should also end the WorkOS session so the next sign-in asks again. It has no body, so the browser sends it without a CORS preflight. After it returns, the app clears its data and shows the sign-in page. Signing out does not disconnect Outlook.
+
 ## Trying the app against the real API
 
 Create `apps/web/.env.development.local` (it's gitignored):
