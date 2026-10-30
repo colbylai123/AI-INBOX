@@ -358,6 +358,14 @@ describe('app', () => {
     expect(marked).toContain('the week of November 10')
   })
 
+  it("marks a value taken from the sender's address", async () => {
+    renderApp('/inbox/m1')
+    const form = await screen.findByRole('region', { name: 'Quote form' })
+    await userEvent.click(within(form).getByRole('button', { name: 'Show sources' }))
+    const marked = [...document.querySelectorAll('mark')].map((mark) => mark.textContent)
+    expect(marked).toContain('orders@brightline.example')
+  })
+
   it('stops citing the email for a value the user changed', async () => {
     renderApp('/inbox/m1')
     await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))

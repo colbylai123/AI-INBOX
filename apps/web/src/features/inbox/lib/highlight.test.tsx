@@ -16,6 +16,17 @@ describe('findSpans', () => {
     ])
   })
 
+  it("doesn't match inside a longer number or word", () => {
+    const text = 'We had 1200 last year, 1,200 in spring, and need 200 now.'
+    const start = text.lastIndexOf('200')
+    expect(findSpans(text, ['200'])).toEqual([{ start, end: start + 3 }])
+    expect(findSpans('Mayan art for Maya', ['Maya'])).toEqual([{ start: 14, end: 18 }])
+  })
+
+  it('still matches phrases that begin or end with punctuation', () => {
+    expect(findSpans('at $1.85 each.', ['$1.85 each'])).toEqual([{ start: 3, end: 13 }])
+  })
+
   it('ignores blank phrases', () => {
     expect(findSpans('anything', ['', '  '])).toEqual([])
   })
