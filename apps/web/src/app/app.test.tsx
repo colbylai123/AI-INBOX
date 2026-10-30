@@ -1,7 +1,8 @@
 import { createMemoryHistory } from '@tanstack/react-router'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { resetMockMessages } from '@/features/inbox/api/mocks'
+import { resetMockMaterials } from '@/features/materials/api/mocks'
 import { ApiError } from '@/lib/api-client'
 import { App } from './app'
 import { createQueryClient } from './query-client'
@@ -20,6 +21,7 @@ function renderApp(url: string) {
 
 beforeEach(() => {
   resetMockMessages()
+  resetMockMaterials()
   localStorage.clear()
 })
 
@@ -59,6 +61,30 @@ describe('app', () => {
     expect(
       await screen.findByText('Reminder that invoice 1182 ($2,400) is due Nov 3.'),
     ).toBeInTheDocument()
+  })
+
+  it('uploads and removes materials', async () => {
+    renderApp('/materials')
+    expect(await screen.findByText('Quote form')).toBeInTheDocument()
+
+    const file = new File(['%PDF'], 'invoice-template.pdf', { type: 'application/pdf' })
+    await userEvent.upload(screen.getByLabelText('Choose a file to upload'), file)
+    expect(await screen.findByText('invoice-template')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Remove Quote form' }))
+    await waitFor(() => expect(screen.queryByText('Quote form')).not.toBeInTheDocument())
+  })
+
+  it('refuses file types the AI cannot use', async () => {
+    renderApp('/materials')
+    const file = new File(['png'], 'photo.png', { type: 'image/png' })
+    // applyAccept: false lets the test pick a file the picker would normally hide.
+    await userEvent.upload(await screen.findByLabelText('Choose a file to upload'), file, {
+      applyAccept: false,
+    })
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      "photo.png isn't a PDF, Word or Excel file.",
+    )
   })
 
   it('sends an action that finds the session expired to sign-in', async () => {
