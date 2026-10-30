@@ -1,7 +1,7 @@
 // Renders public/og-image.png and the app icons from scripts/share-images.html.
 // Run it again after changing the product name, logo or headline:
-//   node scripts/render-share-images.mjs
-// Needs Playwright's Chromium (npx playwright install chromium).
+//   npm run share-images
+// The first time, download the browser it uses: npx playwright install chromium
 import path from 'node:path'
 import { chromium } from 'playwright'
 
