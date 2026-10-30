@@ -41,6 +41,8 @@ Until an endpoint exists, the web app runs on demo data (mocks in `apps/web/src/
 
 `return_to` must be validated on the server: accept only a path on the app (one leading `/`, no `//`, no backslashes), otherwise use `/inbox`.
 
+The inbox re-fetches `GET /messages` once a minute while it's open, and again when the tab regains focus, so new mail shows up without a reload. Search filters the loaded list in the browser, so it needs no endpoint.
+
 ```jsonc
 // User
 { "id": "u1", "name": "Maya Lee", "email": "maya@example.com" }
@@ -220,6 +222,20 @@ Once the user has approved something, the inbox shows the last 7 days: drafts ap
   "formsApproved": 7, // approved drafts that came with a filled form
 }
 ```
+
+## Step 9: more than one account, including Gmail
+
+Settings lets the user connect several email accounts: more than one Outlook account, a Gmail account, or both. Mail from all of them lands in the one inbox. Steps 0 to 8 are unchanged, and Outlook works exactly as in step 5.
+
+| Method | Path                                   | Returns                                      |
+| ------ | -------------------------------------- | -------------------------------------------- |
+| GET    | `/connections/gmail/start?return_to=…` | Redirect to Google, then back to `return_to` |
+
+- **`provider`** can now be `"gmail"` as well as `"outlook"`.
+- **Several accounts.** A user can have any number of connections, including two of the same provider. Connecting an account that's already there (same provider and `accountEmail`) updates that connection instead of adding a second one. Reconnect relies on this.
+- **Coming back.** The app now passes a `return_to` that has its own query, such as `/settings?provider=gmail`, so the page can say which account was connected. Add `connection=connected` or `connection=failed` to it and keep what's already there: `/settings?provider=gmail&connection=connected`. Validate `return_to` as before.
+- **Permissions to ask Google for:** `https://www.googleapis.com/auth/gmail.readonly` (read the inbox), `https://www.googleapis.com/auth/gmail.send` (send the reply only when the user approves) and `openid email` (the account's address), with `access_type=offline` so syncing continues without asking again.
+- **Before launch:** `gmail.readonly` is a restricted scope. Until Google verifies the app, which includes an independent security assessment and takes weeks, only up to 100 test users you list in the Google Cloud console can connect Gmail. Start that early.
 
 ## Step 10: say which uploaded document a value came from
 

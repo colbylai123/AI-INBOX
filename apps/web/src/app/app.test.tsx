@@ -342,7 +342,7 @@ describe('app', () => {
   it('disconnects Outlook only after confirming, and connects it again', async () => {
     renderApp('/settings')
     await userEvent.click(await screen.findByRole('button', { name: 'Disconnect' }))
-    const confirm = screen.getByRole('group', { name: 'Disconnect Outlook?' })
+    const confirm = screen.getByRole('group', { name: 'Disconnect demo@example.com?' })
     expect(mockConnections).toHaveLength(1)
     await userEvent.click(within(confirm).getByRole('button', { name: 'Disconnect' }))
     expect(await screen.findByText(/No email connected yet/)).toBeInTheDocument()
@@ -353,14 +353,58 @@ describe('app', () => {
   })
 
   it('explains a failed connection', async () => {
-    renderApp('/settings?connection=failed')
-    expect(await screen.findByRole('alert')).toHaveTextContent("Outlook wasn't connected")
+    renderApp('/settings?provider=gmail&connection=failed')
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      "Gmail wasn't connected. You may have cancelled, or Google refused access.",
+    )
+  })
+
+  it('connects a Gmail account alongside Outlook', async () => {
+    const { router } = renderApp('/settings')
+    await screen.findByText(/demo@example.com · Synced/)
+    await userEvent.click(screen.getByRole('button', { name: 'Connect Gmail' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Gmail is connected')
+    expect(await screen.findByText(/demo@gmail.example · Synced/)).toBeInTheDocument()
+    expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
+    expect(mockConnections.map((c) => c.provider)).toEqual(['outlook', 'gmail'])
+    expect(router.state.location.search).toEqual({ provider: 'gmail', connection: 'connected' })
+  })
+
+  it('adds a second account from the same provider', async () => {
+    renderApp('/settings')
+    await screen.findByText(/demo@example.com · Synced/)
+    await userEvent.click(screen.getByRole('button', { name: 'Connect Outlook' }))
+    expect(await screen.findByText(/demo2@example.com · Synced/)).toBeInTheDocument()
+    expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
+    expect(mockConnections.map((c) => c.accountEmail)).toEqual([
+      'demo@example.com',
+      'demo2@example.com',
+    ])
+  })
+
+  it('reconnects the account that needs it, with its own provider', async () => {
+    mockConnections.push({
+      id: 'con-gmail',
+      provider: 'gmail',
+      accountEmail: 'sales@gmail.example',
+      status: 'reconnect_needed',
+      connectedAt: '2026-10-20T16:00:00Z',
+      lastSyncedAt: null,
+    })
+    renderApp('/inbox')
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Gmail needs reconnecting. New mail for sales@gmail.example')
+    await userEvent.click(within(alert).getByRole('button', { name: /Reconnect/ }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Gmail is connected')
+    expect(mockConnections.find((c) => c.id === 'con-gmail')?.status).toBe('connected')
   })
 
   it('asks to connect Outlook before showing the inbox', async () => {
     mockConnections.splice(0)
     renderApp('/inbox')
-    expect(await screen.findByText('Connect Outlook to fill your inbox')).toBeInTheDocument()
+    expect(await screen.findByText('Connect your email to fill your inbox')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Connect Outlook' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Connect Gmail' })).toBeInTheDocument()
     expect(screen.queryByRole('navigation', { name: 'Filter by priority' })).not.toBeInTheDocument()
   })
 
@@ -578,6 +622,73 @@ describe('app', () => {
     expect(await screen.findByText('Quote for 40 units by Friday')).toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'Last 7 days' })).not.toBeInTheDocument()
     vi.restoreAllMocks()
+  })
+
+  it('searches the inbox and keeps the words in the URL', async () => {
+    const { router } = renderApp('/inbox')
+    const list = await screen.findByRole('list', { name: 'Messages' })
+    expect(within(list).getAllByRole('listitem')).toHaveLength(8)
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Search the inbox' }), 'units')
+    expect(screen.getByText('2 of 8 messages match')).toBeInTheDocument()
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((li) => li.querySelector('a')!.textContent),
+    ).toEqual([
+      expect.stringContaining('Quote for 40 units'),
+      expect.stringContaining('12 units arrived'),
+    ])
+    await waitFor(() => expect(router.state.location.search).toEqual({ q: 'units' }))
+
+    // Changing the priority keeps the search.
+    await userEvent.click(screen.getByRole('link', { name: 'Medium' }))
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ q: 'units', priority: 'medium' }),
+    )
+    expect(await screen.findByText('No messages match “units”.')).toBeInTheDocument()
+  })
+
+  it('keeps the search when you open a message and go back', async () => {
+    const { router } = renderApp('/inbox?q=units&priority=high')
+    await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
+    await screen.findByRole('button', { name: 'Approve & send' })
+    expect(router.state.location.search).toEqual({ q: 'units', priority: 'high' })
+
+    await userEvent.click(screen.getByRole('link', { name: 'Inbox', current: false }))
+    expect(await screen.findByRole('searchbox', { name: 'Search the inbox' })).toHaveValue('units')
+    expect(router.state.location.search).toEqual({ q: 'units', priority: 'high' })
+
+    // Escape goes back the same way.
+    await userEvent.click(await screen.findByRole('link', { name: /12 units arrived/ }))
+    await screen.findByRole('heading', { name: '12 units arrived damaged' })
+    await userEvent.keyboard('{Escape}')
+    expect(await screen.findByRole('searchbox', { name: 'Search the inbox' })).toHaveValue('units')
+    expect(screen.getByText('2 of 3 messages match')).toBeInTheDocument()
+  })
+
+  it('jumps to search with / and clears it with Escape', async () => {
+    renderApp('/inbox?q=packright')
+    const search = await screen.findByRole('searchbox', { name: 'Search the inbox' })
+    expect(search).toHaveValue('packright')
+    expect(screen.getByText('1 of 8 messages match')).toBeInTheDocument()
+
+    await userEvent.keyboard('/')
+    expect(search).toHaveFocus()
+    expect(search).toHaveValue('packright')
+    await userEvent.keyboard('{Escape}')
+    expect(search).toHaveValue('')
+    expect(
+      within(screen.getByRole('list', { name: 'Messages' })).getAllByRole('listitem'),
+    ).toHaveLength(8)
+  })
+
+  it('empties the search box when the Inbox link clears the search', async () => {
+    renderApp('/inbox?q=invoice')
+    const search = await screen.findByRole('searchbox', { name: 'Search the inbox' })
+    const nav = screen.getByRole('navigation', { name: 'Main' })
+    await userEvent.click(within(nav).getByRole('link', { name: 'Inbox' }))
+    await waitFor(() => expect(search).toHaveValue(''))
   })
 
   it('shows not found for an unknown message', async () => {

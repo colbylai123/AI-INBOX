@@ -10,14 +10,15 @@ const options: { label: string; value: Priority | undefined }[] = [
 // Filter state lives in the URL (?priority=high), so it survives reloads and can be shared.
 export function PriorityFilter({ value }: { value: Priority | undefined }) {
   return (
-    <nav aria-label="Filter by priority" className="mb-6 flex flex-wrap gap-2">
+    <nav aria-label="Filter by priority" className="flex flex-wrap gap-2">
       {options.map((o) => {
         const selected = o.value === value
         return (
           <Link
             key={o.label}
             to="/inbox"
-            search={{ priority: o.value }}
+            // Keeps any search words; only the priority changes.
+            search={(prev) => ({ ...prev, priority: o.value })}
             // The router sets aria-current on the active option. Without this, "All"
             // (priority: undefined) would also count as active under ?priority=high.
             activeOptions={{ explicitUndefined: true }}

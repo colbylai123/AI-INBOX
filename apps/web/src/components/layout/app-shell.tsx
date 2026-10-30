@@ -33,7 +33,7 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
             </Link>
           }
         >
-          You're viewing demo data. Connect Outlook to see your real inbox.
+          You're viewing demo data. Connect your email to see your real inbox.
         </DismissibleBanner>
       )}
 
