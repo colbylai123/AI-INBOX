@@ -173,7 +173,10 @@ export function LandingPage() {
         >
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {features.map(({ icon: Icon, title, body }) => (
-              <li key={title} className="rounded-xl border border-white/65 bg-card/95 p-5 shadow-panel">
+              <li
+                key={title}
+                className="rounded-xl border border-white/65 bg-card/95 p-5 shadow-panel"
+              >
                 <Icon className="size-5 text-muted-foreground" aria-hidden />
                 <h3 className="mt-3 font-display text-base font-semibold tracking-tight">
                   {title}
@@ -211,7 +214,9 @@ export function LandingPage() {
               <h3 className="font-display text-lg font-semibold tracking-tight">
                 What we ask Microsoft for
               </h3>
-              <p className="mt-2 text-sm text-muted-foreground">Only what the inbox needs to work.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Only what the inbox needs to work.
+              </p>
               <dl className="mt-4 divide-y divide-border">
                 {permissions.map(({ name, why }) => (
                   <div key={name} className="grid gap-1 py-4 sm:grid-cols-[10rem_1fr] sm:gap-6">
