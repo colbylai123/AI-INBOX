@@ -22,11 +22,11 @@ export async function getConnections(): Promise<Connection[]> {
  * comes back to Settings with ?provider=…&connection=connected|failed. The mocks
  * connect at once.
  */
-export async function connect(provider: Provider): Promise<void> {
+export async function connect(provider: Provider, connectionId?: string): Promise<void> {
   if (mocksEnabled()) {
     const { connectMockAccount } = await import('./mocks')
     await mockDelay()
-    connectMockAccount(provider)
+    connectMockAccount(provider, connectionId)
     return
   }
   const returnTo = `/settings?provider=${provider}`

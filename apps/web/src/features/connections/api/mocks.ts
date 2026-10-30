@@ -34,11 +34,17 @@ const sampleAddress: Record<Provider, string> = {
 }
 
 /**
- * What the redirect back from the provider would leave behind. An account that
- * needs reconnecting is the one the user signs back into. Otherwise they picked
- * another account, which is added next to the ones already connected.
+ * What the redirect back from the provider would leave behind. Reconnecting a
+ * row updates that account. Otherwise an account that needs reconnecting is the
+ * one the user signs back into, and a fresh sign-in adds another account.
  */
-export function connectMockAccount(provider: Provider) {
+export function connectMockAccount(provider: Provider, connectionId?: string) {
+  if (connectionId) {
+    const selected = mockConnections.find((c) => c.id === connectionId)
+    if (!selected) throw new Error(`Connection ${connectionId} not found`)
+    selected.status = 'connected'
+    return
+  }
   const stale = mockConnections.find(
     (c) => c.provider === provider && c.status === 'reconnect_needed',
   )

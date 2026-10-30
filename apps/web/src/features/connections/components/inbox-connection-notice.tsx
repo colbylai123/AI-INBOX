@@ -39,7 +39,7 @@ export function ReconnectAlert({ connections }: { connections: Connection[] }) {
         </span>{' '}
         New mail for {broken.accountEmail} isn't arriving until you do.
       </p>
-      <ConnectButton provider={broken.provider} size="sm">
+      <ConnectButton provider={broken.provider} connectionId={broken.id} size="sm">
         Reconnect
       </ConnectButton>
     </div>
