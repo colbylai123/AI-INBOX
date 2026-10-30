@@ -14,7 +14,7 @@ function MaterialsPage() {
     <>
       <PageHeader
         title="Materials"
-        description="Forms and templates the AI pre-fills when an email calls for one."
+        description="Forms the AI pre-fills when an email calls for one, and documents like price lists it fills them from."
         actions={<UploadButton />}
       />
       {materials.length === 0 ? <MaterialsEmpty /> : <MaterialsList materials={materials} />}

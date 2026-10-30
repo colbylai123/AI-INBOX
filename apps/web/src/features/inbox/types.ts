@@ -26,11 +26,19 @@ export interface FormField {
   /** Empty when the AI couldn't fill it in. */
   value: string
   /**
-   * The words in the email the value came from, copied exactly so the app can
-   * highlight them. Null when it didn't come from the email (worked out, or from
-   * the user's documents), and after the user changes the value.
+   * The exact words the value came from: in the email, or in the document named
+   * by sourceMaterial. Email words are copied exactly so the app can highlight
+   * them. Null when the AI worked the value out, and after the user changes it.
    */
   source: string | null
+  /** The uploaded document the value came from. Null (or missing) for the email. */
+  sourceMaterial?: MaterialRef | null
+}
+
+/** An uploaded material, by the name it had when the form was filled. */
+export interface MaterialRef {
+  id: string
+  name: string
 }
 
 /** A form from Materials that the AI picked and pre-filled for this reply. */

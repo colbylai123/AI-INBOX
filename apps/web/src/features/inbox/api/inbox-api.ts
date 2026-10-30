@@ -39,8 +39,11 @@ export async function saveDraft(id: string, update: DraftUpdate): Promise<Messag
     message.draftReply = update.draftReply
     for (const field of message.filledForm?.fields ?? []) {
       const value = update.formValues?.[field.id] ?? field.value
-      // A value the user changed no longer comes from the email.
-      if (value !== field.value) field.source = null
+      // A value the user changed no longer comes from the email or a document.
+      if (value !== field.value) {
+        field.source = null
+        field.sourceMaterial = null
+      }
       field.value = value
     }
     return structuredClone(message)

@@ -217,7 +217,7 @@ describe('app', () => {
     const form = await screen.findByRole('region', { name: 'Quote form' })
     expect(within(form).getByText('Quantity').nextSibling).toHaveTextContent('40')
     // A field the AI couldn't fill is called out, not left blank.
-    expect(within(form).getByText('Unit price').nextSibling).toHaveTextContent('Not filled')
+    expect(within(form).getByText('Lead time').nextSibling).toHaveTextContent('Not filled')
   })
 
   it('saves edits to the reply and form before approval', async () => {
@@ -232,13 +232,13 @@ describe('app', () => {
     const quantity = screen.getByRole('textbox', { name: 'Quantity' })
     await userEvent.clear(quantity)
     await userEvent.type(quantity, '45')
-    await userEvent.type(screen.getByRole('textbox', { name: 'Unit price' }), '$18')
+    await userEvent.type(screen.getByRole('textbox', { name: 'Lead time' }), '2 weeks')
     await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
 
     expect(await screen.findByText('Quote attached for 45 units.')).toBeInTheDocument()
     const form = screen.getByRole('region', { name: 'Quote form' })
     expect(within(form).getByText('Quantity').nextSibling).toHaveTextContent('45')
-    expect(within(form).getByText('Unit price').nextSibling).toHaveTextContent('$18')
+    expect(within(form).getByText('Lead time').nextSibling).toHaveTextContent('2 weeks')
     expect(screen.getByRole('button', { name: 'Approve & send' })).toBeEnabled()
     expect(screen.queryByText('Approved')).not.toBeInTheDocument()
   })
@@ -453,7 +453,7 @@ describe('app', () => {
     expect(within(form).getByText('From the email: “$1.85 each”')).toBeInTheDocument()
     // A value the AI worked out itself is flagged for checking.
     expect(within(form).getByText('Total').nextSibling).toHaveTextContent(
-      'Not taken from the email, so check it.',
+      'Not from the email or your documents, so check it.',
     )
     // The same words are marked in the email itself.
     const marked = [...document.querySelectorAll('mark')].map((mark) => mark.textContent)
@@ -469,6 +469,34 @@ describe('app', () => {
     expect(marked).toContain('orders@brightline.example')
   })
 
+  it('quotes the uploaded document a value came from', async () => {
+    renderApp('/inbox/m1')
+    const form = await screen.findByRole('region', { name: 'Quote form' })
+    await userEvent.click(within(form).getByRole('button', { name: 'Show sources' }))
+    expect(within(form).getByText('Unit price').nextSibling).toHaveTextContent(
+      '$42.00From Price list: “Standard package: $42.00 per unit”',
+    )
+    // The document's words aren't in the email, so nothing there is marked for them.
+    const marked = [...document.querySelectorAll('mark')].map((mark) => mark.textContent)
+    expect(marked).not.toContain('Standard package: $42.00 per unit')
+    expect(marked).toContain('40 units')
+  })
+
+  it('stops citing a document for a value the user changed', async () => {
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    const price = screen.getByRole('textbox', { name: 'Unit price' })
+    await userEvent.clear(price)
+    await userEvent.type(price, '$39.00')
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    const form = await screen.findByRole('region', { name: 'Quote form' })
+    await userEvent.click(within(form).getByRole('button', { name: 'Show sources' }))
+    expect(within(form).getByText('Unit price').nextSibling).toHaveTextContent(
+      '$39.00Not from the email or your documents, so check it.',
+    )
+  })
+
   it('stops citing the email for a value the user changed', async () => {
     renderApp('/inbox/m1')
     await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))
@@ -480,7 +508,7 @@ describe('app', () => {
     const form = await screen.findByRole('region', { name: 'Quote form' })
     await userEvent.click(within(form).getByRole('button', { name: 'Show sources' }))
     expect(within(form).getByText('Quantity').nextSibling).toHaveTextContent(
-      'Not taken from the email',
+      'Not from the email or your documents',
     )
     expect(within(form).getByText('Item').nextSibling).toHaveTextContent(
       'From the email: “the standard package”',

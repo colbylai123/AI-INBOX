@@ -202,7 +202,7 @@ So people can trust a draft before they approve it, the app shows why each messa
 ```
 
 - **`source` is copied exactly** from the email body (or the sender's address), character for character, so the app can find and highlight it in the message. Don't paraphrase it.
-- **`null` means the value didn't come from the email**: the AI worked it out (a total, say) or took it from the user's documents. The app tells the user to check those.
+- **`null` means the value didn't come from the email**: the AI worked it out (a total, say). The app tells the user to check those. Values taken from the user's own documents are covered in step 10.
 - **When `PATCH /messages/{id}/draft` changes a field's value, set its `source` to `null`.** The user's own value no longer comes from the email.
 
 ## Step 8: time saved this week
@@ -220,6 +220,28 @@ Once the user has approved something, the inbox shows the last 7 days: drafts ap
   "formsApproved": 7, // approved drafts that came with a filled form
 }
 ```
+
+## Step 10: say which uploaded document a value came from
+
+The AI fills forms from the email and from the user's own documents, like a unit price from their price list. Step 7 can only quote the email, so a value from a document looked like a guess. One new field on `FormField`, no new endpoints:
+
+```jsonc
+// FormField (in filledForm.fields)
+{
+  "id": "unit-price",
+  "label": "Unit price",
+  "value": "$42.00",
+  "source": "Standard package: $42.00 per unit", // the words in the document named below
+  "sourceMaterial": { "id": "mat-prices", "name": "Price list" }, // null when the value came from the email or was worked out
+}
+```
+
+- **`sourceMaterial` names the uploaded material the value came from**, and `source` then holds the exact words from that document. The app quotes them under the value ("From Price list: …") and doesn't look for them in the email.
+- **`sourceMaterial` is `null`** for a value from the email (`source` is the email's words, as in step 7) and for a value the AI worked out (`source` is `null` too).
+- **Keep the name as it was when the form was filled**, so the value still says where it came from after the user deletes or renames that material.
+- **When `PATCH /messages/{id}/draft` changes a field's value, set both `source` and `sourceMaterial` to `null`.**
+- **Materials can be reference documents as well as forms**, such as a price list or a rate sheet. No change to `/materials`: the AI decides which uploads are forms to fill and which are documents to fill them from.
+- An older response without `sourceMaterial` reads as `null`, so this can ship after the front end.
 
 ## Trying the app against the real API
 
