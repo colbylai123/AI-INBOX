@@ -18,6 +18,14 @@ export interface MessageSummary {
   hasDraft: boolean
   /** Set once the user approves the draft. Nothing is sent before this. */
   approvedAt: string | null
+  /** The connected account the email came to, which the reply is sent from. */
+  account?: MessageAccount
+}
+
+export interface MessageAccount {
+  /** The id of the account's connection (see features/connections). */
+  id: string
+  email: string
 }
 
 export interface FormField {

@@ -5,7 +5,14 @@ import { useShortcuts } from '@/lib/use-shortcuts'
 import type { MessageSummary } from '../types'
 import { PriorityBadge } from './priority-badge'
 
-export function MessageList({ messages }: { messages: MessageSummary[] }) {
+export function MessageList({
+  messages,
+  showAccount = false,
+}: {
+  messages: MessageSummary[]
+  /** Say which account each email came to, for a list that mixes accounts. */
+  showAccount?: boolean
+}) {
   const listRef = useRef<HTMLUListElement>(null)
 
   // j and k move between rows, Enter opens one (it's a link).
@@ -31,6 +38,8 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
           <Link
             to="/inbox/$messageId"
             params={{ messageId: m.id }}
+            // Carries the filter and search, so the way back keeps them.
+            search
             className="flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-muted focus-visible:-outline-offset-2"
           >
             <div className="flex items-center justify-between gap-3">
@@ -46,7 +55,10 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
                 <PriorityBadge priority={m.priority} />
               </span>
             </div>
-            <span className="truncate text-metadata text-muted-foreground">{m.from}</span>
+            <span className="truncate text-metadata text-muted-foreground">
+              {m.from}
+              {showAccount && m.account && <> to {m.account.email}</>}
+            </span>
             {/* The AI's one-line summary; the raw preview until it has one. */}
             <span className="truncate text-sm text-muted-foreground">{m.summary ?? m.preview}</span>
           </Link>

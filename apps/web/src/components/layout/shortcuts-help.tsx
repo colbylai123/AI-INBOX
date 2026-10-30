@@ -5,6 +5,7 @@ import { useShortcuts } from '@/lib/use-shortcuts'
 import { cn } from '@/lib/utils'
 
 const shortcuts: { keys: string[]; does: string }[] = [
+  { keys: ['/'], does: 'Search the inbox' },
   { keys: ['j', 'k'], does: 'Next or previous email' },
   { keys: ['Enter'], does: 'Open the email' },
   { keys: ['e'], does: 'Edit the draft' },

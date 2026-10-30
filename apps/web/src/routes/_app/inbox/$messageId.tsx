@@ -25,6 +25,8 @@ function MessagePage() {
     <div className="max-w-3xl">
       <Link
         to="/inbox"
+        // Back to the list as it was: same filter and search.
+        search
         // Exact, so the back link isn't announced as the current page.
         activeOptions={{ exact: true }}
         className="mb-6 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -33,7 +35,7 @@ function MessagePage() {
       </Link>
       <PageHeader
         title={message.subject}
-        description={`From ${message.from}`}
+        description={`From ${message.from}${message.account ? ` to ${message.account.email}` : ''}`}
         actions={<PriorityBadge priority={message.priority} />}
       />
       {/* Keyed so edit and error state never carry over from another message. */}

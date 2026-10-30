@@ -41,6 +41,8 @@ Until an endpoint exists, the web app runs on demo data (mocks in `apps/web/src/
 
 `return_to` must be validated on the server: accept only a path on the app (one leading `/`, no `//`, no backslashes), otherwise use `/inbox`.
 
+The inbox re-fetches `GET /messages` once a minute while it's open, and again when the tab regains focus, so new mail shows up without a reload. Search filters the loaded list in the browser, so it needs no endpoint.
+
 ```jsonc
 // User
 { "id": "u1", "name": "Maya Lee", "email": "maya@example.com" }
@@ -232,6 +234,24 @@ Settings lets the user connect several email accounts: more than one Outlook acc
 - **Coming back.** The app now passes a `return_to` that has its own query, such as `/settings?provider=gmail`, so the page can say which account was connected. Add `connection=connected` or `connection=failed` to it and keep what's already there: `/settings?provider=gmail&connection=connected`. Validate `return_to` as before.
 - **Permissions to ask Google for:** `https://www.googleapis.com/auth/gmail.readonly` (read the inbox), `https://www.googleapis.com/auth/gmail.send` (send the reply only when the user approves) and `openid email` (the account's address), with `access_type=offline` so syncing continues without asking again.
 - **Before launch:** `gmail.readonly` is a restricted scope. Until Google verifies the app, which includes an independent security assessment and takes weeks, only up to 100 test users you list in the Google Cloud console can connect Gmail. Start that early.
+
+## Step 11: one inbox across accounts
+
+With more than one account connected (step 9), the inbox shows mail from all of them in one list, says which account each email came to, and can show one account at a time. One new field on `MessageSummary`, no new endpoints:
+
+```jsonc
+// MessageSummary (in GET /messages and GET /messages/{id})
+{
+  // …the fields from earlier steps…
+  "account": { "id": "con-2", "email": "demo@gmail.example" }, // the connection the email came to
+}
+```
+
+- **`account.id` is the `Connection.id`** from `GET /connections`, and `account.email` its `accountEmail`, so the app can match them.
+- **The reply goes out from that same account**, in the same conversation, when the user approves it. Never from a different account, even if the user has a "main" one.
+- **No filter parameter.** The app filters the list it already has (`/inbox?account=con-2`), so `GET /messages` keeps returning every account's mail. If `/messages` is ever paged, add `?account=` then.
+- **Disconnecting an account** (step 5) stops returning its messages, since nothing can be sent from it any more.
+- An older response without `account` still shows, just without the account.
 
 ## Trying the app against the real API
 

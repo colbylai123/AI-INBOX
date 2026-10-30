@@ -17,6 +17,9 @@ export const messagesQuery = (filters: MessageFilters = {}) =>
   queryOptions({
     queryKey: inboxKeys.list(filters),
     queryFn: () => getMessages(filters),
+    // New mail shows up within a minute while the inbox is open (and when the tab
+    // regains focus), without a reload. Paused while the tab is hidden.
+    refetchInterval: 60_000,
     select: sortByPriority,
   })
 

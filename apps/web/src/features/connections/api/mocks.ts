@@ -9,15 +9,23 @@ const seed: Connection[] = [
     connectedAt: '2026-10-20T16:00:00Z',
     lastSyncedAt: null,
   },
+  {
+    id: 'con-2',
+    provider: 'gmail',
+    accountEmail: 'demo@gmail.example',
+    status: 'connected',
+    connectedAt: '2026-10-20T16:01:00Z',
+    lastSyncedAt: null,
+  },
 ]
 
 // In-memory "database" so connecting and disconnecting behave realistically.
 export let mockConnections: Connection[] = structuredClone(seed)
-let created = 1
+let created = seed.length
 
 export function resetMockConnections() {
   mockConnections = structuredClone(seed)
-  created = 1
+  created = seed.length
 }
 
 const sampleAddress: Record<Provider, string> = {
