@@ -366,7 +366,8 @@ describe('app', () => {
     const { router } = renderApp('/settings')
     await screen.findByText(/demo@example.com · Synced/)
     await userEvent.click(screen.getByRole('button', { name: 'Connect Gmail' }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Gmail is connected')
+    // By text: the send queue's toast area is a status region too.
+    expect(await screen.findByText(/Gmail is connected/)).toBeInTheDocument()
     expect(await screen.findByText(/demo@gmail.example · Synced/)).toBeInTheDocument()
     expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
     expect(mockConnections.map((c) => c.provider)).toEqual(['outlook', 'gmail'])

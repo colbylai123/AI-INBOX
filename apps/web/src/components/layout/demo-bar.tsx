@@ -13,11 +13,7 @@ export function DemoBar() {
   }
 
   return (
-    <div
-      role="region"
-      aria-label="Demo"
-      className="border-b border-border bg-card text-foreground"
-    >
+    <div role="region" aria-label="Demo" className="border-b border-border bg-card text-foreground">
       <div className="mx-auto flex max-w-page flex-wrap items-center justify-center gap-x-4 gap-y-2 px-gutter py-2.5 text-sm">
         <p className="text-center">
           <span className="font-medium">You’re trying the demo.</span>{' '}
