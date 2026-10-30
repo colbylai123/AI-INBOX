@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
-import { z } from 'zod'
+import { z } from 'zod/mini'
 import { Button } from '@/components/ui/button'
 import { sessionQuery, signInUrl } from '@/features/auth'
 import { SiteHeader } from '@/features/marketing'
@@ -10,7 +10,7 @@ import { isSafeRedirectPath } from '@/lib/safe-redirect'
 export const Route = createFileRoute('/sign-in')({
   validateSearch: z.object({
     // Only allow paths on this app, so the link can't bounce users to another site.
-    redirect: z.string().refine(isSafeRedirectPath).optional().catch(undefined),
+    redirect: z.catch(z.optional(z.string().check(z.refine(isSafeRedirectPath))), undefined),
   }),
   beforeLoad: async ({ context, search, preload }) => {
     // Going to sign in ends a demo, so the sample user can't stand in for a real one.
