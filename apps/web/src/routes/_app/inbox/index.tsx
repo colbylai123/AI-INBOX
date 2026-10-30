@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { PageHeader } from '@/components/layout/page-header'
 import { ConnectPrompt, connectionsQuery, ReconnectAlert } from '@/features/connections'
 import { MessageList, messagesQuery, PriorityFilter, priorities } from '@/features/inbox'
+import { materialsQuery } from '@/features/materials'
+import { GettingStarted } from '@/features/onboarding'
 
 export const Route = createFileRoute('/_app/inbox/')({
   // Typed, validated URL state. Unknown values fall back to "all".
@@ -15,6 +17,7 @@ export const Route = createFileRoute('/_app/inbox/')({
     Promise.all([
       context.queryClient.ensureQueryData(messagesQuery(deps)),
       context.queryClient.ensureQueryData(connectionsQuery()),
+      context.queryClient.ensureQueryData(materialsQuery()),
     ]),
   component: InboxPage,
 })
@@ -23,6 +26,7 @@ function InboxPage() {
   const filters = Route.useLoaderDeps()
   const { data: messages } = useSuspenseQuery(messagesQuery(filters))
   const { data: connections } = useSuspenseQuery(connectionsQuery())
+  const { data: materials } = useSuspenseQuery(materialsQuery())
   return (
     <>
       <PageHeader title="Inbox" description="Incoming messages, most important first." />
@@ -31,6 +35,15 @@ function InboxPage() {
       ) : (
         <>
           <ReconnectAlert connections={connections} />
+          {/* Only on the unfiltered list, where "approved any yet?" sees every message. */}
+          {!filters.priority && (
+            <GettingStarted
+              connected={connections.some((c) => c.status === 'connected')}
+              hasMaterials={materials.length > 0}
+              hasApproved={messages.some((m) => m.approvedAt)}
+              topMessageId={messages[0]?.id}
+            />
+          )}
           <PriorityFilter value={filters.priority} />
           <MessageList messages={messages} />
         </>

@@ -12,6 +12,8 @@ export interface MessageSummary {
   summary: string | null
   receivedAt: string
   priority: Priority
+  /** Set once the user approves the draft. Nothing is sent before this. */
+  approvedAt: string | null
 }
 
 export interface FormField {
@@ -33,8 +35,6 @@ export interface Message extends MessageSummary {
   draftReply: string | null
   /** Null when none of the user's materials fits this email. */
   filledForm: FilledForm | null
-  /** Set once the user approves the draft. Nothing is sent before this. */
-  approvedAt: string | null
 }
 
 /** The user's edits to a draft, saved before approval. Saving never sends anything. */

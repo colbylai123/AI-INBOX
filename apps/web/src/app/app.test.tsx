@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockConnections, resetMockConnections } from '@/features/connections/api/mocks'
 import { resetMockMessages } from '@/features/inbox/api/mocks'
-import { resetMockMaterials } from '@/features/materials/api/mocks'
+import { mockMaterials, resetMockMaterials } from '@/features/materials/api/mocks'
 import { ApiError } from '@/lib/api-client'
 import { isDemoMode, setDemoMode } from '@/lib/demo-mode'
 import { App } from './app'
@@ -78,7 +78,9 @@ describe('app', () => {
 
   it('lists the inbox most important first', async () => {
     renderApp('/inbox')
-    const items = await screen.findAllByRole('listitem')
+    const items = within(await screen.findByRole('list', { name: 'Messages' })).getAllByRole(
+      'listitem',
+    )
     expect(items[0]).toHaveTextContent('Quote for 40 units by Friday')
     // Each row carries the AI's one-line summary.
     expect(items[0]).toHaveTextContent('Wants a quote for 40 units')
@@ -271,6 +273,41 @@ describe('app', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/sign-in')
+  })
+
+  it('walks a new user through setup until the first approval', async () => {
+    const { router } = renderApp('/inbox')
+    const setup = await screen.findByRole('region', { name: 'Get set up' })
+    expect(setup).toHaveTextContent('2 of 3 done')
+    expect(within(setup).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2')
+
+    await userEvent.click(within(setup).getByRole('link', { name: 'Open top email' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await screen.findByText('Approved')
+
+    await router.navigate({ to: '/inbox' })
+    const list = await screen.findByRole('list', { name: 'Messages' })
+    // The list refetches after the approval, then marks the row and drops the checklist.
+    await waitFor(() =>
+      expect(within(list).getAllByRole('listitem')[0]).toHaveTextContent('Approved'),
+    )
+    expect(screen.queryByRole('region', { name: 'Get set up' })).not.toBeInTheDocument()
+  })
+
+  it('asks for a form when nothing is uploaded yet', async () => {
+    mockMaterials.splice(0)
+    renderApp('/inbox')
+    const setup = await screen.findByRole('region', { name: 'Get set up' })
+    expect(setup).toHaveTextContent('1 of 3 done')
+    expect(within(setup).getByRole('link', { name: 'Go to Materials' })).toBeInTheDocument()
+  })
+
+  it('hides the setup checklist when asked, and remembers it', async () => {
+    renderApp('/inbox')
+    const setup = await screen.findByRole('region', { name: 'Get set up' })
+    await userEvent.click(within(setup).getByRole('button', { name: 'Hide' }))
+    expect(screen.queryByRole('region', { name: 'Get set up' })).not.toBeInTheDocument()
+    expect(localStorage.getItem('getting-started:hidden')).toBe('1')
   })
 
   it('shows not found for an unknown message', async () => {

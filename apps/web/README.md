@@ -60,6 +60,7 @@ src/
     auth/               Session query, sign-in URL, session expiry, User type
     connections/        Connected email accounts: connect, reconnect, disconnect (step 5)
     marketing/          Landing page and the public site header
+    onboarding/         Getting-started checklist at the top of the inbox
     inbox/
       api/              inbox-api.ts (HTTP or mocks), queries.ts (keys + queryOptions), mocks.ts
       hooks/            Mutations and other hooks (useApproveDraft)
