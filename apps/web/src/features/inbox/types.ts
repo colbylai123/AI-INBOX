@@ -37,6 +37,13 @@ export interface Message extends MessageSummary {
   approvedAt: string | null
 }
 
+/** The user's edits to a draft, saved before approval. Saving never sends anything. */
+export interface DraftUpdate {
+  draftReply: string
+  /** New values for the filled form's fields, keyed by field id. */
+  formValues?: Record<string, string>
+}
+
 export interface MessageFilters {
   priority?: Priority
 }

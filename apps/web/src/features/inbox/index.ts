@@ -7,9 +7,11 @@ export { MessageList } from './components/message-list'
 export { PriorityBadge } from './components/priority-badge'
 export { PriorityFilter } from './components/priority-filter'
 export { useApproveDraft } from './hooks/use-approve-draft'
+export { useSaveDraft } from './hooks/use-save-draft'
 export { sortByPriority } from './lib/sort'
 export { priorities } from './types'
 export type {
+  DraftUpdate,
   FilledForm,
   FormField,
   Message,
