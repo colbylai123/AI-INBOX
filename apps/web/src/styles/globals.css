@@ -12,7 +12,7 @@
 
   --dp-color-ground: #eef2f6;
   --dp-color-ink: #1c2434;
-  --dp-color-ink-secondary: #5d6d82;
+  --dp-color-ink-secondary: #58687d; /* 4.8:1 on ground-muted, so muted text passes WCAG AA */
   --dp-color-ground-muted: #e7edf4;
   --dp-color-rule: #d9e2ec;
   --dp-color-accent: #1c2434;

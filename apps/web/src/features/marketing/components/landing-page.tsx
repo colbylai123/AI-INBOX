@@ -96,7 +96,8 @@ const faqs = [
 
 export function LandingPage() {
   return (
-    <div className="min-h-svh" data-surface="marketing">
+    // Clipped so the hero glow, which spills past the cards, never scrolls the page sideways on phones.
+    <div className="min-h-svh overflow-x-clip" data-surface="marketing">
       <SiteHeader page="landing" />
 
       <main>
