@@ -8,8 +8,11 @@ import {
   messagesQuery,
   PriorityFilter,
   priorities,
+  SearchBox,
+  searchMessages,
   WeeklySummary,
   weeklyStatsQuery,
+  type MessageSummary,
 } from '@/features/inbox'
 import { materialsQuery } from '@/features/materials'
 import { GettingStarted } from '@/features/onboarding'
@@ -18,6 +21,8 @@ export const Route = createFileRoute('/_app/inbox/')({
   // Typed, validated URL state. Unknown values fall back to "all".
   validateSearch: z.object({
     priority: z.catch(z.optional(z.enum(priorities)), undefined),
+    // Search words. The loaded list is filtered in the browser, so they aren't a loader dep.
+    q: z.catch(z.optional(z.string()), undefined),
   }),
   loaderDeps: ({ search }) => ({ priority: search.priority }),
   loader: ({ context, deps }) => {
@@ -34,6 +39,8 @@ export const Route = createFileRoute('/_app/inbox/')({
 
 function InboxPage() {
   const filters = Route.useLoaderDeps()
+  const { q } = Route.useSearch()
+  const navigate = Route.useNavigate()
   const { data: messages } = useSuspenseQuery(messagesQuery(filters))
   const { data: connections } = useSuspenseQuery(connectionsQuery())
   // Not suspense: if these fail to load, the inbox still shows, just without the checklist or stats.
@@ -49,7 +56,7 @@ function InboxPage() {
           <ReconnectAlert connections={connections} />
           {stats.isSuccess && <WeeklySummary stats={stats.data} />}
           {/* Only on the unfiltered list, where "approved any yet?" sees every message. */}
-          {!filters.priority && materials.isSuccess && (
+          {!filters.priority && !q && materials.isSuccess && (
             <GettingStarted
               connected={connections.some((c) => c.status === 'connected')}
               hasMaterials={materials.data.length > 0}
@@ -57,13 +64,47 @@ function InboxPage() {
               nextDraftId={messages.find((m) => m.hasDraft && !m.approvedAt)?.id}
             />
           )}
-          <PriorityFilter value={filters.priority} />
-          <MessageList messages={messages} />
+          <div className="mb-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <PriorityFilter value={filters.priority} />
+            <SearchBox
+              query={q}
+              onQueryChange={(next) =>
+                void navigate({ search: (prev) => ({ ...prev, q: next }), replace: true })
+              }
+            />
+          </div>
+          <SearchResults messages={messages} query={q} />
           <p className="mt-4 text-metadata text-muted-foreground max-md:hidden">
             Press <kbd className="rounded-sm border border-border bg-muted px-1.5">?</kbd> for
             keyboard shortcuts.
           </p>
         </>
+      )}
+    </>
+  )
+}
+
+function SearchResults({
+  messages,
+  query,
+}: {
+  messages: MessageSummary[]
+  query: string | undefined
+}) {
+  const found = searchMessages(messages, query)
+  return (
+    <>
+      {/* Says how many matched as the user types. Empty when not searching. */}
+      <p
+        role="status"
+        className={found === messages ? 'sr-only' : 'mb-3 text-metadata text-muted-foreground'}
+      >
+        {found !== messages && `${found.length} of ${messages.length} messages match`}
+      </p>
+      {found.length === 0 && messages.length > 0 ? (
+        <p className="text-sm text-muted-foreground">No messages match “{query?.trim()}”.</p>
+      ) : (
+        <MessageList messages={found} />
       )}
     </>
   )

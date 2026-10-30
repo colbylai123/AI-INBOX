@@ -450,6 +450,55 @@ describe('app', () => {
     vi.restoreAllMocks()
   })
 
+  it('searches the inbox and keeps the words in the URL', async () => {
+    const { router } = renderApp('/inbox')
+    const list = await screen.findByRole('list', { name: 'Messages' })
+    expect(within(list).getAllByRole('listitem')).toHaveLength(8)
+
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Search the inbox' }), 'units')
+    expect(screen.getByText('2 of 8 messages match')).toBeInTheDocument()
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((li) => li.querySelector('a')!.textContent),
+    ).toEqual([
+      expect.stringContaining('Quote for 40 units'),
+      expect.stringContaining('12 units arrived'),
+    ])
+    await waitFor(() => expect(router.state.location.search).toEqual({ q: 'units' }))
+
+    // Changing the priority keeps the search.
+    await userEvent.click(screen.getByRole('link', { name: 'Medium' }))
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ q: 'units', priority: 'medium' }),
+    )
+    expect(await screen.findByText('No messages match “units”.')).toBeInTheDocument()
+  })
+
+  it('jumps to search with / and clears it with Escape', async () => {
+    renderApp('/inbox?q=packright')
+    const search = await screen.findByRole('searchbox', { name: 'Search the inbox' })
+    expect(search).toHaveValue('packright')
+    expect(screen.getByText('1 of 8 messages match')).toBeInTheDocument()
+
+    await userEvent.keyboard('/')
+    expect(search).toHaveFocus()
+    expect(search).toHaveValue('packright')
+    await userEvent.keyboard('{Escape}')
+    expect(search).toHaveValue('')
+    expect(
+      within(screen.getByRole('list', { name: 'Messages' })).getAllByRole('listitem'),
+    ).toHaveLength(8)
+  })
+
+  it('empties the search box when the Inbox link clears the search', async () => {
+    renderApp('/inbox?q=invoice')
+    const search = await screen.findByRole('searchbox', { name: 'Search the inbox' })
+    const nav = screen.getByRole('navigation', { name: 'Main' })
+    await userEvent.click(within(nav).getByRole('link', { name: 'Inbox' }))
+    await waitFor(() => expect(search).toHaveValue(''))
+  })
+
   it('shows not found for an unknown message', async () => {
     renderApp('/inbox/does-not-exist')
     expect(await screen.findByText('Not found')).toBeInTheDocument()
