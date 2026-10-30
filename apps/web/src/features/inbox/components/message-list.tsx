@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { CircleCheck } from 'lucide-react'
 import type { MessageSummary } from '../types'
 import { PriorityBadge } from './priority-badge'
 
@@ -7,7 +8,10 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
     return <p className="text-sm text-muted-foreground">No messages yet.</p>
   }
   return (
-    <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card shadow-panel">
+    <ul
+      aria-label="Messages"
+      className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card shadow-panel"
+    >
       {messages.map((m) => (
         <li key={m.id}>
           <Link
@@ -17,7 +21,14 @@ export function MessageList({ messages }: { messages: MessageSummary[] }) {
           >
             <div className="flex items-center justify-between gap-3">
               <span className="truncate text-interface font-semibold">{m.subject}</span>
-              <PriorityBadge priority={m.priority} />
+              <span className="flex shrink-0 items-center gap-2">
+                {m.approvedAt && (
+                  <span className="flex items-center gap-1 text-label font-medium text-muted-foreground">
+                    <CircleCheck className="size-3.5 text-primary" aria-hidden /> Approved
+                  </span>
+                )}
+                <PriorityBadge priority={m.priority} />
+              </span>
             </div>
             <span className="truncate text-metadata text-muted-foreground">{m.from}</span>
             {/* The AI's one-line summary; the raw preview until it has one. */}

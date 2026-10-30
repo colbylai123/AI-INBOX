@@ -163,6 +163,22 @@ The Settings page lets the user connect their Outlook account, see that it's con
 
 **Signing out.** `POST /auth/logout` clears the session cookie, and should also end the WorkOS session so the next sign-in asks again. It has no body, so the browser sends it without a CORS preflight. After it returns, the app clears its data and shows the sign-in page. Signing out does not disconnect Outlook.
 
+## Step 6: a getting-started checklist
+
+New users see three steps at the top of the inbox until they're done: connect Outlook, upload a form, approve a first draft. The first two come from `GET /connections` and `GET /materials`. For the third, and so the list can mark what's already been approved, each item in `GET /messages` also carries two fields:
+
+```jsonc
+// MessageSummary, two new fields
+{
+  "id": "m1",
+  // …the fields from steps 0 and 1…
+  "hasDraft": true, // true when the AI drafted a reply (draftReply isn't null), so the checklist links to one
+  "approvedAt": null, // same value as on the full Message; set once the user approves
+}
+```
+
+No new endpoints.
+
 ## Trying the app against the real API
 
 Create `apps/web/.env.development.local` (it's gitignored):
