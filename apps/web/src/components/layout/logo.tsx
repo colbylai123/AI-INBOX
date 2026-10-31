@@ -13,7 +13,7 @@ export function Logo({ className }: { className?: string }) {
         <Inbox className="size-4" aria-hidden />
         <span
           aria-hidden
-          className="absolute -top-1 -right-1 size-2.5 rounded-full bg-approve shadow-[0_0_0_2px_white,0_0_8px_rgb(47_90_173/0.55)]"
+          className="absolute -top-1 -right-1 size-2.5 rounded-full bg-approve shadow-[0_0_0_2px_var(--color-card),0_0_8px_rgb(47_90_173/0.55)]"
         />
       </span>
       ai inbox

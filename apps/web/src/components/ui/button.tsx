@@ -12,7 +12,8 @@ const buttonVariants = cva(
           'rounded-full bg-approve font-semibold text-approve-foreground shadow-glow hover:bg-approve-hover',
         approve:
           'rounded-full bg-approve font-semibold text-approve-foreground shadow-glow hover:bg-approve-hover',
-        destructive: 'rounded-full bg-destructive text-white hover:bg-destructive/90',
+        destructive:
+          'rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline: 'rounded-xl border border-white/65 bg-card text-foreground hover:bg-muted',
         secondary: 'rounded-xl border border-white/65 bg-card text-foreground hover:bg-muted',
         ghost: 'rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground',

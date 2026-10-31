@@ -7,6 +7,17 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fcfcfd" />
+    <!-- Applies a remembered dark theme before the first paint, so it doesn't flash
+         light. Same key as src/lib/theme.ts. A Content-Security-Policy added later
+         must allow this script by its hash. -->
+    <script>
+      try {
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.dataset.theme = 'dark'
+          document.querySelector('meta[name="theme-color"]').content = '#0e131b'
+        }
+      } catch {}
+    </script>
     <meta
       name="description"
       content="AI Inbox ranks your Outlook email, drafts the replies and fills in your forms. You approve before anything is sent."
