@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useParams } from '@tanstack/react-router'
 import { z } from 'zod/mini'
 import { AccountLink } from '@/components/layout/account-link'
+import { Button } from '@/components/ui/button'
 import { ThemePill } from '@/components/layout/theme-toggle'
 import { AccountFilter, connectionsQuery, ReconnectAlert } from '@/features/connections'
 import {
@@ -38,9 +39,9 @@ export const Route = createFileRoute('/_app/inbox')({
     void context.queryClient.prefetchQuery(materialsQuery())
     void context.queryClient.prefetchQuery(weeklyStatsQuery())
     return Promise.all([
-      context.queryClient.ensureQueryData(messagesQuery(deps)),
-      // Waited for, so "Connect your email" doesn't flash, but a failure doesn't stop
-      // the list or an open email from showing. See useInboxList.
+      // Waited for, so the list doesn't flash empty, but neither failure stops an
+      // email opened by its link from showing. See useInboxList.
+      context.queryClient.ensureQueryData(messagesQuery(deps)).catch(() => undefined),
       context.queryClient.ensureQueryData(connectionsQuery()).catch(() => undefined),
     ])
   },
@@ -50,7 +51,17 @@ export const Route = createFileRoute('/_app/inbox')({
 function InboxLayout() {
   const { user } = Route.useRouteContext()
   const navigate = Route.useNavigate()
-  const { search, connections, account, ofAccount, inList, listed, inboxCount } = useInboxList()
+  const {
+    search,
+    connections,
+    account,
+    ofAccount,
+    inList,
+    listed,
+    inboxCount,
+    listFailed,
+    retryList,
+  } = useInboxList()
   const openId = useParams({ strict: false }).messageId
   const manyAccounts = connections.length > 1
   const filtersOn = Boolean(search.priority || account)
@@ -113,7 +124,14 @@ function InboxLayout() {
               {listed !== inList && `${listed.length} of ${inList.length} messages match`}
             </p>
           </div>
-          {listed.length === 0 && inList.length > 0 ? (
+          {listFailed ? (
+            <div role="alert" className="flex flex-wrap items-center gap-3 px-5 pt-2 pb-6">
+              <p className="text-metadata text-muted-foreground">The list didn't load.</p>
+              <Button variant="outline" size="sm" onClick={retryList}>
+                Try again
+              </Button>
+            </div>
+          ) : listed.length === 0 && inList.length > 0 ? (
             <p className="px-5 pt-2 pb-6 text-metadata text-muted-foreground">
               No messages match “{search.q?.trim()}”.
             </p>

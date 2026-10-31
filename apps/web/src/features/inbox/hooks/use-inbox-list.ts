@@ -1,4 +1,4 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { connectionsQuery } from '@/features/connections'
 import { messagesQuery } from '../api/queries'
@@ -15,7 +15,14 @@ export type InboxSearch = { priority?: Priority; q?: string; account?: string; f
  */
 export function useInboxList() {
   const search: InboxSearch = useSearch({ strict: false })
-  const { data: all } = useSuspenseQuery(messagesQuery({ priority: search.priority }))
+  // Not suspense: an email opened by its link still shows, and can be approved, if
+  // the list fails to load. The list card says so instead (see listFailed).
+  const list = useQuery({
+    ...messagesQuery({ priority: search.priority }),
+    // While another priority loads, the rows on screen stay instead of emptying.
+    placeholderData: keepPreviousData,
+  })
+  const all = list.data ?? []
   // Not suspense: the accounts only filter the list and flag a reconnect, so if they
   // fail to load the list and the open email still show, across every account.
   const accounts = useQuery(connectionsQuery())
@@ -30,6 +37,9 @@ export function useInboxList() {
     connections,
     /** False until the accounts load, and while they fail to. */
     connectionsKnown: accounts.isSuccess,
+    /** The list request failed, so the list is empty for that reason, not an empty inbox. */
+    listFailed: list.isError && !list.data,
+    retryList: () => void list.refetch(),
     account,
     /** Every email of the chosen account, before the folder and search. */
     ofAccount,

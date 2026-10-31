@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { isDemoMode } from '@/lib/demo-mode'
 
 /**
  * Stars, Archive and Deleted kept in this browser only. The API has no fields for
@@ -8,21 +9,32 @@ import { useSyncExternalStore } from 'react'
 export type LocalFolders = { starred: string[]; archived: string[]; deleted: string[] }
 export type LocalPlace = 'archived' | 'deleted'
 
+// The demo keeps its own, for this tab, so starting it never touches a real inbox's.
 const storageKey = 'inbox:local-folders'
+const demoKey = 'inbox:demo-folders'
+const store = () =>
+  isDemoMode()
+    ? { storage: sessionStorage, key: demoKey }
+    : { storage: localStorage, key: storageKey }
 const empty: LocalFolders = { starred: [], archived: [], deleted: [] }
 const listeners = new Set<() => void>()
+let cachedKey = ''
 let cachedRaw: string | null = null
 let cached: LocalFolders = empty
 
 function read(): LocalFolders {
   let raw: string | null = null
+  let key = ''
   try {
-    raw = localStorage.getItem(storageKey)
+    const { storage, key: current } = store()
+    key = current
+    raw = storage.getItem(key)
   } catch {
     // Storage can be unavailable (private mode); the folders then last for this visit.
     return cached
   }
-  if (raw === cachedRaw) return cached
+  if (key === cachedKey && raw === cachedRaw) return cached
+  cachedKey = key
   cachedRaw = raw
   try {
     const parsed = raw ? (JSON.parse(raw) as Partial<LocalFolders>) : {}
@@ -42,8 +54,10 @@ function read(): LocalFolders {
 function write(next: LocalFolders) {
   cached = next
   try {
+    const { storage, key } = store()
+    cachedKey = key
     cachedRaw = JSON.stringify(next)
-    localStorage.setItem(storageKey, cachedRaw)
+    storage.setItem(key, cachedRaw)
   } catch {
     cachedRaw = null
   }
@@ -72,7 +86,7 @@ export function moveTo(id: string, place: LocalPlace | null) {
   })
 }
 
-/** Forgets every star and move, as when a fresh demo starts. */
+/** Forgets every star and move in the current store, as when a fresh demo starts. */
 export function resetLocalFolders() {
   write(empty)
 }

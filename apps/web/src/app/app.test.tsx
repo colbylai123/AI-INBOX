@@ -1100,6 +1100,44 @@ describe('dashboard', () => {
     expect(screen.queryByRole('region', { name: 'Get set up' })).not.toBeInTheDocument()
   })
 
+  it('opens an email by its link when the list fails to load', async () => {
+    const getMessages = vi
+      .spyOn(inboxApi, 'getMessages')
+      .mockRejectedValue(new ApiError(500, 'Down'))
+    fakeClock()
+    renderApp('/inbox/m1')
+    // Past the retries.
+    await act(() => vi.advanceTimersByTimeAsync(10_000))
+    const email = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    expect(within(email).getByRole('button', { name: 'Approve & send' })).toBeInTheDocument()
+    // The list card says it didn't load, rather than showing an empty inbox.
+    const failed = screen.getByRole('alert')
+    expect(failed).toHaveTextContent("The list didn't load.")
+    expect(screen.queryByText('No messages yet')).not.toBeInTheDocument()
+
+    getMessages.mockRestore()
+    await userEvent.click(within(failed).getByRole('button', { name: 'Try again' }))
+    expect(await screen.findByRole('list', { name: 'Messages' })).toBeInTheDocument()
+  })
+
+  it("keeps a real inbox's stars when the demo starts", async () => {
+    const { router } = renderApp('/inbox/m1')
+    const email = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    await userEvent.click(within(email).getByRole('button', { name: 'Star' }))
+    expect(localStorage.getItem('inbox:local-folders')).toContain('m1')
+
+    await act(() => router.navigate({ to: '/demo' }))
+    await screen.findByRole('region', { name: 'Demo' })
+    // The demo starts with nothing starred, and the real inbox's star is kept.
+    await act(() => router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } }))
+    const sample = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    expect(within(sample).getByRole('button', { name: 'Star' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    expect(localStorage.getItem('inbox:local-folders')).toContain('m1')
+  })
+
   it('takes focus to the email it opens on phones', async () => {
     const matchMedia = window.matchMedia
     window.matchMedia = ((query: string) => ({ matches: true, media: query })) as never

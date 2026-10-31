@@ -16,7 +16,7 @@ export const Route = createFileRoute('/_app/inbox/')({
 
 function InboxOverview() {
   const demo = useDemoMode()
-  const { search, connections, connectionsKnown, account, ofAccount } = useInboxList()
+  const { search, connections, connectionsKnown, account, ofAccount, listFailed } = useInboxList()
   // Not suspense: if these fail to load, the inbox still shows, just without the checklist or stats.
   const materials = useQuery(materialsQuery())
   const stats = useQuery(weeklyStatsQuery())
@@ -46,8 +46,8 @@ function InboxOverview() {
           {demo && <DemoWelcome />}
           {stats.isSuccess && <WeeklySummary stats={stats.data} />}
           {/* Only on the unfiltered inbox, where "approved any yet?" sees every message,
-              and once the accounts are known, so it never says none are connected wrongly. */}
-          {unfiltered && connectionsKnown && materials.isSuccess && (
+              and once the accounts and the list are known, so it never guesses. */}
+          {unfiltered && connectionsKnown && !listFailed && materials.isSuccess && (
             <GettingStarted
               connected={connections.some((c) => c.status === 'connected')}
               hasMaterials={materials.data.length > 0}

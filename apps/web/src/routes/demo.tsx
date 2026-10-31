@@ -12,9 +12,10 @@ export const Route = createFileRoute('/demo')({
     await Promise.all([resetSampleInbox(), resetSampleMaterials(), resetSampleConnections()])
     // Forget anything cached from a real session before the sample one starts.
     context.queryClient.clear()
-    // Stars and moves on sample mail start over too.
-    resetLocalFolders()
     setDemoMode(true)
+    // Stars and moves on sample mail start over too. Only the demo's: a real
+    // inbox's are kept apart and stay as they were.
+    resetLocalFolders()
     throw redirect({ to: '/inbox' })
   },
 })
