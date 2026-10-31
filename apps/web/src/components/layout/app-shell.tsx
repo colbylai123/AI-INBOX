@@ -1,23 +1,16 @@
-import { Link, type LinkProps, useRouterState } from '@tanstack/react-router'
-import { ChevronRight } from 'lucide-react'
+import { Link, useRouterState } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import type { User } from '@/features/auth'
 import { useDemoMode } from '@/lib/demo-mode'
 import { env } from '@/lib/env'
 import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { AccountLink } from './account-link'
+import { AppRail } from './app-rail'
 import { DemoBar } from './demo-bar'
 import { DismissibleBanner } from './dismissible-banner'
-import { Logo } from './logo'
 import { ShortcutsHelp } from './shortcuts-help'
-import { ThemeToggle } from './theme-toggle'
-
-// Add a nav entry here when you add a top-level page under routes/_app/.
-const nav: { to: LinkProps['to']; label: string }[] = [
-  { to: '/inbox', label: 'Inbox' },
-  { to: '/materials', label: 'Materials' },
-  { to: '/settings', label: 'Settings' },
-]
+import { ThemePill } from './theme-toggle'
+import { WindowBar } from './window-bar'
 
 function surfaceFor(pathname: string) {
   if (pathname.startsWith('/materials')) return 'materials'
@@ -29,70 +22,43 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
   const demo = useDemoMode()
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   return (
-    <div className="min-h-svh" data-surface={surfaceFor(pathname)}>
-      {demo && <DemoBar />}
-      {/* Development on mocks; a visitor in the demo sees the demo bar instead. */}
-      {env.VITE_USE_MOCKS && !demo && (
-        <DismissibleBanner
-          storageKey="banner:demo-data"
-          action={
-            <Link to="/settings" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-              Connect
-            </Link>
-          }
-        >
-          You're viewing demo data. Connect your email to see your real inbox.
-        </DismissibleBanner>
-      )}
-
-      <header className="border-b border-border/80 bg-card/80 backdrop-blur-md">
-        <div className="mx-auto grid max-w-page grid-cols-[1fr_auto] items-center gap-x-6 gap-y-3 px-gutter py-4 md:grid-cols-[1fr_auto_1fr] md:py-5">
-          <Link to="/inbox" className="justify-self-start rounded-md">
-            <Logo />
-          </Link>
-
-          <nav
-            aria-label="Main"
-            // The padding keeps focus outlines from being clipped by the scroll area.
-            className="col-span-2 row-start-2 -mx-3 -my-1 flex gap-1 overflow-x-auto p-1 md:col-span-1 md:col-start-2 md:row-start-1 md:-mx-1"
-          >
-            {nav.map(({ to, label }) => (
-              <Link
-                key={to}
-                to={to}
-                // The router marks the current page with aria-current="page".
-                className={cn(
-                  'rounded-full px-3 py-1.5 text-interface font-medium whitespace-nowrap text-muted-foreground transition-colors',
-                  'hover:bg-muted hover:text-foreground',
-                  'aria-[current=page]:bg-muted aria-[current=page]:text-foreground',
-                )}
-              >
-                {label}
+    // The field. On wide screens the app sits on it as one rounded window.
+    <div className="flex min-h-svh flex-col lg:p-5" data-surface={surfaceFor(pathname)}>
+      {/* On wide screens these sit on the field above the window, rounded like it. */}
+      <div className="empty:hidden lg:mx-auto lg:mb-3 lg:w-full lg:max-w-[1600px] lg:overflow-hidden lg:rounded-2xl">
+        {demo && <DemoBar />}
+        {/* Development on mocks; a visitor in the demo sees the demo bar instead. */}
+        {env.VITE_USE_MOCKS && !demo && (
+          <DismissibleBanner
+            storageKey="banner:demo-data"
+            action={
+              <Link to="/settings" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                Connect
               </Link>
-            ))}
-          </nav>
+            }
+          >
+            You're viewing demo data. Connect your email to see your real inbox.
+          </DismissibleBanner>
+        )}
+      </div>
 
-          <div className="flex items-center gap-2 justify-self-end md:col-start-3">
-            <ThemeToggle />
-            <Link
-              to="/settings"
-              className="flex items-center gap-2 rounded-md border border-white/65 bg-card py-1 pr-2.5 pl-1 text-interface shadow-xs transition-colors hover:bg-muted"
-            >
-              <span
-                aria-hidden
-                className="grid size-7 place-items-center rounded-full bg-muted text-metadata font-semibold"
-              >
-                {user.name.charAt(0)}
-              </span>
-              {/* Read out at every width, so the link keeps a name when phones show only the initial. */}
-              <span className="max-sm:sr-only">{user.name}</span>
-              <ChevronRight className="size-3.5 text-muted-foreground" aria-hidden />
-            </Link>
+      <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col bg-canvas lg:rounded-[28px] lg:border lg:border-card-edge">
+        <header>
+          <WindowBar />
+        </header>
+        {/* Phones: the rail and the theme and account controls share the top row, and
+            the page goes under them. Wide screens: the rail is a column at the left. */}
+        <div className="grid flex-1 grid-cols-[1fr_auto] content-start lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_1fr]">
+          <AppRail className="lg:row-span-2" />
+          <div className="flex items-center justify-end gap-2 pr-3 pb-3 sm:pr-4 lg:pt-2 lg:pr-5">
+            <ThemePill />
+            <AccountLink user={user} />
           </div>
+          <main className="col-span-2 min-w-0 px-3 pb-6 sm:px-4 lg:col-span-1 lg:pr-5 lg:pb-5 lg:pl-1">
+            {children}
+          </main>
         </div>
-      </header>
-
-      <main className="mx-auto max-w-page px-gutter pt-10 pb-24 md:pt-14">{children}</main>
+      </div>
       <ShortcutsHelp />
     </div>
   )

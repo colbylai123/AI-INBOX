@@ -30,3 +30,23 @@ export function ThemeToggle({ row = false, className }: { row?: boolean; classNa
     </button>
   )
 }
+
+/**
+ * The violet pill in the app's top row. It's labeled with the theme it switches
+ * to, Dark or Light, so it's a plain button rather than a pressed toggle.
+ */
+export function ThemePill() {
+  const dark = useTheme() === 'dark'
+  const Icon = dark ? Sun : Moon
+  return (
+    <button
+      type="button"
+      aria-label={dark ? 'Light mode' : 'Dark mode'}
+      onClick={() => setTheme(dark ? 'light' : 'dark')}
+      className={cn(buttonVariants({ variant: 'approve', size: 'sm' }), 'h-9 px-4')}
+    >
+      <Icon aria-hidden />
+      {dark ? 'Light' : 'Dark'}
+    </button>
+  )
+}

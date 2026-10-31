@@ -55,7 +55,7 @@ export function ConnectedAccounts({
           </div>
         ) : (
           <>
-            <ul className="divide-y divide-border rounded-md border border-white/65">
+            <ul className="divide-y divide-border rounded-md border border-card-edge">
               {connections.map((connection) => (
                 <ConnectionRow key={connection.id} connection={connection} />
               ))}

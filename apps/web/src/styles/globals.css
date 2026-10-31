@@ -6,35 +6,38 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 /*
- * Cool gray canvas and white panels, in the spirit of a light tool workspace.
- * The one bright color is amber, and it is only for the forward action.
- * The mark and the mail desk are this product's, not a copy of anyone else's.
+ * The signed-in app is one rounded window on a plain field: a canvas inside it, and
+ * cards a step lighter (dark) or brighter (light) than the canvas. Violet is the one
+ * primary color, for Approve & send and the other primary pills. The public landing
+ * page has its own palette, scoped to [data-surface='marketing'] further down.
  */
 :root {
   color-scheme: light;
 
-  --dp-color-ground: #eef2f6;
-  --dp-color-ink: #1c2434;
-  --dp-color-ink-secondary: #58687d; /* 4.8:1 on ground-muted, so muted text passes WCAG AA */
-  --dp-color-ground-muted: #e7edf4;
-  --dp-color-rule: #d9e2ec;
-  --dp-color-accent: #1c2434;
-  --dp-color-field: #1c2434;
-  --dp-color-on-field: #f7f9fc;
-  --dp-color-on-field-secondary: #c5d0de;
-  --dp-color-panel: #ffffff;
-  --dp-color-on-accent: #f7f9fc;
-  --dp-color-approve: #2f5aad;
-  --dp-color-on-approve: #f4fffd;
-  --dp-color-draft: #f3f6fb;
+  --dp-color-ground: #e8e8ec; /* the field around the window */
+  --dp-color-canvas: #f3f3f5;
+  --dp-color-panel: #fcfcfd;
+  --dp-color-raised: #efeff3; /* the open row, the draft */
+  --dp-color-rail-active: #e2e2e8;
+  --dp-color-ink: #18181b;
+  --dp-color-ink-secondary: #5c5c66; /* 5.9:1 on the canvas, 6.2:1 on cards */
+  --dp-color-ground-muted: #ebebef;
+  --dp-color-rule: #e0e0e6;
+  --dp-color-card-edge: #e0e0e6; /* the hairline that separates cards in light mode */
+  --dp-color-accent: #18181b;
+  --dp-color-field: #18181b;
+  --dp-color-on-field: #fafafa;
+  --dp-color-on-field-secondary: #c9c9d1;
+  --dp-color-on-accent: #fafafa;
+  /* About #9078C8 in the reference, a step deeper so white labels keep 4.5:1. */
+  --dp-color-violet: #8068bc;
+  --dp-color-violet-hover: #6f57ad;
+  --dp-color-on-violet: #ffffff;
+  --dp-color-violet-soft: #ece8f6;
+  --dp-color-draft: #efeff3;
   --dp-color-danger: #c4321c;
   --dp-color-on-danger: #ffffff;
-  --dp-shadow-panel:
-    0 0 0 1px rgb(28 36 52 / 0.06), inset 0 0 0 1px rgb(255 255 255 / 0.55),
-    inset 0 1px 0 rgb(255 255 255 / 0.8), 0 16px 40px -24px rgb(28 36 52 / 0.22);
-  --dp-canvas-glow: rgb(47 90 173 / 0.12);
-  --dp-canvas-haze: rgb(120 146 178 / 0.22);
-  --dp-canvas-grid: rgb(28 36 52 / 0.045);
+  --dp-shadow-panel: 0 1px 2px rgb(24 24 27 / 0.04);
   --dp-typography-display: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
   --dp-typography-body: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
   --dp-typography-body-size: 16px;
@@ -44,7 +47,7 @@
   --dp-typography-label-size: 12px;
   --dp-typography-body-leading: 1.55;
   --dp-spacing-grid-gap: 24px;
-  --dp-radius-panel: 10px;
+  --dp-radius-panel: 16px;
   --dp-border-hairline: 1px;
   --dp-motion-interaction: 160ms;
   --dp-motion-easing: ease-out;
@@ -55,8 +58,8 @@
   --foreground: var(--dp-color-ink);
   --card: var(--dp-color-panel);
   --card-foreground: var(--dp-color-ink);
-  --primary: var(--dp-color-accent);
-  --primary-foreground: var(--dp-color-on-accent);
+  --primary: var(--dp-color-violet);
+  --primary-foreground: var(--dp-color-on-violet);
   --secondary: var(--dp-color-panel);
   --secondary-foreground: var(--dp-color-ink);
   --muted: var(--dp-color-ground-muted);
@@ -68,51 +71,46 @@
   --border: var(--dp-color-rule);
   --input: var(--dp-color-rule);
   --ring: var(--dp-color-ink);
-  --approve: var(--dp-color-approve);
-  --approve-foreground: var(--dp-color-on-approve);
+  --approve: var(--dp-color-violet);
+  --approve-foreground: var(--dp-color-on-violet);
   --draft: var(--dp-color-draft);
+  --canvas: var(--dp-color-canvas);
+  --raised: var(--dp-color-raised);
+  --rail-active: var(--dp-color-rail-active);
 
-  --primary-hover: color-mix(in oklab, var(--dp-color-ink) 88%, white);
-  --primary-soft: #e7edf4;
-  --approve-hover: #274e96;
+  --primary-hover: var(--dp-color-violet-hover);
+  --primary-soft: var(--dp-color-violet-soft);
+  --approve-hover: var(--dp-color-violet-hover);
 }
 
 /*
- * Dark theme: the same roles on a deep blue-gray desk. Panels sit a step above the
- * ground, text keeps at least 7:1 (muted 6:1), and the cobalt approve button keeps
- * white text at 5.5:1. The light "High" pill and primary marks invert so they still
- * stand out. Contrast was checked for every text and background pair.
+ * Dark theme: the reference frame. A near-black field, a #1F1F1F canvas and cards
+ * at #2B2B2B, with the open row and the draft a step lighter. Text keeps at least
+ * 7:1 (muted 5:1), and the violet keeps white labels at 4.5:1.
  */
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --dp-color-ground: #0e131b;
-  --dp-color-ink: #e5eaf1;
-  --dp-color-ink-secondary: #93a1b4;
-  --dp-color-ground-muted: #1a2230;
-  --dp-color-rule: #283244;
-  --dp-color-accent: #e5eaf1;
-  --dp-color-field: #dfe6ef;
-  --dp-color-on-field: #0e131b;
-  --dp-color-on-field-secondary: #3b4658;
-  --dp-color-panel: #151c27;
-  --dp-color-on-accent: #0e131b;
-  --dp-color-approve: #3a66c0;
-  --dp-color-on-approve: #ffffff;
-  --dp-color-draft: #1b2433;
+  --dp-color-ground: #141414;
+  --dp-color-canvas: #1f1f1f;
+  --dp-color-panel: #2b2b2b;
+  --dp-color-raised: #353535;
+  --dp-color-rail-active: #141414;
+  --dp-color-ink: #ededed;
+  --dp-color-ink-secondary: #a8a8a8;
+  --dp-color-ground-muted: #363636;
+  --dp-color-rule: #3a3a3a;
+  --dp-color-card-edge: transparent;
+  --dp-color-accent: #ededed;
+  --dp-color-field: #e6e6e6;
+  --dp-color-on-field: #141414;
+  --dp-color-on-field-secondary: #3d3d3d;
+  --dp-color-on-accent: #141414;
+  --dp-color-violet-soft: #3a3448;
+  --dp-color-draft: #353535;
   --dp-color-danger: #f07a66;
   --dp-color-on-danger: #1b0904;
-  --dp-color-glass-edge: rgb(255 255 255 / 0.07);
-  --dp-shadow-panel:
-    0 0 0 1px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.04),
-    0 16px 40px -24px rgb(0 0 0 / 0.7);
-  --dp-canvas-glow: rgb(58 102 192 / 0.18);
-  --dp-canvas-haze: rgb(58 80 112 / 0.18);
-  --dp-canvas-grid: rgb(255 255 255 / 0.03);
-
-  --primary-hover: color-mix(in oklab, var(--dp-color-ink) 86%, black);
-  --primary-soft: #1e2b40;
-  --approve-hover: #4673cc;
+  --dp-shadow-panel: none;
 }
 
 @theme inline {
@@ -137,7 +135,7 @@
   --radius-md: 8px;
   --radius-lg: var(--dp-radius-panel);
   --shadow-panel: var(--dp-shadow-panel);
-  --shadow-glow: 0 0 0 1px rgb(47 90 173 / 0.35), 0 10px 28px -10px rgb(47 90 173 / 0.5);
+  --shadow-glow: none;
   --default-transition-duration: var(--dp-motion-interaction);
   --default-transition-timing-function: var(--dp-motion-easing);
 
@@ -157,6 +155,10 @@
   --color-approve-foreground: var(--approve-foreground);
   --color-approve-hover: var(--approve-hover);
   --color-draft: var(--draft);
+  --color-canvas: var(--canvas);
+  --color-card-edge: var(--dp-color-card-edge);
+  --color-raised: var(--raised);
+  --color-rail-active: var(--rail-active);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -189,17 +191,6 @@
     @apply min-h-svh bg-background font-sans text-foreground antialiased;
     font-size: var(--dp-typography-body-size);
     line-height: var(--dp-typography-body-leading);
-    background-image:
-      radial-gradient(ellipse 70% 42% at 50% -12%, var(--dp-canvas-glow), transparent 58%),
-      radial-gradient(ellipse 36% 28% at 100% 0%, var(--dp-canvas-haze), transparent 55%),
-      linear-gradient(to right, var(--dp-canvas-grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--dp-canvas-grid) 1px, transparent 1px);
-    background-size:
-      auto,
-      auto,
-      56px 56px,
-      56px 56px;
-    background-attachment: fixed;
   }
   h1,
   h2 {
@@ -218,57 +209,4 @@
       transition-duration: 0ms !important;
     }
   }
-}
-
-/*
- * Kinzo changes the card edge by page and keeps the panel itself solid.
- * These sit outside Tailwind's layers so they win over the utility border.
- * Inbox stays a thin frost. Materials sits flatter, like a library card.
- * Settings takes a brighter rim. Marketing and sign-in lift a little more.
- */
-[data-surface='materials'] .border-white\/65 {
-  border-color: rgb(255 255 255 / 0.34);
-}
-[data-surface='materials'] .shadow-panel {
-  box-shadow:
-    0 0 0 1px rgb(28 36 52 / 0.08),
-    inset 0 1px 0 rgb(255 255 255 / 0.5),
-    0 1px 2px rgb(28 36 52 / 0.05);
-}
-[data-surface='settings'] .border-white\/65 {
-  border-color: rgb(255 255 255 / 0.86);
-}
-[data-surface='settings'] .shadow-panel {
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.92),
-    0 1px 2px rgb(28 36 52 / 0.06),
-    0 14px 34px -22px rgb(28 36 52 / 0.28);
-}
-[data-surface='marketing'] .border-white\/65 {
-  border-color: rgb(255 255 255 / 0.92);
-}
-[data-surface='marketing'] .shadow-panel {
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.95),
-    0 8px 30px rgb(28 36 52 / 0.06);
-}
-[data-surface='sign-in'] .border-white\/65 {
-  border-color: rgb(255 255 255 / 0.78);
-  border-radius: 1.25rem;
-}
-[data-surface='sign-in'] .shadow-panel {
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.9),
-    0 8px 30px rgb(28 36 52 / 0.07);
-}
-
-/*
- * In the dark theme every page shares one quiet edge and shadow: the white rims
- * above would glow on dark panels. More specific than the rules above, so it wins.
- */
-:root[data-theme='dark'] .border-white\/65 {
-  border-color: var(--dp-color-glass-edge);
-}
-:root[data-theme='dark'] [data-surface] .shadow-panel {
-  box-shadow: var(--dp-shadow-panel);
 }

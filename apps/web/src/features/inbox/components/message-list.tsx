@@ -88,7 +88,7 @@ function MessageRows({
     <ul
       ref={listRef}
       aria-label="Messages"
-      className="relative overflow-hidden rounded-lg border border-white/65 bg-card shadow-panel"
+      className="relative overflow-hidden rounded-lg border border-card-edge bg-card shadow-panel"
       style={{ height: virtualizer.getTotalSize() }}
       onFocus={(event) => {
         const row = event.target.closest<HTMLElement>('[data-index]')

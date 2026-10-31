@@ -122,7 +122,7 @@ export function LandingPage() {
               aria-hidden
               className="pointer-events-none absolute -inset-x-6 -top-8 -bottom-6 -z-10 bg-[radial-gradient(ellipse_at_center,rgb(47_90_173/0.14),transparent_68%)]"
             />
-            <div className="flex flex-col rounded-xl border border-white/65 bg-card/95 p-6 shadow-panel md:p-8">
+            <div className="flex flex-col rounded-xl border border-card-edge bg-card/95 p-6 shadow-panel md:p-8">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-label font-semibold tracking-[0.12em] text-muted-foreground uppercase">
                   On the desk
@@ -141,7 +141,7 @@ export function LandingPage() {
                 The demo runs on sample emails. No account needed.
               </p>
             </div>
-            <div className="rounded-xl border border-white/65 bg-card/95 p-4 shadow-panel sm:p-6">
+            <div className="rounded-xl border border-card-edge bg-card/95 p-4 shadow-panel sm:p-6">
               <ProductPreview />
             </div>
           </div>
@@ -152,7 +152,7 @@ export function LandingPage() {
             {steps.map(({ icon: Icon, title, body }, index) => (
               <li
                 key={title}
-                className="rounded-lg border border-white/65 bg-card p-6 shadow-panel md:p-7"
+                className="rounded-lg border border-card-edge bg-card p-6 shadow-panel md:p-7"
               >
                 <div className="flex items-center justify-between">
                   <span className="grid size-10 place-items-center rounded-full bg-approve text-approve-foreground">
@@ -179,7 +179,7 @@ export function LandingPage() {
             {features.map(({ icon: Icon, title, body }) => (
               <li
                 key={title}
-                className="rounded-xl border border-white/65 bg-card/95 p-5 shadow-panel"
+                className="rounded-xl border border-card-edge bg-card/95 p-5 shadow-panel"
               >
                 <Icon className="size-5 text-muted-foreground" aria-hidden />
                 <h3 className="mt-3 font-display text-base font-semibold tracking-tight">
@@ -214,7 +214,7 @@ export function LandingPage() {
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl border border-white/65 bg-card p-6 shadow-panel md:p-8">
+            <div className="rounded-2xl border border-card-edge bg-card p-6 shadow-panel md:p-8">
               <h3 className="font-display text-lg font-semibold tracking-tight">
                 What we ask Microsoft and Google for
               </h3>
@@ -252,7 +252,7 @@ export function LandingPage() {
         </Section>
 
         <section className="mx-auto max-w-page px-gutter pb-24">
-          <div className="flex flex-col items-start gap-8 rounded-2xl border border-white/65 bg-card p-8 shadow-panel md:flex-row md:items-center md:justify-between md:p-12">
+          <div className="flex flex-col items-start gap-8 rounded-2xl border border-card-edge bg-card p-8 shadow-panel md:flex-row md:items-center md:justify-between md:p-12">
             <div>
               <h2 className="font-display text-2xl leading-tight font-semibold tracking-[-0.02em] md:text-3xl">
                 See it with sample emails
