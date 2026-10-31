@@ -37,6 +37,9 @@ function fakeClock() {
 }
 const waitOutUndo = () => act(() => vi.advanceTimersByTimeAsync(UNDO_SECONDS * 1000))
 
+// The priority and account filters sit behind the filter button in the search field.
+const openFilters = () => userEvent.click(screen.getByRole('button', { name: /^Filters/ }))
+
 async function approveAndSend() {
   fakeClock()
   await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
@@ -180,7 +183,7 @@ describe('app', () => {
     const { router } = renderApp('/demo')
     await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
     await approveAndSend()
-    await screen.findByText('Approved')
+    await screen.findByText('Sent')
 
     await router.navigate({ to: '/demo' })
     await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
@@ -209,6 +212,8 @@ describe('app', () => {
     expect(await screen.findByText('Five ways to close the month faster')).toBeInTheDocument()
     expect(screen.queryByText('Quote for 40 units by Friday')).not.toBeInTheDocument()
     // Only the chosen filter is marked as selected, not "All" as well.
+    expect(screen.getByRole('button', { name: 'Filters, on' })).toBeInTheDocument()
+    await openFilters()
     const filters = screen.getByRole('navigation', { name: 'Filter by priority' })
     const selected = within(filters)
       .getAllByRole('link')
@@ -220,9 +225,9 @@ describe('app', () => {
     const approve = vi.spyOn(inboxApi, 'approveDraft')
     renderApp('/inbox/m1')
     await screen.findByRole('button', { name: 'Approve & send' })
-    expect(screen.queryByText('Approved')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sent')).not.toBeInTheDocument()
     await approveAndSend()
-    expect(await screen.findByText('Approved')).toBeInTheDocument()
+    expect(await screen.findByText('Sent')).toBeInTheDocument()
     expect(approve).toHaveBeenCalledTimes(1)
     // Once sent, the draft can't be edited any more.
     expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
@@ -243,7 +248,7 @@ describe('app', () => {
     await waitOutUndo()
     expect(approve).not.toHaveBeenCalled()
     expect(screen.getByRole('button', { name: 'Approve & send' })).toBeEnabled()
-    expect(screen.queryByText('Approved')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sent')).not.toBeInTheDocument()
   })
 
   it('keeps the undo window while you move on, then sends', async () => {
@@ -261,7 +266,7 @@ describe('app', () => {
       'Reply sent to orders@brightline.example',
     )
     const list = screen.getByRole('list', { name: 'Messages' })
-    await waitFor(() => expect(within(list).getAllByText('Approved')).toHaveLength(1))
+    await waitFor(() => expect(within(list).getAllByText('Reply sent')).toHaveLength(1))
   })
 
   it('says when a reply could not be sent, and lets you try again', async () => {
@@ -270,7 +275,7 @@ describe('app', () => {
     await approveAndSend()
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't send. Please try again.")
     await approveAndSend()
-    expect(await screen.findByText('Approved')).toBeInTheDocument()
+    expect(await screen.findByText('Sent')).toBeInTheDocument()
   })
 
   it('drops a held reply as soon as you sign out, even if signing out is slow', async () => {
@@ -303,7 +308,7 @@ describe('app', () => {
     await router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } })
     await screen.findByRole('heading', { name: 'Quote for 40 units by Friday' })
     expect(screen.queryByRole('button', { name: 'Approve & send' })).not.toBeInTheDocument()
-    expect(screen.getByText('Approved')).toBeInTheDocument()
+    expect(screen.getByText('Sent')).toBeInTheDocument()
   })
 
   it('shows the form the AI filled in with the draft', async () => {
@@ -334,7 +339,7 @@ describe('app', () => {
     expect(within(form).getByText('Quantity').nextSibling).toHaveTextContent('45')
     expect(within(form).getByText('Lead time').nextSibling).toHaveTextContent('2 weeks')
     expect(screen.getByRole('button', { name: 'Approve & send' })).toBeEnabled()
-    expect(screen.queryByText('Approved')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sent')).not.toBeInTheDocument()
   })
 
   it('will not save a blank reply', async () => {
@@ -363,10 +368,11 @@ describe('app', () => {
     expect(screen.queryByText('Filled by AI')).not.toBeInTheDocument()
   })
 
-  it('shows the AI summary above the conversation', async () => {
+  it('shows the AI summary above the email', async () => {
     renderApp('/inbox/m2')
+    const email = await screen.findByRole('article', { name: 'Invoice 1182 due next week' })
     expect(
-      await screen.findByText('Reminder that invoice 1182 ($2,400) is due Nov 3.'),
+      within(email).getByText('Reminder that invoice 1182 ($2,400) is due Nov 3.'),
     ).toBeInTheDocument()
   })
 
@@ -556,13 +562,13 @@ describe('app', () => {
 
     await userEvent.click(within(setup).getByRole('link', { name: 'Open the next draft' }))
     await approveAndSend()
-    await screen.findByText('Approved')
+    await screen.findByText('Sent')
 
     await router.navigate({ to: '/inbox' })
     const list = await screen.findByRole('list', { name: 'Messages' })
     // The list refetches after the approval, then marks the row and drops the checklist.
     await waitFor(() =>
-      expect(within(list).getAllByRole('listitem')[0]).toHaveTextContent('Approved'),
+      expect(within(list).getAllByRole('listitem')[0]).toHaveTextContent('Reply sent'),
     )
     expect(screen.queryByRole('region', { name: 'Get set up' })).not.toBeInTheDocument()
   })
@@ -691,7 +697,7 @@ describe('app', () => {
 
     await router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } })
     await approveAndSend()
-    await screen.findByText('Approved')
+    await screen.findByText('Sent')
     await router.navigate({ to: '/inbox' })
 
     const week = await screen.findByRole('region', { name: 'Last 7 days' })
@@ -721,7 +727,7 @@ describe('app', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
 
     await userEvent.keyboard('as')
-    expect(screen.queryByText('Approved')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sent')).not.toBeInTheDocument()
 
     await userEvent.keyboard('{Escape}')
     await screen.findByRole('list', { name: 'Messages' })
@@ -762,13 +768,13 @@ describe('app', () => {
     ).toBeVisible()
   })
 
-  it('goes back to the inbox search with / from an email', async () => {
+  it('jumps to the search with / from an email, which stays open beside it', async () => {
     const { router } = renderApp('/inbox/m1')
     await screen.findByRole('button', { name: 'Approve & send' })
     await userEvent.keyboard('/')
-    const search = await screen.findByRole('searchbox', { name: 'Search the inbox' })
+    const search = screen.getByRole('searchbox', { name: 'Search the inbox' })
     await waitFor(() => expect(search).toHaveFocus())
-    expect(router.state.location.pathname).toBe('/inbox')
+    expect(router.state.location.pathname).toBe('/inbox/m1')
     // The slash itself isn't typed into the box.
     expect(search).toHaveValue('')
   })
@@ -805,7 +811,7 @@ describe('app', () => {
       expect(within(help).getByRole('heading', { name: group })).toBeInTheDocument()
     }
     expect(help).toHaveTextContent('Open the next or previous email')
-    expect(help).toHaveTextContent('Back to the inbox, searching')
+    expect(help).toHaveTextContent('Close the email')
     expect(help).toHaveTextContent(/Ctrl\s*Enter\s*Save your changes|Save your changesCtrlEnter/)
     expect(help).toHaveTextContent('a stray key can never send an email')
     expect(within(help).getByRole('button', { name: 'Close' })).toHaveFocus()
@@ -841,6 +847,7 @@ describe('app', () => {
     await waitFor(() => expect(router.state.location.search).toEqual({ q: 'units' }))
 
     // Changing the priority keeps the search.
+    await openFilters()
     await userEvent.click(screen.getByRole('link', { name: 'Medium' }))
     await waitFor(() =>
       expect(router.state.location.search).toEqual({ q: 'units', priority: 'medium' }),
@@ -854,16 +861,14 @@ describe('app', () => {
     await screen.findByRole('button', { name: 'Approve & send' })
     expect(router.state.location.search).toEqual({ q: 'units', priority: 'high' })
 
-    await userEvent.click(screen.getByRole('link', { name: 'Inbox', current: false }))
-    expect(await screen.findByRole('searchbox', { name: 'Search the inbox' })).toHaveValue('units')
-    expect(router.state.location.search).toEqual({ q: 'units', priority: 'high' })
-
-    // Escape goes back the same way.
-    await userEvent.click(await screen.findByRole('link', { name: /12 units arrived/ }))
-    await screen.findByRole('heading', { name: '12 units arrived damaged' })
-    await userEvent.keyboard('{Escape}')
-    expect(await screen.findByRole('searchbox', { name: 'Search the inbox' })).toHaveValue('units')
+    // The list stays beside the email, still searched.
     expect(screen.getByText('2 of 3 messages match')).toBeInTheDocument()
+
+    // Escape closes the email and keeps the search.
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/inbox'))
+    expect(screen.getByRole('searchbox', { name: 'Search the inbox' })).toHaveValue('units')
+    expect(router.state.location.search).toEqual({ q: 'units', priority: 'high' })
   })
 
   it('jumps to search with / and clears it with Escape', async () => {
@@ -897,6 +902,7 @@ describe('app', () => {
       'orders@brightline.example to demo@gmail.example',
     )
 
+    await openFilters()
     await userEvent.selectOptions(
       screen.getByRole('combobox', { name: 'Account' }),
       'demo@gmail.example (Gmail)',
@@ -914,19 +920,21 @@ describe('app', () => {
   it('keeps the account when you open a message and go back', async () => {
     const { router } = renderApp('/inbox?account=con-2')
     await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
-    expect(
-      await screen.findByText('From orders@brightline.example to demo@gmail.example'),
-    ).toBeInTheDocument()
+    const email = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    expect(email).toHaveTextContent('orders@brightline.example to demo@gmail.example')
     expect(router.state.location.search).toEqual({ account: 'con-2' })
 
-    await userEvent.click(screen.getByRole('link', { name: 'Inbox', current: false }))
-    expect(await screen.findByRole('combobox', { name: 'Account' })).toHaveValue('con-2')
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/inbox'))
+    await openFilters()
+    expect(screen.getByRole('combobox', { name: 'Account' })).toHaveValue('con-2')
   })
 
   it('shows every account when the link names one that is not connected', async () => {
     renderApp('/inbox?account=con-gone')
     const list = await screen.findByRole('list', { name: 'Messages' })
     expect(within(list).getAllByRole('listitem')).toHaveLength(8)
+    await openFilters()
     expect(screen.getByRole('combobox', { name: 'Account' })).toHaveValue('')
   })
 
@@ -934,6 +942,7 @@ describe('app', () => {
     mockConnections.splice(1)
     renderApp('/inbox')
     const list = await screen.findByRole('list', { name: 'Messages' })
+    await openFilters()
     expect(screen.queryByRole('combobox', { name: 'Account' })).not.toBeInTheDocument()
     expect(list).not.toHaveTextContent('to demo@')
   })
@@ -941,5 +950,136 @@ describe('app', () => {
   it('shows not found for an unknown message', async () => {
     renderApp('/inbox/does-not-exist')
     expect(await screen.findByText('Not found')).toBeInTheDocument()
+  })
+})
+
+describe('dashboard', () => {
+  const rowsOf = () =>
+    within(screen.getByRole('list', { name: 'Messages' }))
+      .getAllByRole('listitem')
+      .map((li) => li.querySelector('a')!.textContent)
+  const folder = (name: RegExp | string) =>
+    within(screen.getByRole('navigation', { name: 'Folders' })).getByRole('link', { name })
+
+  it('shows the list and the open email side by side, with its place in the list', async () => {
+    const { router } = renderApp('/inbox/m4')
+    const email = await screen.findByRole('article', { name: 'PO needed for 200 shipping boxes' })
+    expect(within(email).getByText('2 of 8')).toBeInTheDocument()
+    // The open email's row is marked in the list beside it.
+    expect(
+      within(screen.getByRole('list', { name: 'Messages' })).getByRole('link', {
+        name: /PO needed for 200 shipping boxes/,
+      }),
+    ).toHaveAttribute('aria-current', 'page')
+
+    await userEvent.click(within(email).getByRole('link', { name: 'Next email' }))
+    expect(
+      await screen.findByRole('article', { name: '12 units arrived damaged' }),
+    ).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/inbox/m5')
+    await userEvent.click(screen.getByRole('link', { name: 'Previous email' }))
+    await screen.findByRole('article', { name: 'PO needed for 200 shipping boxes' })
+  })
+
+  it('sorts mail into folder chips without sending or changing the mailbox', async () => {
+    const approve = vi.spyOn(inboxApi, 'approveDraft')
+    const { router } = renderApp('/inbox')
+    await screen.findByRole('list', { name: 'Messages' })
+    expect(folder(/^Inbox/)).toHaveAccessibleName('Inbox, 8 emails')
+    expect(folder(/^Inbox/)).toHaveAttribute('aria-current', 'page')
+
+    // Drafts are the drafted replies still waiting for approval.
+    await userEvent.click(folder('Drafts'))
+    await waitFor(() => expect(router.state.location.search).toEqual({ folder: 'drafts' }))
+    expect(folder('Drafts')).toHaveAttribute('aria-current', 'page')
+    expect(folder(/^Inbox/)).not.toHaveAttribute('aria-current')
+    expect(rowsOf()).not.toContainEqual(expect.stringContaining('Five ways to close'))
+
+    // Nothing has been sent yet, and nothing marks spam.
+    await userEvent.click(folder('Sent items'))
+    expect(await screen.findByText('No sent replies yet')).toBeInTheDocument()
+    await userEvent.click(folder('Spam'))
+    expect(await screen.findByText('Nothing in Spam')).toBeInTheDocument()
+    expect(approve).not.toHaveBeenCalled()
+  })
+
+  it('archives, deletes and stars in this browser only, and moves mail back', async () => {
+    const { router } = renderApp('/inbox/m1')
+    const email = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+
+    await userEvent.click(within(email).getByRole('button', { name: 'Star' }))
+    expect(within(email).getByRole('button', { name: 'Star' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await userEvent.click(within(email).getByRole('button', { name: 'Archive' }))
+    expect(email).toHaveTextContent("Moved to Archive in this browser. Your mailbox isn't changed.")
+    // It leaves the inbox list and the chip's count.
+    await waitFor(() =>
+      expect(rowsOf()).not.toContainEqual(expect.stringContaining('Quote for 40 units')),
+    )
+    expect(folder(/^Inbox/)).toHaveAccessibleName('Inbox, 7 emails')
+
+    await router.navigate({ to: '/inbox', search: { folder: 'archive' } })
+    await waitFor(() => expect(rowsOf()).toEqual([expect.stringContaining('Quote for 40 units')]))
+    await router.navigate({ to: '/inbox', search: { folder: 'favorites' } })
+    await waitFor(() => expect(rowsOf()).toEqual([expect.stringContaining('Quote for 40 units')]))
+
+    await router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } })
+    const again = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    await userEvent.click(within(again).getByRole('button', { name: 'Move back to the inbox' }))
+    await waitFor(() => expect(folder(/^Inbox/)).toHaveAccessibleName('Inbox, 8 emails'))
+  })
+
+  it('opens a draft from New email, and never sends from it', async () => {
+    const approve = vi.spyOn(inboxApi, 'approveDraft')
+    const { router } = renderApp('/inbox')
+    await screen.findByRole('list', { name: 'Messages' })
+    const newEmail = screen.getByRole('button', { name: 'New email' })
+    expect(newEmail).toHaveAccessibleDescription(
+      'Opens a drafted reply to review. Nothing is sent until you approve it.',
+    )
+
+    // With no email open it opens the first one with a draft waiting.
+    await userEvent.click(newEmail)
+    await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    expect(router.state.location.pathname).toBe('/inbox/m1')
+    expect(screen.queryByRole('textbox', { name: 'Reply' })).not.toBeInTheDocument()
+
+    // With it open, it opens that draft for editing.
+    await userEvent.click(screen.getByRole('button', { name: 'New email' }))
+    expect(await screen.findByRole('textbox', { name: 'Reply' })).toHaveFocus()
+    expect(approve).not.toHaveBeenCalled()
+  })
+
+  it('copies a link to the email, and forwards only through your own email app', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    renderApp('/inbox/m1')
+    const email = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+
+    await userEvent.click(within(email).getByRole('button', { name: 'Get link' }))
+    expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/inbox/m1`)
+    expect(await within(email).findByText('Link copied')).toBeInTheDocument()
+    expect(within(email).getByRole('link', { name: 'Forward' })).toHaveAttribute(
+      'href',
+      expect.stringMatching(/^mailto:\?subject=Fwd%3A%20Quote%20for%2040%20units/),
+    )
+  })
+
+  it('goes back and refreshes from the window bar', async () => {
+    const getMessages = vi.spyOn(inboxApi, 'getMessages')
+    const { router } = renderApp('/inbox')
+    await screen.findByRole('list', { name: 'Messages' })
+    expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
+
+    await userEvent.click(screen.getByRole('link', { name: 'Settings' }))
+    await screen.findByRole('heading', { name: 'Settings' })
+    await userEvent.click(screen.getByRole('button', { name: 'Back' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/inbox'))
+
+    const calls = getMessages.mock.calls.length
+    await userEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+    await waitFor(() => expect(getMessages.mock.calls.length).toBeGreaterThan(calls))
   })
 })

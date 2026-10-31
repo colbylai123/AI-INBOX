@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { resetSampleConnections } from '@/features/connections'
-import { resetSampleInbox } from '@/features/inbox'
+import { resetLocalFolders, resetSampleInbox } from '@/features/inbox'
 import { resetSampleMaterials } from '@/features/materials'
 import { setDemoMode } from '@/lib/demo-mode'
 
@@ -12,6 +12,8 @@ export const Route = createFileRoute('/demo')({
     await Promise.all([resetSampleInbox(), resetSampleMaterials(), resetSampleConnections()])
     // Forget anything cached from a real session before the sample one starts.
     context.queryClient.clear()
+    // Stars and moves on sample mail start over too.
+    resetLocalFolders()
     setDemoMode(true)
     throw redirect({ to: '/inbox' })
   },

@@ -49,23 +49,24 @@ describe('a long inbox', () => {
     account: { id: 'con-2', email: 'demo@gmail.example' },
   }))
 
-  // jsdom has no layout or scrolling: give rows a height, and let scrollTo move the
-  // page and tell listeners, as a browser would.
-  const scrollPage = (top: number) =>
-    act(() => {
-      Object.defineProperty(window, 'scrollY', { value: top, configurable: true })
-      window.dispatchEvent(new Event('scroll'))
-    })
+  // jsdom has no layout or scrolling: give rows (and the list card) a height, and let
+  // scrollTo move the list and tell listeners, as a browser would.
+  // The list's first guess at a row's height, so every row is where it expects.
+  const rowHeight = 104
+  const scroller = () => screen.getByRole('list', { name: 'Messages' }).parentElement!
+  const scrollTo = function (this: Element, options: ScrollToOptions) {
+    Object.defineProperty(this, 'scrollTop', { value: options.top ?? 0, configurable: true })
+    this.dispatchEvent(new Event('scroll'))
+  }
+  const scrollList = (top: number) => act(() => scrollTo.call(scroller(), { top }))
+  const originalScrollTo = Element.prototype.scrollTo
   beforeEach(() => {
-    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(92)
-    vi.spyOn(Element.prototype, 'scrollHeight', 'get').mockReturnValue(500 * 92)
-    vi.spyOn(window, 'scrollTo').mockImplementation(((options: ScrollToOptions) => {
-      Object.defineProperty(window, 'scrollY', { value: options.top ?? 0, configurable: true })
-      window.dispatchEvent(new Event('scroll'))
-    }) as typeof window.scrollTo)
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(rowHeight)
+    vi.spyOn(Element.prototype, 'scrollHeight', 'get').mockReturnValue(500 * rowHeight)
+    Element.prototype.scrollTo = scrollTo as typeof Element.prototype.scrollTo
   })
-  afterEach(async () => {
-    await scrollPage(0)
+  afterEach(() => {
+    Element.prototype.scrollTo = originalScrollTo
     vi.restoreAllMocks()
   })
 
@@ -82,7 +83,7 @@ describe('a long inbox', () => {
     expect(rows()[0]).toHaveTextContent('to demo@gmail.example')
     expect(screen.queryByText('Message 400')).not.toBeInTheDocument()
 
-    await scrollPage(400 * 92)
+    await scrollList(400 * rowHeight)
     expect(await screen.findByText('Message 401')).toBeInTheDocument()
     expect(screen.queryByText('Message 1')).not.toBeInTheDocument()
   })
@@ -103,7 +104,7 @@ describe('a long inbox', () => {
     await userEvent.keyboard('jjj')
     expect(focusedRow()).toHaveTextContent('Message 3')
 
-    await scrollPage(300 * 92)
+    await scrollList(300 * rowHeight)
     await screen.findByText('Message 301')
     expect(focusedRow()).toHaveTextContent('Message 3')
     // j carries on from the focused row, not from where the page is.

@@ -6,7 +6,7 @@ import { FilledFormHeader } from './filled-form'
 
 /**
  * Editable copy of the AI's reply and its filled form. Submitted by the Save
- * button in DraftReview's footer through the form `id`, or with Ctrl+Enter.
+ * button in ReadingPane's bottom row through the form `id`, or with Ctrl+Enter.
  */
 export function DraftEditor({
   id,

@@ -21,9 +21,10 @@ function surfaceFor(pathname: string) {
 export function AppShell({ user, children }: { user: User; children: ReactNode }) {
   const demo = useDemoMode()
   const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const surface = surfaceFor(pathname)
   return (
     // The field. On wide screens the app sits on it as one rounded window.
-    <div className="flex min-h-svh flex-col lg:p-5" data-surface={surfaceFor(pathname)}>
+    <div className="flex min-h-svh flex-col lg:p-5" data-surface={surface}>
       {/* On wide screens these sit on the field above the window, rounded like it. */}
       <div className="empty:hidden lg:mx-auto lg:mb-3 lg:w-full lg:max-w-[1600px] lg:overflow-hidden lg:rounded-2xl">
         {demo && <DemoBar />}
@@ -50,11 +51,14 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
             the page goes under them. Wide screens: the rail is a column at the left. */}
         <div className="grid flex-1 grid-cols-[1fr_auto] content-start lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_1fr]">
           <AppRail className="lg:row-span-2" />
-          <div className="flex items-center justify-end gap-2 pr-3 pb-3 sm:pr-4 lg:pt-2 lg:pr-5">
-            <ThemePill />
-            <AccountLink user={user} />
-          </div>
-          <main className="col-span-2 min-w-0 px-3 pb-6 sm:px-4 lg:col-span-1 lg:pr-5 lg:pb-5 lg:pl-1">
+          {/* The inbox has them at the end of its folder chips, as in the reference. */}
+          {surface !== 'inbox' && (
+            <div className="flex items-center justify-end gap-2 pr-3 pb-3 sm:pr-4 lg:pt-2 lg:pr-5">
+              <ThemePill />
+              <AccountLink user={user} />
+            </div>
+          )}
+          <main className="col-span-2 min-w-0 px-3 pb-6 sm:px-4 lg:col-span-1 lg:pt-2 lg:pr-5 lg:pb-5 lg:pl-1">
             {children}
           </main>
         </div>
