@@ -1,6 +1,9 @@
 import { Link } from '@tanstack/react-router'
+import { Menu, X } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Logo } from '@/components/layout/logo'
 import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 const sections = [
   { href: '#how-it-works', label: 'How it works' },
@@ -13,8 +16,8 @@ const sections = [
 export function SiteHeader({ page }: { page: 'landing' | 'sign-in' }) {
   return (
     <header className="sticky top-0 z-10 border-b border-border/80 bg-card/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-page items-center gap-6 px-gutter py-3.5">
-        <Link to="/" className="rounded-md">
+      <div className="mx-auto flex max-w-page items-center gap-3 px-gutter py-3.5 md:gap-6">
+        <Link to="/" className="shrink-0 rounded-md">
           <Logo />
         </Link>
         {page === 'landing' && (
@@ -32,7 +35,11 @@ export function SiteHeader({ page }: { page: 'landing' | 'sign-in' }) {
         )}
         <div className="ml-auto flex items-center gap-2">
           {page === 'landing' && (
-            <Link to="/sign-in" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+            // The narrowest phones have no room for it here, so it moves into the menu.
+            <Link
+              to="/sign-in"
+              className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'max-[379px]:hidden')}
+            >
               Sign in
             </Link>
           )}
@@ -40,8 +47,81 @@ export function SiteHeader({ page }: { page: 'landing' | 'sign-in' }) {
           <Link to="/demo" preload={false} className={buttonVariants({ size: 'sm' })}>
             Try the demo
           </Link>
+          {page === 'landing' && <SectionsMenu />}
         </div>
       </div>
     </header>
+  )
+}
+
+/** Below md the section links are hidden, so a menu button opens them instead. */
+function SectionsMenu() {
+  const [open, setOpen] = useState(false)
+  const panelId = useId()
+  const rootRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    // A tap anywhere else on the page closes it.
+    const closeOutside = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [open])
+
+  return (
+    <div
+      ref={rootRef}
+      className="md:hidden"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && open) {
+          setOpen(false)
+          buttonRef.current?.focus()
+        }
+      }}
+    >
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-label="Page sections"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((value) => !value)}
+        className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-8')}
+      >
+        {open ? <X aria-hidden /> : <Menu aria-hidden />}
+      </button>
+      {open && (
+        <nav
+          id={panelId}
+          aria-label="Page sections"
+          className="absolute inset-x-0 top-full border-b border-border/80 bg-card px-gutter py-2 shadow-panel"
+        >
+          <ul className="flex flex-col">
+            {sections.map(({ href, label }) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className="flex h-11 items-center rounded-md px-3 text-interface font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+            <li className="min-[380px]:hidden">
+              <Link
+                to="/sign-in"
+                className="flex h-11 items-center rounded-md px-3 text-interface font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                Sign in
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      )}
+    </div>
   )
 }
