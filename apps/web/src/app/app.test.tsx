@@ -160,6 +160,7 @@ describe('app', () => {
     await router.navigate({ to: '/inbox' })
     const notice = await screen.findByText(/sends in/)
     expect(notice).toHaveTextContent('Reply to orders@brightline.example sends in')
+    expect(notice.closest('[role="status"]')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument()
 
     await waitOutUndo()
@@ -366,8 +367,7 @@ describe('app', () => {
     const { router } = renderApp('/settings')
     await screen.findByText(/demo@example.com · Synced/)
     await userEvent.click(screen.getByRole('button', { name: 'Connect Gmail' }))
-    const notice = await screen.findByText(/Gmail is connected/)
-    expect(notice.closest('[role="status"]')).toHaveTextContent('Gmail is connected')
+    expect(await screen.findByRole('status')).toHaveTextContent('Gmail is connected')
     expect(await screen.findByText(/demo@gmail.example · Synced/)).toBeInTheDocument()
     expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
     expect(mockConnections.map((c) => c.provider)).toEqual(['outlook', 'gmail'])

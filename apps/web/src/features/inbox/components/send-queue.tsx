@@ -49,6 +49,11 @@ export function SendQueue() {
   }, [anyHeld])
 
   const openId = useParams({ strict: false }).messageId
+  // With no replies there's nothing to announce, so there's no status region to
+  // compete with the page's own, such as "Gmail is connected" in Settings. It mounts
+  // when Approve & send is clicked, while the draft page still shows that reply, so
+  // the region is already there when its first toast appears.
+  if (replies.length === 0) return null
   return (
     // Phones show these at the top, clear of the draft page's approve bar.
     <div
