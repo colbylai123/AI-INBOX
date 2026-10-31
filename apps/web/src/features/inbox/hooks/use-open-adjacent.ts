@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { connectionsQuery } from '@/features/connections'
 import { messagesQuery } from '../api/queries'
 import { searchMessages } from '../lib/search'
 import { sortByPriority } from '../lib/sort'
@@ -18,15 +19,19 @@ export function useOpenAdjacent(message: Message) {
   })
 
   return async (by: 1 | -1) => {
-    const all = sortByPriority(
-      await queryClient.ensureQueryData(messagesQuery({ priority: search.priority })),
-    )
-    // The list shows one account's mail only when that filter is on, as it is for this email.
-    const sameAccount =
-      search.account && message.account?.id === search.account
-        ? all.filter((m) => m.account?.id === search.account)
-        : all
-    const listed = searchMessages(sameAccount, search.q)
+    const [all, connections] = await Promise.all([
+      queryClient.ensureQueryData(messagesQuery({ priority: search.priority })),
+      queryClient.ensureQueryData(connectionsQuery()),
+    ])
+    // As in the inbox, an account that isn't connected (an old link, say) shows every
+    // account. A filter for some other account than this email's can't be the list
+    // you came from, so that walks every account too.
+    const account =
+      connections.some((c) => c.id === search.account) && message.account?.id === search.account
+        ? search.account
+        : undefined
+    const inList = account ? all.filter((m) => m.account?.id === account) : all
+    const listed = searchMessages(sortByPriority(inList), search.q)
     const at = listed.findIndex((m) => m.id === message.id)
     const next = at === -1 ? undefined : listed[at + by]
     if (!next) return

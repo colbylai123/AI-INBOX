@@ -753,6 +753,17 @@ describe('app', () => {
     expect(router.state.location.pathname).toBe('/inbox/m1')
   })
 
+  it('walks the same emails as the inbox when the account in the link is no longer connected', async () => {
+    // Gmail was disconnected, so ?account=con-2 is stale and the inbox lists every account.
+    mockConnections.splice(1)
+    renderApp('/inbox/m1?account=con-2')
+    await screen.findByRole('heading', { name: 'Quote for 40 units by Friday' })
+    await userEvent.keyboard('j')
+    expect(
+      await screen.findByRole('heading', { name: 'PO needed for 200 shipping boxes' }),
+    ).toBeVisible()
+  })
+
   it('goes back to the inbox search with / from an email', async () => {
     const { router } = renderApp('/inbox/m1')
     await screen.findByRole('button', { name: 'Approve & send' })
