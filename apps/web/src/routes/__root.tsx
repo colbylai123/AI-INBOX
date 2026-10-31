@@ -1,6 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense } from 'react'
+import { LandingHandoff } from '@/features/marketing/components/landing-handoff'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -32,6 +33,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => (
     <>
       <Outlet />
+      <LandingHandoff />
       {import.meta.env.MODE !== 'test' && (
         <Suspense>
           <Devtools />

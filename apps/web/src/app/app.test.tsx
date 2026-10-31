@@ -63,6 +63,11 @@ describe('app', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Your inbox, sorted and drafted' }),
     ).toBeInTheDocument()
+    expect(screen.getByText('Mail, but it waits its turn.')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Approve the send. Keep the evening.' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/About four minutes a reply/)).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: /Try the demo/ }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Sign in' }).length).toBeGreaterThan(0)
   })

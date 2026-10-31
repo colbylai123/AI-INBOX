@@ -12,7 +12,7 @@ import {
   Sparkles,
   Upload,
 } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Logo } from '@/components/layout/logo'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -97,31 +97,50 @@ const faqs = [
   },
 ]
 
+const benefits = [
+  {
+    kicker: 'How it helps',
+    title: 'Open the mail. The reply is already dressed.',
+    body: 'A one-line summary, a draft, and the form filled from that email and the files you uploaded. You edit. You approve. That is the whole job.',
+  },
+  {
+    kicker: 'Why the day gets lighter',
+    title: 'Your night is not a second inbox.',
+    body: 'The same quote, the same order, the same “yes, Friday works.” You stop writing them from a blank page. Nothing sends on its own, and you have 10 seconds to take a send back.',
+  },
+  {
+    kicker: 'Time back, counted honestly',
+    title: 'About four minutes a reply. Six more for a form.',
+    body: 'Those are the minutes the app counts for a reply or a form you would have done by hand. An estimate, shown on the inbox card, not a promise. A week of approvals is where it adds up.',
+  },
+]
+
 export function LandingPage() {
   return (
     // Clipped so the hero glow, which spills past the cards, never scrolls the page sideways on phones.
-    <div className="min-h-svh overflow-x-clip" data-surface="marketing">
+    <div className="relative min-h-svh overflow-x-clip" data-surface="marketing">
+      <ScrollBubbles />
       <SiteHeader page="landing" />
 
-      <main>
+      <main className="relative">
         {/* Hero split about 1.25 : 1, copy first, stacked below 1050px. */}
         <section className="mx-auto max-w-page px-gutter pt-10 pb-16 md:pt-14">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-metadata font-medium text-muted-foreground">A desk for work email</p>
+            <p className="mt-3 font-display text-lg text-balance text-[#5c4d86]">
+              Mail, but it waits its turn.
+            </p>
             <h1 className="mt-3 font-display text-[clamp(32px,4vw,44px)] leading-[1.08] font-semibold tracking-[-0.04em] text-balance">
               Your inbox, sorted and drafted
             </h1>
             <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-              AI ranks incoming email, writes the reply and fills in your forms.{' '}
-              <span className="text-foreground">You approve before anything is sent.</span>
+              The inbox writes the first draft. You keep the last word.{' '}
+              <span className="text-foreground">Nothing sends until you approve it.</span>
             </p>
             <CallsToAction className="mt-6 justify-center" />
           </div>
           <div className="relative mt-12 grid items-stretch gap-5 lg:grid-cols-2">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-x-6 -top-8 -bottom-6 -z-10 bg-[radial-gradient(ellipse_at_center,rgb(47_90_173/0.14),transparent_68%)]"
-            />
+            <div aria-hidden className="landing-blob" />
             <div className="flex flex-col rounded-xl border border-card-edge bg-card/95 p-6 shadow-panel md:p-8">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-label font-semibold tracking-[0.12em] text-muted-foreground uppercase">
@@ -143,6 +162,37 @@ export function LandingPage() {
             </div>
             <div className="rounded-xl border border-card-edge bg-card/95 p-4 shadow-panel sm:p-6">
               <ProductPreview />
+            </div>
+          </div>
+        </section>
+
+        <section id="why" className="scroll-mt-16 border-t border-border">
+          <div className="mx-auto max-w-page px-gutter py-20 md:py-28">
+            <Reveal>
+              <p className="text-label font-semibold tracking-[0.08em] text-[#5c4d86] uppercase">
+                What you get back
+              </p>
+              <h2 className="mt-2 max-w-2xl font-display text-3xl leading-tight font-semibold tracking-[-0.02em] text-balance md:text-4xl">
+                Approve the send. Keep the evening.
+              </h2>
+              <p className="mt-4 max-w-xl font-display text-lg text-[#5c4d86]">
+                “The draft can wait. Your name on it should not be a surprise.”
+              </p>
+            </Reveal>
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {benefits.map((benefit) => (
+                <Reveal key={benefit.kicker}>
+                  <article className="h-full rounded-2xl border border-card-edge bg-card/90 p-6 shadow-panel">
+                    <p className="text-label font-semibold tracking-[0.08em] text-[#6d5b9a] uppercase">
+                      {benefit.kicker}
+                    </p>
+                    <h3 className="mt-3 font-display text-xl leading-snug font-semibold tracking-tight">
+                      {benefit.title}
+                    </h3>
+                    <p className="mt-3 text-muted-foreground">{benefit.body}</p>
+                  </article>
+                </Reveal>
+              ))}
             </div>
           </div>
         </section>
@@ -278,6 +328,79 @@ export function LandingPage() {
   )
 }
 
+function prefersReducedMotion() {
+  return typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false
+}
+
+const bubbles = [
+  { className: 'landing-bubble-a', depth: 0.12 },
+  { className: 'landing-bubble-b', depth: 0.22 },
+  { className: 'landing-bubble-c', depth: 0.08 },
+  { className: 'landing-bubble-d', depth: 0.18 },
+]
+
+/** Soft violet bubbles that drift as the page scrolls. */
+function ScrollBubbles() {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    if (prefersReducedMotion()) return
+    const onScroll = () => {
+      const y = window.scrollY
+      for (const bubble of node.querySelectorAll<HTMLElement>('[data-depth]')) {
+        const depth = Number(bubble.dataset.depth)
+        bubble.style.transform = `translate3d(0, ${(-y * depth).toFixed(1)}px, 0)`
+      }
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return (
+    <div ref={ref} className="landing-bubbles" aria-hidden="true">
+      {bubbles.map((bubble) => (
+        <span
+          key={bubble.className}
+          data-depth={bubble.depth}
+          className={cn('landing-bubble', bubble.className)}
+        />
+      ))}
+    </div>
+  )
+}
+
+/** Fades and rises a block the first time it enters the viewport. */
+function Reveal({ children, className }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    if (typeof IntersectionObserver === 'undefined' || prefersReducedMotion()) {
+      setShown(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return
+        setShown(true)
+        observer.disconnect()
+      },
+      { threshold: 0.16 },
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className={cn('landing-reveal', shown && 'landing-reveal-in', className)}>
+      {children}
+    </div>
+  )
+}
+
 function CallsToAction({ className }: { className?: string }) {
   return (
     <div className={cn('flex flex-wrap items-center gap-3', className)}>
@@ -316,7 +439,7 @@ function Section({
           split && 'grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16',
         )}
       >
-        <div className="max-w-2xl">
+        <Reveal className="max-w-2xl">
           <p className="text-label font-semibold tracking-[0.08em] text-muted-foreground uppercase">
             {eyebrow}
           </p>
@@ -326,8 +449,8 @@ function Section({
           {description && (
             <p className="mt-3 text-base text-muted-foreground md:text-lg">{description}</p>
           )}
-        </div>
-        {children}
+        </Reveal>
+        <Reveal>{children}</Reveal>
       </div>
     </section>
   )

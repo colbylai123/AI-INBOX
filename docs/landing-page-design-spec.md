@@ -41,7 +41,9 @@ Do not ship a static hero.
 
 ## After the hero
 
-Keep the current story, in this order: how it works, features, your control (no auto-send, 10-second undo, disconnect), FAQ. Copy must mention Outlook and Gmail and more than one account. A pricing block can be a single quiet placeholder: “Pricing is not set for this release.” Do not invent prices.
+A “What you get back” band comes next: how the draft helps, why the evening is lighter, and the time estimate already used in the app (about 4 minutes a reply, about 6 more when a form is filled). Say it is an estimate. Then the current story, in this order: how it works, features, your control (no auto-send, 10-second undo, disconnect), FAQ.
+
+As the page scrolls, sections fade and rise into place, and soft violet bubbles drift upward. The hero’s two cards sit on one organic violet shape. Do not paste another product’s artwork. Copy must mention Outlook and Gmail and more than one account. A pricing block can be a single quiet placeholder: “Pricing is not set for this release.” Do not invent prices.
 
 ## Palette
 
@@ -53,4 +55,4 @@ Keep the current story, in this order: how it works, features, your control (no 
 
 ## Where the dashboard starts
 
-“Try the demo” opens the existing demo inbox. From the first inbox paint, the screen is the Email Management Dashboard spec, dark or light according to the existing theme control. The lavender hero does not continue inside the app.
+“Try the demo” opens the existing demo inbox. The move is an animation, not a cut: a lavender field covers the page, a rounded dark frame eases in, and both fade to leave the inbox. From the end of that animation, the screen is the Email Management Dashboard spec, dark or light according to the existing theme control. The lavender does not stay inside the app.
