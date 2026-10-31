@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 /** True when the keystroke belongs to a field the user is typing in. */
-function isTyping(target: EventTarget | null) {
+export function isTyping(target: EventTarget | null) {
   return (
     target instanceof HTMLElement &&
     (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))

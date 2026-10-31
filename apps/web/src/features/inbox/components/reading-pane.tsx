@@ -54,6 +54,8 @@ export function ReadingPane({ message }: { message: Message }) {
   const save = useSaveDraft(message.id)
   const [editing, setEditing] = useState(false)
   const [showSources, setShowSources] = useState(false)
+  // Set by Undo, so the draft coming back is read out.
+  const [undone, setUndone] = useState(false)
   const editorId = useId()
   const subjectId = useId()
   const navigate = useNavigate()
@@ -70,6 +72,7 @@ export function ReadingPane({ message }: { message: Message }) {
   const canEdit = !approved && !!message.draftReply && !busy
   const startEditing = () => {
     dismissReply(message.id)
+    setUndone(false)
     setEditing(true)
   }
 
@@ -80,7 +83,13 @@ export function ReadingPane({ message }: { message: Message }) {
       ...(canEdit && { e: startEditing }),
       j: () => adjacent.open(1),
       k: () => adjacent.open(-1),
-      Escape: () => void navigate({ to: '/inbox', search: true }),
+      Escape: () =>
+        void navigate({ to: '/inbox', search: true }).then(() => {
+          // Back to the email's row in the list, so a keyboard user carries on from it.
+          for (const row of document.querySelectorAll<HTMLElement>('[data-message-id]')) {
+            if (row.dataset.messageId === message.id) return row.focus()
+          }
+        }),
     },
     !editing,
   )
@@ -109,6 +118,20 @@ export function ReadingPane({ message }: { message: Message }) {
     })
     return () => cancelAnimationFrame(frame)
   }, [message.id])
+
+  // Undo, Save and Cancel leave the card when pressed, and focus would go with them
+  // to the page. It comes to the draft's Edit button instead, not to Approve & send,
+  // so pressing Enter again can't approve. Once a reply sends, it comes to "Sent".
+  const editRef = useRef<HTMLButtonElement>(null)
+  const sentRef = useRef<HTMLParagraphElement>(null)
+  const wasAway = useRef(false)
+  useEffect(() => {
+    const away = busy || editing
+    if (wasAway.current && !away && document.activeElement === document.body) {
+      ;(editRef.current ?? sentRef.current)?.focus()
+    }
+    wasAway.current = away
+  }, [busy, editing])
 
   // Only words from the email are marked in it; a document's words are quoted under the value.
   const phrases = sources.flatMap((field) =>
@@ -191,7 +214,7 @@ export function ReadingPane({ message }: { message: Message }) {
               Draft
             </h2>
             {canEdit && !editing && (
-              <Button key="edit" variant="ghost" size="sm" onClick={startEditing}>
+              <Button key="edit" ref={editRef} variant="ghost" size="sm" onClick={startEditing}>
                 Edit
               </Button>
             )}
@@ -234,10 +257,18 @@ export function ReadingPane({ message }: { message: Message }) {
           </p>
         )}
         <span role="status" className="sr-only">
-          {held && `Your reply sends in ${UNDO_SECONDS} seconds unless you undo it.`}
+          {held
+            ? `Your reply sends in ${UNDO_SECONDS} seconds unless you undo it.`
+            : reply?.status === 'sent'
+              ? 'Your reply was sent.'
+              : undone && 'Not sent. Your draft is back.'}
         </span>
         {approved ? (
-          <p className="flex h-9 items-center gap-2 text-interface font-medium">
+          <p
+            ref={sentRef}
+            tabIndex={-1}
+            className="flex h-9 items-center gap-2 text-interface font-medium outline-none"
+          >
             <CircleCheck className="size-4 text-primary" aria-hidden /> Sent
           </p>
         ) : editing ? (
@@ -268,7 +299,10 @@ export function ReadingPane({ message }: { message: Message }) {
               variant="secondary"
               autoFocus
               disabled={!held}
-              onClick={() => undoSend(message.id)}
+              onClick={() => {
+                undoSend(message.id)
+                setUndone(true)
+              }}
             >
               <Undo2 aria-hidden /> Undo
             </Button>
@@ -277,7 +311,10 @@ export function ReadingPane({ message }: { message: Message }) {
           <Button
             variant="approve"
             disabled={!message.draftReply}
-            onClick={() => holdSend(message.id, message.from)}
+            onClick={() => {
+              setUndone(false)
+              holdSend(message.id, message.from)
+            }}
           >
             <Send aria-hidden /> Approve & send
           </Button>
@@ -322,7 +359,8 @@ function Toolbar({
   }
   return (
     <div className="border-b border-border px-3 py-2.5 sm:px-5 print:hidden">
-      <div className="flex items-center gap-1">
+      {/* On the narrowest phones the place in the list wraps under the icons. */}
+      <div className="flex flex-wrap items-center gap-1">
         <Toggletip icon={Clock} label="When it arrived">
           Arrived {fullDate(message.receivedAt)}
         </Toggletip>

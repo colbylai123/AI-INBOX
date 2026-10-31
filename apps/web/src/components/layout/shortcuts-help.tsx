@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
-import { useShortcuts } from '@/lib/use-shortcuts'
+import { isTyping, useShortcuts } from '@/lib/use-shortcuts'
 import { cn } from '@/lib/utils'
 
 // A key as shown, and as read out when the symbol alone wouldn't be.
@@ -52,9 +52,26 @@ export function ShortcutsHelp() {
     if (open) {
       returnFocus.current = document.activeElement
       closeRef.current?.focus()
-    } else if (returnFocus.current instanceof HTMLElement) {
+    } else if (
+      returnFocus.current instanceof HTMLElement &&
+      // Only when focus went with the list, not when the user had already moved on.
+      (!document.activeElement || document.activeElement === document.body)
+    ) {
       returnFocus.current.focus()
     }
+  }, [open])
+
+  // Esc closes the list wherever focus is, and before the page can treat it as
+  // "close the email", which listens for it too.
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented || isTyping(event.target)) return
+      event.preventDefault()
+      setOpen(false)
+    }
+    window.addEventListener('keydown', onKeyDown, true)
+    return () => window.removeEventListener('keydown', onKeyDown, true)
   }, [open])
 
   if (!open) return null
@@ -62,13 +79,6 @@ export function ShortcutsHelp() {
     <div
       role="dialog"
       aria-labelledby={headingId}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') {
-          // Handled here, so the page doesn't also treat it as "back to the inbox".
-          event.preventDefault()
-          setOpen(false)
-        }
-      }}
       // Scrolls inside itself on short screens, so every shortcut can be reached.
       className="fixed right-4 bottom-4 left-4 z-20 max-h-[calc(100svh-2rem)] overflow-y-auto rounded-lg border border-card-edge bg-card p-5 shadow-panel sm:left-auto sm:w-96"
     >

@@ -54,10 +54,13 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
           <AppRail className="lg:row-span-2 print:hidden" />
           {/* The inbox has them at the end of its folder chips, as in the reference. */}
           {surface !== 'inbox' && (
-            <div className="flex items-center justify-end gap-2 pr-3 pb-3 sm:pr-4 lg:pt-2 lg:pr-5 print:hidden">
+            <section
+              aria-label="Theme and account"
+              className="flex items-center justify-end gap-2 pr-3 pb-3 sm:pr-4 lg:pt-2 lg:pr-5 print:hidden"
+            >
               <ThemePill />
               <AccountLink user={user} />
-            </div>
+            </section>
           )}
           <main className="col-span-2 min-w-0 px-3 pb-6 sm:px-4 lg:col-span-1 lg:pt-2 lg:pr-5 lg:pb-5 lg:pl-1">
             {children}

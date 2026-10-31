@@ -1,5 +1,5 @@
 import { Mail, Plug } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Notice } from '@/components/feedback/notice'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,17 @@ export function ConnectedAccounts({
   provider?: Provider
 }) {
   const name = provider ? providerNames[provider] : 'Your email'
+  // The account just disconnected. Its row is gone, so focus that was on its
+  // Disconnect button comes to the notice that says so.
+  const [disconnected, setDisconnected] = useState<Connection | null>(null)
+  const noticeRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLUListElement>(null)
+  useEffect(() => {
+    const focus = document.activeElement
+    if (disconnected && (focus === document.body || listRef.current?.contains(focus))) {
+      noticeRef.current?.focus()
+    }
+  }, [disconnected])
   return (
     <Card>
       <CardHeader>
@@ -46,6 +57,14 @@ export function ConnectedAccounts({
             {provider ? providerCompanies[provider] : 'the provider'} refused access. Try again.
           </Notice>
         )}
+        {disconnected && (
+          <div ref={noticeRef} tabIndex={-1} className="outline-none">
+            <Notice tone="success">
+              {providerNames[disconnected.provider]} is disconnected. New mail from{' '}
+              {disconnected.accountEmail} no longer arrives.
+            </Notice>
+          </div>
+        )}
         {connections.length === 0 ? (
           <div className="flex flex-col items-start gap-4 rounded-md border border-dashed border-border p-5">
             <p className="text-sm text-muted-foreground">
@@ -55,9 +74,13 @@ export function ConnectedAccounts({
           </div>
         ) : (
           <>
-            <ul className="divide-y divide-border rounded-md border border-card-edge">
+            <ul ref={listRef} className="divide-y divide-border rounded-md border border-card-edge">
               {connections.map((connection) => (
-                <ConnectionRow key={connection.id} connection={connection} />
+                <ConnectionRow
+                  key={connection.id}
+                  connection={connection}
+                  onDisconnected={() => setDisconnected(connection)}
+                />
               ))}
             </ul>
             {/* Mail from every account lands in the one inbox, so more can be added at any time. */}
@@ -72,9 +95,17 @@ export function ConnectedAccounts({
   )
 }
 
-function ConnectionRow({ connection }: { connection: Connection }) {
+function ConnectionRow({
+  connection,
+  onDisconnected,
+}: {
+  connection: Connection
+  onDisconnected: () => void
+}) {
   const [confirming, setConfirming] = useState(false)
-  const disconnect = useDisconnect()
+  // Cancel puts focus back on Disconnect, where it was before the question.
+  const [cancelled, setCancelled] = useState(false)
+  const disconnect = useDisconnect(onDisconnected)
   const needsReconnect = connection.status === 'reconnect_needed'
   const name = providerNames[connection.provider]
 
@@ -115,7 +146,15 @@ function ConnectionRow({ connection }: { connection: Connection }) {
           >
             Disconnect
           </Button>
-          <Button size="sm" variant="ghost" autoFocus onClick={() => setConfirming(false)}>
+          <Button
+            size="sm"
+            variant="ghost"
+            autoFocus
+            onClick={() => {
+              setConfirming(false)
+              setCancelled(true)
+            }}
+          >
             Cancel
           </Button>
         </div>
@@ -126,7 +165,12 @@ function ConnectionRow({ connection }: { connection: Connection }) {
               Reconnect
             </ConnectButton>
           )}
-          <Button size="sm" variant="outline" onClick={() => setConfirming(true)}>
+          <Button
+            size="sm"
+            variant="outline"
+            autoFocus={cancelled}
+            onClick={() => setConfirming(true)}
+          >
             Disconnect
           </Button>
         </div>
