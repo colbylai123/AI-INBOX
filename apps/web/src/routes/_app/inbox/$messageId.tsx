@@ -3,6 +3,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 import { NotFound } from '@/components/feedback/not-found'
 import { messageQuery, ReadingPane } from '@/features/inbox'
 import { isApiError } from '@/lib/api-client'
+import { usePageTitle } from '@/lib/use-page-title'
 
 // The open email, in the reading card beside the list (see ./route.tsx).
 export const Route = createFileRoute('/_app/inbox/$messageId')({
@@ -22,6 +23,7 @@ export const Route = createFileRoute('/_app/inbox/$messageId')({
 function MessagePage() {
   const { messageId } = Route.useParams()
   const { data: message } = useSuspenseQuery(messageQuery(messageId))
+  usePageTitle(message.subject)
   // Keyed so edit and error state never carry over from another message.
   return <ReadingPane key={message.id} message={message} />
 }

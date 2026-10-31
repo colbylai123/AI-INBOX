@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  type ErrorComponentProps,
-  Outlet,
-  redirect,
-} from '@tanstack/react-router'
+import { createFileRoute, type ErrorComponentProps, Outlet, redirect } from '@tanstack/react-router'
 import { RouteError } from '@/components/feedback/route-error'
 import { AppShell } from '@/components/layout/app-shell'
 import { sessionQuery } from '@/features/auth'

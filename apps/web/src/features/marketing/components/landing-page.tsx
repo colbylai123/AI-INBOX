@@ -13,6 +13,7 @@ import {
 import type { ReactNode } from 'react'
 import { Logo } from '@/components/layout/logo'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
+import { usePageTitle } from '@/lib/use-page-title'
 import { cn } from '@/lib/utils'
 import { Hero, HeroHeader } from './hero'
 import { ArrowPill } from './pills'
@@ -116,6 +117,7 @@ const benefits = [
 ]
 
 export function LandingPage() {
+  usePageTitle()
   return (
     // Clipped so the scene's glow never scrolls the page sideways on phones.
     <div className="relative min-h-svh overflow-x-clip bg-background" data-surface="marketing">

@@ -1,18 +1,14 @@
 <!doctype html>
-<!-- Source for the icons and the link preview image. Render with scripts/render-share-images.mjs. -->
+<!-- Source for the icons and the link preview image. Render with scripts/render-share-images.mjs.
+     Colors are the landing page's (the [data-surface='marketing'] palette in src/styles/globals.css). -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <style>
       @font-face {
-        font-family: 'Host Grotesk';
-        src: url('../node_modules/@fontsource-variable/host-grotesk/files/host-grotesk-latin-wght-normal.woff2');
-        font-weight: 300 800;
-      }
-      @font-face {
-        font-family: 'Instrument Sans';
-        src: url('../node_modules/@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2');
-        font-weight: 400 700;
+        font-family: 'Inter Variable';
+        src: url('../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2');
+        font-weight: 100 900;
       }
       * {
         box-sizing: border-box;
@@ -20,6 +16,7 @@
       }
       body {
         background: transparent;
+        font-family: 'Inter Variable', sans-serif;
       }
       .glyph {
         fill: none;
@@ -29,116 +26,187 @@
         stroke-linejoin: round;
       }
 
-      /* App icons: a full-bleed square for home screens (the phone rounds it), glyph inside the safe zone. */
+      /* App icons: a full-bleed square for home screens (the phone rounds it), glyph
+         inside the safe zone, and the logo's violet dot. */
       #icon {
         width: 512px;
         height: 512px;
-        background: #074ce0;
+        background: #231d33;
         display: grid;
         place-items: center;
+        position: relative;
       }
       #icon svg {
-        width: 52%;
-        height: 52%;
+        width: 46%;
+        height: 46%;
+      }
+      #icon .dot {
+        position: absolute;
+        top: 24%;
+        right: 24%;
+        width: 12%;
+        height: 12%;
+        border-radius: 50%;
+        background: #8068bc;
       }
 
-      /* Link preview, 1200 x 630. */
+      /* Link preview, 1200 x 630: the hero's sky and hills, its headline and the sample card. */
       #og {
         width: 1200px;
         height: 630px;
-        padding: 72px 80px;
+        padding: 40px 72px 120px;
         overflow: hidden;
         position: relative;
-        background: #fcfcfd;
-        color: #16191f;
-        font-family: 'Instrument Sans', sans-serif;
+        isolation: isolate;
+        background: linear-gradient(180deg, #ddd2f2 0%, #ebe2f7 45%, #f8f2ee 78%);
+        color: #231d33;
         display: grid;
-        grid-template-columns: 1fr 420px;
-        gap: 56px;
+        grid-template-columns: 1fr 440px;
+        gap: 48px;
         align-items: center;
+      }
+      #og .hills {
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 104px;
+        width: 100%;
+        z-index: -1;
+      }
+      #og .sun {
+        position: absolute;
+        right: 120px;
+        bottom: 40px;
+        width: 520px;
+        height: 520px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgb(247 168 132 / 0.5) 0%, transparent 62%);
+        z-index: -1;
       }
       .brand {
         display: flex;
         align-items: center;
         gap: 14px;
-        font: 700 28px 'Host Grotesk';
-        letter-spacing: -0.01em;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
       }
       .brand i {
-        width: 48px;
-        height: 48px;
+        position: relative;
+        width: 46px;
+        height: 46px;
         border-radius: 10px;
-        background: #074ce0;
+        background: #231d33;
         display: grid;
         place-items: center;
       }
+      .brand i::after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #8068bc;
+        box-shadow: 0 0 0 3px #e4daf5;
+      }
       .brand svg {
-        width: 26px;
-        height: 26px;
+        width: 24px;
+        height: 24px;
+      }
+      .kicker {
+        margin-top: 32px;
+        font-size: 24px;
+        color: #5c4d86;
       }
       h1 {
-        text-wrap: balance;
-        margin-top: 44px;
-        font: 700 76px/1.02 'Host Grotesk';
-        letter-spacing: -0.03em;
+        margin-top: 12px;
+        font-size: 80px;
+        line-height: 0.95;
+        font-weight: 600;
+        letter-spacing: -0.05em;
       }
-      p {
+      h1 span {
+        display: block;
+      }
+      h1 .faded {
+        color: #76679a;
+      }
+      .lede {
+        margin-top: 22px;
+        max-width: 560px;
+        font-size: 23px;
+        line-height: 1.4;
+        color: #5c5470;
         text-wrap: pretty;
-        margin-top: 24px;
-        font-size: 26px;
-        line-height: 1.45;
-        color: #454c58;
       }
       .card {
-        background: #fff;
-        border: 1px solid #dde0e6;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow:
-          0 1px 2px rgb(22 25 31 / 0.04),
-          0 18px 40px -16px rgb(22 25 31 / 0.22);
+        border-radius: 28px;
+        padding: 26px;
+        background: rgb(29 23 41 / 0.88);
+        color: #f7f4fb;
+        box-shadow: 0 24px 60px -24px rgb(20 14 32 / 0.6);
         font-size: 17px;
-        line-height: 1.5;
+        line-height: 1.45;
       }
-      .label {
-        font-size: 13px;
+      .card .top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
         font-weight: 600;
-        color: #454c58;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #d6cde6;
       }
-      .bubble {
-        margin-top: 8px;
-        padding: 14px 16px;
-        border-radius: 12px;
+      .card .top span + span {
+        letter-spacing: 0;
+        text-transform: none;
       }
-      .in {
-        background: #f3f4f6;
+      .subject {
+        margin-top: 16px;
+        font-size: 19px;
+        font-weight: 600;
+      }
+      .soft {
+        font-size: 15px;
+        color: #d6cde6;
       }
       .draft {
-        margin-top: 18px;
-        background: color-mix(in oklab, #074ce0 7%, #fff);
-        border: 1px solid color-mix(in oklab, #074ce0 22%, #fff);
+        margin-top: 16px;
+        padding: 16px;
+        border-radius: 18px;
+        background: rgb(255 255 255 / 0.08);
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+        font-size: 15.5px;
+      }
+      .draft b {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #d6cde6;
       }
       .row {
-        margin-top: 20px;
+        margin-top: 18px;
         display: flex;
-        justify-content: flex-end;
         gap: 10px;
       }
       .btn {
-        height: 40px;
-        padding: 0 18px;
-        border-radius: 8px;
+        height: 42px;
+        padding: 0 20px;
+        border-radius: 999px;
         display: inline-flex;
         align-items: center;
+        font-size: 15px;
         font-weight: 600;
-        font-size: 16px;
-      }
-      .secondary {
-        border: 1px solid #dde0e6;
       }
       .primary {
-        background: #074ce0;
-        color: #fff;
+        background: #fff;
+        color: #231d33;
+      }
+      .secondary {
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.3);
       }
     </style>
   </head>
@@ -155,30 +223,49 @@
 
     <div id="icon">
       <svg><use href="#inbox" /></svg>
+      <span class="dot"></span>
     </div>
 
     <div id="og">
+      <div class="sun"></div>
+      <svg class="hills" viewBox="0 0 1200 170" preserveAspectRatio="none">
+        <path fill="#b7a2de" opacity="0.8" d="M0 52C175 22 333 32 508 55S858 32 1200 46V170H0Z" />
+        <path fill="#efcf86" d="M0 92C208 66 433 82 633 95S992 70 1200 83V170H0Z" />
+        <path fill="#8f78c0" d="M0 116C242 101 467 130 733 120S1042 105 1200 115V170H0Z" />
+        <path
+          fill="#dcae5a"
+          opacity="0.9"
+          d="M0 141C292 128 633 147 900 138S1117 132 1200 137V170H0Z"
+        />
+      </svg>
       <div>
         <div class="brand">
           <i
             ><svg><use href="#inbox" /></svg></i
           >ai inbox
         </div>
-        <h1>Your inbox, sorted and drafted</h1>
-        <p>
-          Ranks your Outlook email, drafts the replies and fills in your forms. Nothing sends until
-          you approve.
+        <p class="kicker">Mail, but it waits its turn.</p>
+        <h1>
+          <span>Read it.</span>
+          <span class="faded">Approve it.</span>
+          <span>Then it sends.</span>
+        </h1>
+        <p class="lede">
+          Ranks your Outlook and Gmail email, drafts the replies and fills in your forms.
         </p>
       </div>
       <div class="card">
-        <div class="label">orders@brightline.example</div>
-        <div class="bubble in">Could you send pricing for 40 units by Friday?</div>
-        <div class="label" style="margin-top: 18px; text-align: right">AI draft</div>
-        <div class="bubble draft" style="margin-top: 8px">
-          Hi Maya, I've attached a quote for 40 units, delivered by November 14.
+        <div class="top">
+          <span>A sample email</span><span>Nothing sends until you approve</span>
+        </div>
+        <p class="subject">Quote for 40 units by Friday</p>
+        <p class="soft">Maya at Brightline · orders@brightline.example</p>
+        <div class="draft">
+          <b>Draft</b>
+          Hi Maya, the quote for 40 units is attached, with delivery to Austin by November 14.
         </div>
         <div class="row">
-          <span class="btn secondary">Edit</span><span class="btn primary">Approve &amp; send</span>
+          <span class="btn primary">Approve &amp; send</span><span class="btn secondary">Edit</span>
         </div>
       </div>
     </div>

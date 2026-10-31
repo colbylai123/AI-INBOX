@@ -1,9 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import { buttonVariants } from '@/components/ui/button'
+import { usePageTitle } from '@/lib/use-page-title'
 import { SiteHeader } from './site-header'
 
 /** An address that isn't part of the site, such as a mistyped link. */
 export function PageNotFound() {
+  usePageTitle('Page not found')
   return (
     <div className="flex min-h-svh flex-col" data-surface="not-found">
       <SiteHeader />

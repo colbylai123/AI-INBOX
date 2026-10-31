@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { usePageTitle } from '@/lib/use-page-title'
 
 export function PageHeader({
   title,
@@ -9,6 +10,7 @@ export function PageHeader({
   description?: string
   actions?: ReactNode
 }) {
+  usePageTitle(title)
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
       <div className="max-w-3xl min-w-0">

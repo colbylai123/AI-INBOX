@@ -1,7 +1,9 @@
 import { Link } from '@tanstack/react-router'
+import { usePageTitle } from '@/lib/use-page-title'
 
 /** For an unknown email or page inside the app. Unknown site addresses get PageNotFound. */
 export function NotFound() {
+  usePageTitle('Not found')
   return (
     <div className="flex flex-col items-start gap-2 p-8">
       <h1 className="font-display text-lg font-bold">Not found</h1>
