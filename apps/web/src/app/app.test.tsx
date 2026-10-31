@@ -637,6 +637,16 @@ describe('app', () => {
     const setup = await screen.findByRole('region', { name: 'Get set up' })
     expect(setup).toHaveTextContent('2 of 3 done')
     expect(within(setup).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2')
+    // Finished steps say so in words, under their names.
+    expect(
+      within(setup)
+        .getAllByRole('listitem')
+        .map((step) => step.textContent),
+    ).toEqual([
+      'Connect your emailDone',
+      'Upload a form you fill in oftenDone',
+      expect.stringMatching(/^3Approve your first draftOpen an email/),
+    ])
 
     await userEvent.click(within(setup).getByRole('link', { name: 'Open the next draft' }))
     await approveAndSend()
@@ -949,6 +959,16 @@ describe('app', () => {
     expect(router.state.location.search).toEqual({ q: 'units', priority: 'high' })
   })
 
+  it('goes back to the list from the email with a button, for phones', async () => {
+    const { router } = renderApp('/inbox?q=units')
+    await userEvent.click(await screen.findByRole('link', { name: /Quote for 40 units/ }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Back to the list' }))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/inbox'))
+    expect(router.state.location.search).toEqual({ q: 'units' })
+    // Focus lands on the email's row, which brings the list back into view.
+    await waitFor(() => expect(document.activeElement).toHaveAttribute('data-message-id', 'm1'))
+  })
+
   it('jumps to search with / and clears it with Escape', async () => {
     renderApp('/inbox?q=packright')
     const search = await screen.findByRole('searchbox', { name: 'Search the inbox' })
@@ -1062,12 +1082,19 @@ describe('app', () => {
       ).toBeInTheDocument()
     })
 
-    it('says the inbox did not load, with the site header to go elsewhere', async () => {
+    it('says the inbox cannot be reached, with a retry, the demo and the site header', async () => {
       renderApp('/inbox')
       const main = await screen.findByRole('main')
       expect(
-        await within(main).findByRole('heading', { name: 'Something went wrong' }),
+        await within(main).findByRole('heading', {
+          name: "Your inbox can't be reached right now",
+        }),
       ).toBeInTheDocument()
+      expect(within(main).getByRole('button', { name: 'Try again' })).toBeInTheDocument()
+      expect(within(main).getByRole('link', { name: 'Try the demo' })).toHaveAttribute(
+        'href',
+        '/demo',
+      )
       expect(
         within(screen.getByRole('banner')).getByRole('link', { name: 'Try the demo' }),
       ).toBeInTheDocument()
