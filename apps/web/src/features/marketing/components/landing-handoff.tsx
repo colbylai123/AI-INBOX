@@ -1,7 +1,7 @@
 import { useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
-const PLAY_MS = 1200
+const PLAY_MS = 700
 
 /** True when this navigation is the public page opening the inbox. */
 function entersInbox(from: string, to: string) {

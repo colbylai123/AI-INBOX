@@ -8,10 +8,10 @@ function prefersReducedMotion() {
 }
 
 const bubbles = [
-  { className: 'landing-bubble-a', depth: 0.04 },
-  { className: 'landing-bubble-b', depth: 0.07 },
-  { className: 'landing-bubble-c', depth: 0.03 },
-  { className: 'landing-bubble-d', depth: 0.05 },
+  { className: 'landing-bubble-a', depth: 0.12 },
+  { className: 'landing-bubble-b', depth: 0.22 },
+  { className: 'landing-bubble-c', depth: 0.08 },
+  { className: 'landing-bubble-d', depth: 0.18 },
 ]
 
 /** Soft violet bubbles that drift up as the page scrolls. With reduced motion they stay put. */
@@ -21,29 +21,16 @@ export function ScrollBubbles() {
     const node = ref.current
     if (!node) return
     if (prefersReducedMotion()) return
-    const items = [...node.querySelectorAll<HTMLElement>('[data-depth]')]
-    let target = window.scrollY
-    let current = target
-    let frame = 0
-    const tick = () => {
-      current += (target - current) * 0.08
-      if (Math.abs(target - current) < 0.3) current = target
-      for (const bubble of items) {
-        const depth = Number(bubble.dataset.depth)
-        bubble.style.transform = `translate3d(0, ${(-current * depth).toFixed(1)}px, 0)`
-      }
-      frame = current === target ? 0 : window.requestAnimationFrame(tick)
-    }
     const onScroll = () => {
-      target = window.scrollY
-      if (!frame) frame = window.requestAnimationFrame(tick)
+      const y = window.scrollY
+      for (const bubble of node.querySelectorAll<HTMLElement>('[data-depth]')) {
+        const depth = Number(bubble.dataset.depth)
+        bubble.style.transform = `translate3d(0, ${(-y * depth).toFixed(1)}px, 0)`
+      }
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      if (frame) window.cancelAnimationFrame(frame)
-    }
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
   return (
     <div ref={ref} className="landing-bubbles" aria-hidden="true">

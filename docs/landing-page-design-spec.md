@@ -43,7 +43,7 @@ Do not ship a static hero.
 
 A “What you get back” band comes next: how the draft helps, why the evening is lighter, and the time estimate already used in the app (about 4 minutes a reply, about 6 more when a form is filled). Say it is an estimate. Then the current story, in this order: how it works, features, your control (no auto-send, 10-second undo, disconnect), FAQ.
 
-As the page scrolls, sections fade and rise a short distance, eased so they settle rather than snap. Soft violet bubbles follow the scroll with a lag, and the shape behind the hero card drifts slowly. The hero copy and the card ease in on load. The move into the inbox is a 1.2 second lavender fade with a faint frame, not a hard cut. Inside the app, a new page, a folder or priority change, and an opened email each fade in over a short rise. Do not paste another product’s artwork. Copy must mention Outlook and Gmail and more than one account. A pricing block can be a single quiet placeholder: “Pricing is not set for this release.” Do not invent prices.
+As the page scrolls, sections fade and rise into place, and soft violet bubbles drift upward. The hero’s two cards sit on one organic violet shape. Do not paste another product’s artwork. Copy must mention Outlook and Gmail and more than one account. A pricing block can be a single quiet placeholder: “Pricing is not set for this release.” Do not invent prices.
 
 ## Palette
 

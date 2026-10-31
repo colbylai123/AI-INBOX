@@ -3,7 +3,6 @@ import {
   type ErrorComponentProps,
   Outlet,
   redirect,
-  useRouterState,
 } from '@tanstack/react-router'
 import { RouteError } from '@/components/feedback/route-error'
 import { AppShell } from '@/components/layout/app-shell'
@@ -41,15 +40,10 @@ function AppError(props: ErrorComponentProps) {
 
 function AppLayout() {
   const { user } = Route.useRouteContext()
-  const pathname = useRouterState({ select: (state) => state.location.pathname })
-  // Opening an email stays inside the inbox, so the list is not faded and remounted.
-  const view = pathname.startsWith('/inbox') ? '/inbox' : pathname
   return (
     <AppShell user={user}>
-      {/* A new page eases in. The send queue stays put, so an undo is not restarted. */}
-      <div key={view} className="app-view">
-        <Outlet />
-      </div>
+      <Outlet />
+      {/* Here, not on the draft page, so an approved reply keeps its undo window on any page. */}
       <SendQueue />
     </AppShell>
   )

@@ -101,7 +101,6 @@ function InboxLayout() {
             inboxCount={inboxCount}
             className="order-last w-full lg:order-none lg:w-auto lg:flex-1"
           />
-          {/* Room between the last chips, including Deleted, and the theme control. */}
           <span className="ml-auto flex shrink-0 items-center gap-2 pl-4 sm:pl-8">
             <ThemePill />
             <AccountLink user={user} />
@@ -113,9 +112,8 @@ function InboxLayout() {
 
       <div className="grid gap-3 lg:h-[max(34rem,calc(100svh-15rem))] lg:grid-cols-[minmax(20rem,26rem)_1fr] print:block print:h-auto">
         <section
-          key={`${search.folder ?? 'inbox'}-${search.priority ?? 'all'}-${account ?? 'all'}`}
           aria-labelledby="list-heading"
-          className="app-view flex max-h-[30rem] min-h-0 min-w-0 flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:max-h-none print:hidden"
+          className="flex max-h-[30rem] min-h-0 min-w-0 flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:max-h-none print:hidden"
         >
           <div className="flex items-baseline justify-between gap-3 px-5 pt-4 pb-2">
             <h2 id="list-heading" className="text-metadata font-semibold text-muted-foreground">
@@ -152,9 +150,7 @@ function InboxLayout() {
           aria-label="Reading pane"
           className="flex min-h-[24rem] min-w-0 flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:min-h-0 print:min-h-0 print:border-0 print:shadow-none"
         >
-          <div key={openId ?? 'closed'} className="app-view flex min-h-0 flex-1 flex-col">
-            <Outlet />
-          </div>
+          <Outlet />
         </section>
       </div>
     </div>
