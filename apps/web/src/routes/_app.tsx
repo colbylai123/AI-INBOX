@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useRouterState } from '@tanstack/react-router'
 import { AppShell } from '@/components/layout/app-shell'
 import { sessionQuery } from '@/features/auth'
 import { SendQueue } from '@/features/inbox'
@@ -19,10 +19,15 @@ export const Route = createFileRoute('/_app')({
 
 function AppLayout() {
   const { user } = Route.useRouteContext()
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  // Opening an email stays inside the inbox, so the list is not faded and remounted.
+  const view = pathname.startsWith('/inbox') ? '/inbox' : pathname
   return (
     <AppShell user={user}>
-      <Outlet />
-      {/* Here, not on the draft page, so an approved reply keeps its undo window on any page. */}
+      {/* A new page eases in. The send queue stays put, so an undo is not restarted. */}
+      <div key={view} className="app-view">
+        <Outlet />
+      </div>
       <SendQueue />
     </AppShell>
   )

@@ -42,8 +42,8 @@ export function Reveal({
       data-revealed={shown}
       style={{ transitionDelay: shown ? `${delay}ms` : undefined }}
       className={cn(
-        'transition-[opacity,translate] duration-700 ease-out',
-        shown ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+        'transition-[opacity,translate] duration-[780ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
+        shown ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0',
         className,
       )}
     >
