@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { connectionsQuery } from '@/features/connections'
 import { messagesQuery } from '../api/queries'
@@ -16,7 +16,10 @@ export type InboxSearch = { priority?: Priority; q?: string; account?: string; f
 export function useInboxList() {
   const search: InboxSearch = useSearch({ strict: false })
   const { data: all } = useSuspenseQuery(messagesQuery({ priority: search.priority }))
-  const { data: connections } = useSuspenseQuery(connectionsQuery())
+  // Not suspense: the accounts only filter the list and flag a reconnect, so if they
+  // fail to load the list and the open email still show, across every account.
+  const accounts = useQuery(connectionsQuery())
+  const connections = accounts.data ?? []
   const local = useLocalFolders()
   // An account that isn't connected (an old link, say) shows every account.
   const account = connections.some((c) => c.id === search.account) ? search.account : undefined
@@ -25,6 +28,8 @@ export function useInboxList() {
   return {
     search,
     connections,
+    /** False until the accounts load, and while they fail to. */
+    connectionsKnown: accounts.isSuccess,
     account,
     /** Every email of the chosen account, before the folder and search. */
     ofAccount,

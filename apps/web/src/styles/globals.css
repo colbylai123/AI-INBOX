@@ -113,6 +113,19 @@
   --dp-shadow-panel: none;
 }
 
+/* Paper is white whatever the theme, so a printed email uses the light colors. */
+@media print {
+  :root[data-theme='dark'] {
+    color-scheme: light;
+    --dp-color-ground: #ffffff;
+    --dp-color-canvas: #ffffff;
+    --dp-color-panel: #ffffff;
+    --dp-color-ink: #18181b;
+    --dp-color-ink-secondary: #5c5c66;
+    --dp-color-rule: #e0e0e6;
+  }
+}
+
 @theme inline {
   --font-sans: var(--dp-typography-body);
   --font-display: var(--dp-typography-display);

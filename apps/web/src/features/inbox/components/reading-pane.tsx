@@ -93,12 +93,20 @@ export function ReadingPane({ message }: { message: Message }) {
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [editRequest])
 
-  // On phones the reading card sits under the list, so an opened email scrolls into view.
+  // On phones the reading card sits under the list, so an opened email scrolls into
+  // view, and focus comes with it to the subject, so a keyboard user isn't left on a
+  // list row that has scrolled away.
   const cardRef = useRef<HTMLElement>(null)
+  const subjectRef = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
     if (!window.matchMedia?.('(max-width: 1049px)').matches) return
     // After the router's own scroll to the top of the page on navigation.
-    const frame = requestAnimationFrame(() => cardRef.current?.scrollIntoView?.({ block: 'start' }))
+    const frame = requestAnimationFrame(() => {
+      cardRef.current?.scrollIntoView?.({ block: 'start' })
+      if (!cardRef.current?.contains(document.activeElement)) {
+        subjectRef.current?.focus({ preventScroll: true })
+      }
+    })
     return () => cancelAnimationFrame(frame)
   }, [message.id])
 
@@ -111,7 +119,7 @@ export function ReadingPane({ message }: { message: Message }) {
     <article ref={cardRef} aria-labelledby={subjectId} className="flex min-h-0 flex-1 flex-col">
       <Toolbar message={message} place={place} adjacent={adjacent} />
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 sm:px-7">
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 sm:px-7 print:overflow-visible">
         <div className="flex flex-wrap items-center gap-3 pt-5">
           <SenderMark from={message.from} className="size-11" />
           <div className="min-w-0 flex-1">
@@ -127,7 +135,7 @@ export function ReadingPane({ message }: { message: Message }) {
           <p className="order-last w-full pl-14 text-metadata text-muted-foreground tabular-nums sm:order-none sm:w-auto sm:pl-0">
             {fullDate(message.receivedAt)}
           </p>
-          <div className="flex items-center">
+          <div className="flex items-center print:hidden">
             <IconButton
               icon={Star}
               label="Star"
@@ -147,15 +155,17 @@ export function ReadingPane({ message }: { message: Message }) {
 
         <div className="mt-5 flex flex-wrap items-start gap-x-3 gap-y-2">
           <h1
+            ref={subjectRef}
             id={subjectId}
-            className="min-w-0 flex-1 font-display text-2xl leading-tight font-semibold tracking-[-0.02em] text-balance"
+            tabIndex={-1}
+            className="min-w-0 flex-1 font-display text-2xl leading-tight font-semibold tracking-[-0.02em] text-balance outline-none"
           >
             {message.subject}
           </h1>
           <PriorityBadge priority={message.priority} />
         </div>
         {(message.summary || message.priorityReason) && (
-          <dl className="mt-3 grid gap-x-3 gap-y-1 text-metadata sm:grid-cols-[auto_1fr]">
+          <dl className="mt-3 grid gap-x-3 gap-y-1 text-metadata sm:grid-cols-[auto_1fr] print:hidden">
             {message.summary && (
               <>
                 <dt className="font-semibold text-muted-foreground">Summary</dt>
@@ -175,7 +185,7 @@ export function ReadingPane({ message }: { message: Message }) {
           {highlight(message.body, phrases)}
         </div>
 
-        <section aria-label="Draft" className="mt-7 rounded-2xl bg-raised p-4 sm:p-5">
+        <section aria-label="Draft" className="mt-7 rounded-2xl bg-raised p-4 sm:p-5 print:hidden">
           <div className="mb-3 flex items-center justify-between gap-3">
             <h2 className="text-label font-semibold tracking-[0.08em] text-muted-foreground uppercase">
               Draft
@@ -217,7 +227,7 @@ export function ReadingPane({ message }: { message: Message }) {
 
       {/* The card's bottom row, where the reference has Reply. On phones it stays on
           screen while you read a long email. */}
-      <footer className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-3.5 max-lg:sticky max-lg:bottom-0 max-lg:rounded-b-[20px] max-lg:bg-card sm:px-7">
+      <footer className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-3.5 max-lg:sticky max-lg:bottom-0 max-lg:rounded-b-[20px] max-lg:bg-card sm:px-7 print:hidden">
         {(reply?.status === 'failed' || save.isError) && (
           <p role="alert" className="w-full text-metadata text-destructive">
             {save.isError ? "Couldn't save your changes." : "Couldn't send."} Please try again.
@@ -311,7 +321,7 @@ function Toolbar({
     )
   }
   return (
-    <div className="border-b border-border px-3 py-2.5 sm:px-5">
+    <div className="border-b border-border px-3 py-2.5 sm:px-5 print:hidden">
       <div className="flex items-center gap-1">
         <Toggletip icon={Clock} label="When it arrived">
           Arrived {fullDate(message.receivedAt)}
@@ -505,6 +515,7 @@ function MoreMenu({ message }: { message: Message }) {
         />
         <button
           type="button"
+          // Prints only the email: the app around it is hidden in print (print:hidden).
           onClick={() => {
             menu.setOpen(false)
             window.print()

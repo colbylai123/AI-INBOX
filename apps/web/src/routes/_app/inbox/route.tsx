@@ -39,7 +39,9 @@ export const Route = createFileRoute('/_app/inbox')({
     void context.queryClient.prefetchQuery(weeklyStatsQuery())
     return Promise.all([
       context.queryClient.ensureQueryData(messagesQuery(deps)),
-      context.queryClient.ensureQueryData(connectionsQuery()),
+      // Waited for, so "Connect your email" doesn't flash, but a failure doesn't stop
+      // the list or an open email from showing. See useInboxList.
+      context.queryClient.ensureQueryData(connectionsQuery()).catch(() => undefined),
     ])
   },
   component: InboxLayout,
@@ -55,49 +57,52 @@ function InboxLayout() {
 
   return (
     <div className="flex flex-col gap-3">
-      <SearchBox
-        query={search.q}
-        onQueryChange={(next) =>
-          void navigate({ search: (prev) => ({ ...prev, q: next }), replace: true })
-        }
-        filtersOn={filtersOn}
-        filters={
-          <>
-            <PriorityFilter value={search.priority} />
-            {manyAccounts && (
-              <AccountFilter
-                connections={connections}
-                value={account}
-                onChange={(next) =>
-                  void navigate({ search: (prev) => ({ ...prev, account: next }) })
-                }
-              />
-            )}
-          </>
-        }
-      />
-
-      {/* Phones: New email and the theme and account controls on one line, the chips
-          scrolling sideways under them. Wide screens: all of it on one line. */}
-      <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap">
-        <NewEmailButton openId={openId} listed={listed} all={ofAccount} />
-        <FolderChips
-          folder={search.folder}
-          inboxCount={inboxCount}
-          className="order-last w-full lg:order-none lg:w-auto lg:flex-1"
+      {/* Printing prints only the open email, so everything but its card is hidden. */}
+      <div className="contents print:hidden">
+        <SearchBox
+          query={search.q}
+          onQueryChange={(next) =>
+            void navigate({ search: (prev) => ({ ...prev, q: next }), replace: true })
+          }
+          filtersOn={filtersOn}
+          filters={
+            <>
+              <PriorityFilter value={search.priority} />
+              {manyAccounts && (
+                <AccountFilter
+                  connections={connections}
+                  value={account}
+                  onChange={(next) =>
+                    void navigate({ search: (prev) => ({ ...prev, account: next }) })
+                  }
+                />
+              )}
+            </>
+          }
         />
-        <span className="ml-auto flex items-center gap-2">
-          <ThemePill />
-          <AccountLink user={user} />
-        </span>
+
+        {/* Phones: New email and the theme and account controls on one line, the chips
+          scrolling sideways under them. Wide screens: all of it on one line. */}
+        <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap">
+          <NewEmailButton openId={openId} listed={listed} all={ofAccount} />
+          <FolderChips
+            folder={search.folder}
+            inboxCount={inboxCount}
+            className="order-last w-full lg:order-none lg:w-auto lg:flex-1"
+          />
+          <span className="ml-auto flex items-center gap-2">
+            <ThemePill />
+            <AccountLink user={user} />
+          </span>
+        </div>
+
+        <ReconnectAlert connections={connections} />
       </div>
 
-      <ReconnectAlert connections={connections} />
-
-      <div className="grid gap-3 lg:h-[max(34rem,calc(100svh-15rem))] lg:grid-cols-[minmax(20rem,26rem)_1fr]">
+      <div className="grid gap-3 lg:h-[max(34rem,calc(100svh-15rem))] lg:grid-cols-[minmax(20rem,26rem)_1fr] print:block print:h-auto">
         <section
           aria-labelledby="list-heading"
-          className="flex max-h-[30rem] min-h-0 flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:max-h-none"
+          className="flex max-h-[30rem] min-h-0 flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:max-h-none print:hidden"
         >
           <div className="flex items-baseline justify-between gap-3 px-5 pt-4 pb-2">
             <h2 id="list-heading" className="text-metadata font-semibold text-muted-foreground">
@@ -125,7 +130,7 @@ function InboxLayout() {
         </section>
         <section
           aria-label="Reading pane"
-          className="flex min-h-[24rem] flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:min-h-0"
+          className="flex min-h-[24rem] flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:min-h-0 print:min-h-0 print:border-0 print:shadow-none"
         >
           <Outlet />
         </section>

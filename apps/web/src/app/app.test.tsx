@@ -1082,4 +1082,60 @@ describe('dashboard', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Refresh' }))
     await waitFor(() => expect(getMessages.mock.calls.length).toBeGreaterThan(calls))
   })
+
+  it('opens an email and the list when the accounts fail to load', async () => {
+    vi.spyOn(connectionsApi, 'getConnections').mockRejectedValue(new ApiError(500, 'Down'))
+    fakeClock()
+    renderApp('/inbox/m1')
+    // Past the retries.
+    await act(() => vi.advanceTimersByTimeAsync(10_000))
+    const email = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    expect(within(email).getByRole('button', { name: 'Approve & send' })).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'Messages' })).toBeInTheDocument()
+
+    // Without an email open, it doesn't claim no account is connected.
+    await userEvent.keyboard('{Escape}')
+    expect(await screen.findByRole('heading', { level: 1, name: 'Inbox' })).toBeInTheDocument()
+    expect(screen.queryByText('Connect your email to fill your inbox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Get set up' })).not.toBeInTheDocument()
+  })
+
+  it('takes focus to the email it opens on phones', async () => {
+    const matchMedia = window.matchMedia
+    window.matchMedia = ((query: string) => ({ matches: true, media: query })) as never
+    try {
+      renderApp('/inbox')
+      const list = await screen.findByRole('list', { name: 'Messages' })
+      const row = within(list).getByRole('link', { name: /Quote for 40 units/ })
+      row.focus()
+      await userEvent.keyboard('{Enter}')
+      const subject = await screen.findByRole('heading', {
+        level: 1,
+        name: 'Quote for 40 units by Friday',
+      })
+      await waitFor(() => expect(subject).toHaveFocus())
+    } finally {
+      window.matchMedia = matchMedia
+    }
+  })
+
+  it('prints only the open email', async () => {
+    const print = vi.spyOn(window, 'print').mockImplementation(() => {})
+    renderApp('/inbox/m1')
+    const email = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    await userEvent.click(within(email).getByRole('button', { name: 'More' }))
+    await userEvent.click(within(email).getByRole('button', { name: 'Print' }))
+    expect(print).toHaveBeenCalledOnce()
+    // Everything around the email, and the email's own controls and draft, are left out.
+    for (const part of [
+      screen.getByRole('navigation', { name: 'Main' }),
+      screen.getByRole('search'),
+      screen.getByRole('list', { name: 'Messages' }),
+      within(email).getByRole('region', { name: 'Draft' }),
+      within(email).getByRole('button', { name: 'Approve & send' }),
+    ]) {
+      expect(part.closest('.print\\:hidden')).not.toBeNull()
+    }
+    expect(within(email).getByRole('heading', { level: 1 }).closest('.print\\:hidden')).toBeNull()
+  })
 })
