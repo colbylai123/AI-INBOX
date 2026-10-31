@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
-import { useEffect, useId, useRef, useState } from 'react'
+import { type MouseEvent, useEffect, useId, useRef, useState } from 'react'
 import { Logo } from '@/components/layout/logo'
 import { cn } from '@/lib/utils'
 import { LiveApproveCard } from './live-approve-card'
@@ -14,9 +14,25 @@ const sections = [
   { href: '#faq', label: 'FAQ' },
 ]
 
-// Quiet nav type: hover darkens it and draws a thin underline.
+// Quiet nav type: hover darkens it and draws a thin underline. A press eases out.
 const quietLink =
-  'rounded-md text-interface font-medium text-[var(--lp-ink-soft)] underline decoration-transparent decoration-1 underline-offset-[6px] transition-[color,text-decoration-color] hover:text-[var(--lp-ink)] hover:decoration-current'
+  'rounded-md text-interface font-medium text-[var(--lp-ink-soft)] underline decoration-transparent decoration-1 underline-offset-[6px] transition-[color,text-decoration-color,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-[var(--lp-ink)] hover:decoration-current motion-safe:active:opacity-80'
+
+// These two ease down the page. The others stay ordinary jumps.
+const easedSections = new Set(['#how-it-works', '#features'])
+
+function followSection(event: MouseEvent<HTMLAnchorElement>, href: string) {
+  if (!easedSections.has(href)) return
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
+  const target = document.getElementById(href.slice(1))
+  if (!target) return
+  event.preventDefault()
+  const reduce =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  target.scrollIntoView?.({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+  history.replaceState(null, '', href)
+}
 
 // The field, the white frame and the scene's inset. The header repeats them, so it
 // lines up inside the frame while staying outside <main>.
@@ -36,7 +52,12 @@ export function HeroHeader() {
             </Link>
             <nav aria-label="Page sections" className="hidden flex-1 justify-center gap-7 md:flex">
               {sections.map(({ href, label }) => (
-                <a key={href} href={href} className={quietLink}>
+                <a
+                  key={href}
+                  href={href}
+                  className={quietLink}
+                  onClick={(event) => followSection(event, href)}
+                >
                   {label}
                 </a>
               ))}
@@ -188,7 +209,7 @@ function SectionsMenu() {
   }, [open])
 
   const item =
-    'flex h-11 items-center rounded-xl px-3 text-interface font-medium text-[var(--lp-ink-soft)] transition-colors hover:bg-muted hover:text-[var(--lp-ink)]'
+    'flex h-11 items-center rounded-xl px-3 text-interface font-medium text-[var(--lp-ink-soft)] transition-[color,background-color,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted hover:text-[var(--lp-ink)] motion-safe:active:opacity-80'
 
   return (
     <div
@@ -221,7 +242,14 @@ function SectionsMenu() {
           <ul className="flex flex-col">
             {sections.map(({ href, label }) => (
               <li key={href}>
-                <a href={href} onClick={() => setOpen(false)} className={item}>
+                <a
+                  href={href}
+                  onClick={(event) => {
+                    followSection(event, href)
+                    setOpen(false)
+                  }}
+                  className={item}
+                >
                   {label}
                 </a>
               </li>

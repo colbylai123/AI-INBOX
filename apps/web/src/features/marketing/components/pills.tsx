@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 // Both pills lift a little and change color on hover. With reduced motion only the
 // color changes (the lift is motion-safe, and globals.css stops transitions).
 const lift =
-  'transition-[background-color,color,translate,box-shadow] motion-safe:hover:-translate-y-0.5'
+  'transition-[background-color,color,translate,box-shadow,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:hover:-translate-y-0.5 motion-safe:active:opacity-80'
 
 /** The muted dusty-lavender pill at the top right of the hero. Opens the demo. */
 export function DemoPill({ className }: { className?: string }) {

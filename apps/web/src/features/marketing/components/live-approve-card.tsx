@@ -8,9 +8,9 @@ const HOLD_SECONDS = 10
 type Step = 'draft' | 'held' | 'sent'
 
 const whiteButton =
-  'inline-flex h-10 items-center justify-center gap-2 rounded-full bg-white px-5 text-metadata font-semibold text-[#231d33] transition-[background-color,translate] hover:bg-[#efe9f8] motion-safe:hover:-translate-y-0.5'
+  'inline-flex h-10 items-center justify-center gap-2 rounded-full bg-white px-5 text-metadata font-semibold text-[#231d33] transition-[background-color,translate,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#efe9f8] motion-safe:hover:-translate-y-0.5 motion-safe:active:opacity-80'
 const quietButton =
-  'inline-flex h-10 items-center justify-center rounded-full px-4 text-metadata font-semibold text-[var(--lp-on-card)] ring-1 ring-white/30 transition-colors hover:bg-white/10'
+  'inline-flex h-10 items-center justify-center rounded-full px-4 text-metadata font-semibold text-[var(--lp-on-card)] ring-1 ring-white/30 transition-[color,background-color,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-white/10 motion-safe:active:opacity-80'
 
 /**
  * A live sample of approve and send, in one card on the hero. Approve & send swaps
@@ -76,7 +76,9 @@ export function LiveApproveCard() {
           aria-hidden={step !== 'draft'}
           className={cn(
             'col-start-1 row-start-1',
-            step === 'draft' ? 'animate-in duration-300 fade-in' : 'invisible',
+            step === 'draft'
+              ? 'animate-in duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] fade-in'
+              : 'invisible',
           )}
         >
           <p className="text-interface font-semibold">Quote for 40 units by Friday</p>
@@ -99,7 +101,7 @@ export function LiveApproveCard() {
           // Keyed, so each step fades in fresh: a short crossfade in the same card.
           <div
             key={step}
-            className="col-start-1 row-start-1 flex animate-in flex-col justify-center duration-300 fade-in"
+            className="col-start-1 row-start-1 flex animate-in flex-col justify-center duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] fade-in"
           >
             {step === 'held' ? (
               <>

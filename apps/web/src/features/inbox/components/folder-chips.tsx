@@ -59,7 +59,7 @@ export function FolderChips({
             activeOptions={{ explicitUndefined: true }}
             aria-label={id === undefined ? `${name}, ${inboxCount} emails` : undefined}
             className={cn(
-              'inline-flex h-9 shrink-0 items-center gap-2 rounded-full border px-3.5 text-metadata font-medium whitespace-nowrap transition-colors',
+              'inline-flex h-9 shrink-0 items-center gap-2 rounded-full border px-3.5 text-metadata font-medium whitespace-nowrap transition-[color,background-color,border-color,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:active:opacity-80',
               selected
                 ? 'border-transparent bg-foreground text-background'
                 : 'border-card-edge bg-card text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-raised dark:hover:bg-muted',

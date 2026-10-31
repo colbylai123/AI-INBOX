@@ -23,7 +23,7 @@ export function AppRail({ className }: { className?: string }) {
           // The page stays marked while an email is open (/inbox/m1) or a filter is on.
           activeOptions={{ includeSearch: false }}
           title={label}
-          className="grid size-11 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground aria-[current=page]:bg-rail-active aria-[current=page]:text-foreground"
+          className="grid size-11 place-items-center rounded-xl text-muted-foreground transition-[color,background-color,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted hover:text-foreground aria-[current=page]:bg-rail-active aria-[current=page]:text-foreground motion-safe:active:opacity-80"
         >
           <Icon className="size-5" aria-hidden />
           <span className="sr-only">{label}</span>

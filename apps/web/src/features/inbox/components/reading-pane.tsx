@@ -263,62 +263,67 @@ export function ReadingPane({ message }: { message: Message }) {
               ? 'Your reply was sent.'
               : undone && 'Not sent. Your draft is back.'}
         </span>
-        {approved ? (
-          <p
-            ref={sentRef}
-            tabIndex={-1}
-            className="flex h-9 items-center gap-2 text-interface font-medium outline-none"
-          >
-            <CircleCheck className="size-4 text-primary" aria-hidden /> Sent
-          </p>
-        ) : editing ? (
-          <>
-            <Button type="submit" form={editorId} disabled={save.isPending}>
-              {save.isPending ? 'Saving…' : 'Save changes'}
-            </Button>
+        <div
+          key={approved ? 'sent' : editing ? 'edit' : busy ? 'hold' : 'ready'}
+          className="press-in flex flex-wrap items-center gap-2"
+        >
+          {approved ? (
+            <p
+              ref={sentRef}
+              tabIndex={-1}
+              className="flex h-9 items-center gap-2 text-interface font-medium outline-none"
+            >
+              <CircleCheck className="size-4 text-primary" aria-hidden /> Sent
+            </p>
+          ) : editing ? (
+            <>
+              <Button type="submit" form={editorId} disabled={save.isPending}>
+                {save.isPending ? 'Saving…' : 'Save changes'}
+              </Button>
+              <Button
+                variant="ghost"
+                disabled={save.isPending}
+                onClick={() => {
+                  save.reset()
+                  setEditing(false)
+                }}
+              >
+                Cancel
+              </Button>
+            </>
+          ) : busy ? (
+            <>
+              {/* Approve's place shows the countdown, so a double click can't undo.
+                  Focus moves to Undo from the button that was just disabled. */}
+              <Button variant="approve" disabled>
+                {held ? `Sends in ${seconds}s` : 'Sending…'}
+              </Button>
+              <Button
+                key="undo"
+                variant="secondary"
+                autoFocus
+                disabled={!held}
+                onClick={() => {
+                  undoSend(message.id)
+                  setUndone(true)
+                }}
+              >
+                <Undo2 aria-hidden /> Undo
+              </Button>
+            </>
+          ) : (
             <Button
-              variant="ghost"
-              disabled={save.isPending}
+              variant="approve"
+              disabled={!message.draftReply}
               onClick={() => {
-                save.reset()
-                setEditing(false)
+                setUndone(false)
+                holdSend(message.id, message.from)
               }}
             >
-              Cancel
+              <Send aria-hidden /> Approve & send
             </Button>
-          </>
-        ) : busy ? (
-          <>
-            {/* Approve's place shows the countdown, so a double click can't undo.
-                Focus moves to Undo from the button that was just disabled. */}
-            <Button variant="approve" disabled>
-              {held ? `Sends in ${seconds}s` : 'Sending…'}
-            </Button>
-            <Button
-              key="undo"
-              variant="secondary"
-              autoFocus
-              disabled={!held}
-              onClick={() => {
-                undoSend(message.id)
-                setUndone(true)
-              }}
-            >
-              <Undo2 aria-hidden /> Undo
-            </Button>
-          </>
-        ) : (
-          <Button
-            variant="approve"
-            disabled={!message.draftReply}
-            onClick={() => {
-              setUndone(false)
-              holdSend(message.id, message.from)
-            }}
-          >
-            <Send aria-hidden /> Approve & send
-          </Button>
-        )}
+          )}
+        </div>
         <span className="ml-auto flex items-center gap-1">
           <a
             href={forwardLink(message)}

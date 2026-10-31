@@ -413,3 +413,19 @@
 :root[data-theme='dark'] .landing-blob {
   opacity: 0.45;
 }
+
+/* Send swaps (Approve & send, the countdown, Sent) ease in. Reduced motion skips it. */
+@media (prefers-reduced-motion: no-preference) {
+  .press-in {
+    animation: press-in 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes press-in {
+    from {
+      opacity: 0.4;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 // The amber pill is the one bright action. Everything else is a white or quiet button.
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 text-interface font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,translate] disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-y-px motion-safe:active:translate-y-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 text-interface font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,translate,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:pointer-events-none disabled:opacity-50 motion-safe:hover:-translate-y-px motion-safe:active:translate-y-0 motion-safe:active:opacity-80 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
