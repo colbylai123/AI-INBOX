@@ -64,6 +64,23 @@ describe('app', () => {
     expect(screen.getAllByRole('link', { name: 'Sign in' }).length).toBeGreaterThan(0)
   })
 
+  it('names Gmail and several accounts on the landing page, like Settings', async () => {
+    renderApp('/')
+    const faq = await screen.findByText('Which email accounts work?')
+    expect(faq.closest('details')).toHaveTextContent(/Outlook and Gmail.*more than one account/)
+    expect(screen.getByText(/Disconnect any account at any time/)).toHaveTextContent(
+      "that account's access is deleted",
+    )
+    expect(
+      screen.getByRole('heading', { name: 'What we ask Microsoft and Google for' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/Disconnect Outlook/)).not.toBeInTheDocument()
+    // Still no shared team inbox.
+    expect(
+      screen.getByText('Can my whole team share one inbox?').closest('details'),
+    ).toHaveTextContent('Not yet')
+  })
+
   it('opens the demo from the landing page and exits back to it', async () => {
     const { router } = renderApp('/')
     const [tryDemo] = await screen.findAllByRole('link', { name: /Try the demo/ })

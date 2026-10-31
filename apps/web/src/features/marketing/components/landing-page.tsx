@@ -22,8 +22,8 @@ import { SiteHeader } from './site-header'
 const steps = [
   {
     icon: Plug,
-    title: 'Connect Outlook',
-    body: 'Sign in with your work account and connect your mailbox. New mail starts arriving here, ranked.',
+    title: 'Connect your email',
+    body: 'Connect one or more Outlook and Gmail accounts. New mail from all of them arrives in one inbox, ranked.',
   },
   {
     icon: Upload,
@@ -64,14 +64,17 @@ const promises = [
   'Every reply and form waits for your approval. There is no auto-send.',
   'After you approve, you have 10 seconds to undo before it sends.',
   'Forms are filled only from the email in front of you and the documents you uploaded.',
-  'Disconnect Outlook at any time and its access is deleted.',
+  "Disconnect any account at any time and that account's access is deleted. Your other accounts stay connected.",
 ]
 
-// The Microsoft permissions in docs/api-contract.md, in plain words.
+// The Microsoft and Google permissions in docs/api-contract.md (steps 5 and 9), in plain words.
 const permissions = [
   { name: 'Read your mail', why: 'To rank, sum up and draft replies to new messages.' },
-  { name: 'Send mail as you', why: 'Used only when you click Approve & send.' },
-  { name: 'Your profile', why: "Your name and email address, to show who's signed in." },
+  {
+    name: 'Send mail as you',
+    why: 'Used only when you click Approve & send, from the account the email came to.',
+  },
+  { name: 'Your email address', why: 'To show which account each email came to.' },
   { name: 'Stay connected', why: 'So new mail keeps arriving without signing in every day.' },
 ]
 
@@ -82,7 +85,7 @@ const faqs = [
   },
   {
     q: 'Which email accounts work?',
-    a: 'Outlook work accounts. Support for more email and messaging apps is planned.',
+    a: 'Outlook and Gmail. You can connect more than one account, including several of the same kind, and their mail arrives in one inbox. Support for messaging apps is planned.',
   },
   {
     q: 'What kinds of forms can I upload?',
@@ -213,10 +216,11 @@ export function LandingPage() {
             </div>
             <div className="rounded-2xl border border-white/65 bg-card p-6 shadow-panel md:p-8">
               <h3 className="font-display text-lg font-semibold tracking-tight">
-                What we ask Microsoft for
+                What we ask Microsoft and Google for
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Only what the inbox needs to work.
+                Only what the inbox needs to work, asked once for each account you connect.
+                Disconnecting an account deletes that account's access.
               </p>
               <dl className="mt-4 divide-y divide-border">
                 {permissions.map(({ name, why }) => (
