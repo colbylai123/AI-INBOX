@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import {
   Archive,
   ArchiveRestore,
+  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   CircleCheck,
@@ -76,6 +77,16 @@ export function ReadingPane({ message }: { message: Message }) {
     setEditing(true)
   }
 
+  // Closes the email, keeping the list's folder, filters and search. Focus goes back
+  // to the email's row in the list, so the reader carries on from it, and on phones
+  // that scrolls the list back into view above the card.
+  const backToList = () =>
+    void navigate({ to: '/inbox', search: true }).then(() => {
+      for (const row of document.querySelectorAll<HTMLElement>('[data-message-id]')) {
+        if (row.dataset.messageId === message.id) return row.focus()
+      }
+    })
+
   // No shortcut approves: sending always takes a click on Approve & send. None of
   // these run while editing, so a stray key can't leave unsaved changes behind.
   useShortcuts(
@@ -83,13 +94,7 @@ export function ReadingPane({ message }: { message: Message }) {
       ...(canEdit && { e: startEditing }),
       j: () => adjacent.open(1),
       k: () => adjacent.open(-1),
-      Escape: () =>
-        void navigate({ to: '/inbox', search: true }).then(() => {
-          // Back to the email's row in the list, so a keyboard user carries on from it.
-          for (const row of document.querySelectorAll<HTMLElement>('[data-message-id]')) {
-            if (row.dataset.messageId === message.id) return row.focus()
-          }
-        }),
+      Escape: backToList,
     },
     !editing,
   )
@@ -140,7 +145,7 @@ export function ReadingPane({ message }: { message: Message }) {
 
   return (
     <article ref={cardRef} aria-labelledby={subjectId} className="flex min-h-0 flex-1 flex-col">
-      <Toolbar message={message} place={place} adjacent={adjacent} />
+      <Toolbar message={message} place={place} adjacent={adjacent} onBack={backToList} />
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 sm:px-7 print:overflow-visible">
         <div className="flex flex-wrap items-center gap-3 pt-5">
@@ -348,10 +353,12 @@ function Toolbar({
   message,
   place,
   adjacent,
+  onBack,
 }: {
   message: Message
   place: ReturnType<typeof placeOf>
   adjacent: ReturnType<typeof useAdjacent>
+  onBack: () => void
 }) {
   const [moved, setMoved] = useState('')
   const move = (to: typeof place) => {
@@ -366,6 +373,12 @@ function Toolbar({
     <div className="border-b border-border px-3 py-2.5 sm:px-5 print:hidden">
       {/* On the narrowest phones the place in the list wraps under the icons. */}
       <div className="flex flex-wrap items-center gap-1">
+        {/* Below lg the card sits under the list, a scroll away; Escape does the same
+            for keyboards. Wide screens show both cards, so it isn't needed there. */}
+        <span className="flex items-center gap-1 lg:hidden">
+          <IconButton icon={ArrowLeft} label="Back to the list" onClick={onBack} />
+          <span aria-hidden className="mx-1 h-5 w-px bg-border" />
+        </span>
         <Toggletip icon={Clock} label="When it arrived">
           Arrived {fullDate(message.receivedAt)}
         </Toggletip>

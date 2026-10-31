@@ -134,9 +134,11 @@ export function GettingStarted({
             <div className="min-w-0">
               <p className={cn('font-semibold', step.done && 'text-muted-foreground')}>
                 {step.title}
-                {step.done && <span className="sr-only"> (done)</span>}
               </p>
-              {!step.done && (
+              {/* Said in words too, not only by the tick and the grey. */}
+              {step.done ? (
+                <p className="mt-1 text-metadata text-muted-foreground">Done</p>
+              ) : (
                 <>
                   <p className="mt-1 text-metadata text-muted-foreground">{step.body}</p>
                   {step.action && <div className="mt-3">{step.action}</div>}

@@ -1,5 +1,12 @@
-import { createFileRoute, type ErrorComponentProps, Outlet, redirect } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  type ErrorComponentProps,
+  Link,
+  Outlet,
+  redirect,
+} from '@tanstack/react-router'
 import { RouteError } from '@/components/feedback/route-error'
+import { buttonVariants } from '@/components/ui/button'
 import { AppShell } from '@/components/layout/app-shell'
 import { sessionQuery } from '@/features/auth'
 import { SendQueue } from '@/features/inbox'
@@ -21,13 +28,23 @@ export const Route = createFileRoute('/_app')({
 })
 
 // The app couldn't start, as when the server can't be reached. The shell needs the
-// signed-in user, so the page has the site's header instead, with the way home and to the demo.
+// signed-in user, so the page has the site's header instead, and says so plainly, with
+// a retry and the demo, which works without the server.
 function AppError(props: ErrorComponentProps) {
   return (
     <div className="flex min-h-svh flex-col">
       <SiteHeader />
       <main className="mx-auto w-full max-w-page flex-1 px-gutter">
-        <RouteError {...props} />
+        <RouteError
+          {...props}
+          title="Your inbox can't be reached right now"
+          description="Try again in a moment. Meanwhile, the demo shows how it works with sample emails."
+          actions={
+            <Link to="/demo" preload={false} className={buttonVariants({ variant: 'ghost' })}>
+              Try the demo
+            </Link>
+          }
+        />
       </main>
     </div>
   )
