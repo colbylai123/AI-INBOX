@@ -408,7 +408,9 @@
 
 /* At dusk the bubbles and the shape glow less, so they don't outshine the text. */
 :root[data-theme='dark'] .landing-bubble {
-  opacity: 0.16;
+  /* Violet glass at dusk; the light bubbles dimmed read as grey discs here. */
+  background: radial-gradient(circle at 32% 28%, #9a84d4 0%, #5a4690 45%, #2c2342 100%);
+  opacity: 0.3;
 }
 :root[data-theme='dark'] .landing-blob {
   opacity: 0.45;
