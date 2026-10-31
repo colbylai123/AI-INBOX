@@ -3,8 +3,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { MailOpen } from 'lucide-react'
 import { DemoWelcome } from '@/components/layout/demo-welcome'
 import { useDemoMode } from '@/lib/demo-mode'
+import { usePageTitle } from '@/lib/use-page-title'
 import { ConnectPrompt } from '@/features/connections'
-import { useInboxList, WeeklySummary, weeklyStatsQuery } from '@/features/inbox'
+import { folderNames, useInboxList, WeeklySummary, weeklyStatsQuery } from '@/features/inbox'
 import { materialsQuery } from '@/features/materials'
 import { GettingStarted } from '@/features/onboarding'
 
@@ -21,6 +22,7 @@ function InboxOverview() {
   const materials = useQuery(materialsQuery())
   const stats = useQuery(weeklyStatsQuery())
   const unfiltered = !search.priority && !search.q && !account && !search.folder
+  usePageTitle(folderNames[search.folder ?? 'inbox'])
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-7">
       {connectionsKnown && connections.length === 0 ? (

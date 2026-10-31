@@ -40,7 +40,7 @@ Every variable is declared and validated in `src/lib/env.ts`. `VITE_*` values sh
 
 - **Link previews.** `index.html` has the Open Graph tags, and `public/og-image.png` is the image. Previews need absolute URLs, so `vite.config.ts` adds `og:url` and `og:image` when the build knows the site's address. In Cloudflare Pages, set `SITE_URL` to the real domain, such as `https://app.example.com`. Without it, Pages builds use the deployment's own URL. This is a build setting, not a `VITE_*` variable.
 - **Add to home screen.** `public/manifest.webmanifest` and the icons let phones and desktop Chrome install the app. It opens on `/inbox`.
-- **Changing the name, logo or headline.** Edit `scripts/share-images.html`, then run `npm run share-images` to redraw the preview image and icons. The first time, run `npx playwright install chromium` to download the browser it uses. `public/favicon.svg` is drawn by hand and matches the logo in `components/layout/logo.tsx`.
+- **Changing the name, logo or headline.** Edit `scripts/share-images.html`, then run `npm run share-images` to redraw the preview image and icons. The first time, run `npx playwright install chromium` to download the browser it uses. `public/favicon.svg` is drawn by hand and matches the logo in `components/layout/logo.tsx`. Both use the landing page's colors.
 
 ## Demo mode
 

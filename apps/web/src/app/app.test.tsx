@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createMemoryHistory } from '@tanstack/react-router'
-import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockConnections, resetMockConnections } from '@/features/connections/api/mocks'
 import { mockMessages, resetMockMessages } from '@/features/inbox/api/mocks'
@@ -91,6 +91,33 @@ describe('app', () => {
     expect(
       screen.getByText('Can my whole team share one inbox?').closest('details'),
     ).toHaveTextContent('Not yet')
+  })
+
+  it('lets the browser follow the section links, so keyboard focus moves with them', async () => {
+    renderApp('/')
+    const nav = await screen.findByRole('navigation', { name: 'Page sections' })
+    for (const name of ['How it works', 'Features', 'Your control', 'FAQ']) {
+      // fireEvent.click is false when a handler stopped the browser's own jump.
+      expect(fireEvent.click(within(nav).getByRole('link', { name }))).toBe(true)
+    }
+  })
+
+  it('names each page in the browser tab', async () => {
+    const { router } = renderApp('/')
+    await screen.findByRole('heading', { level: 1, name: 'Read it. Approve it. Then it sends.' })
+    expect(document.title).toBe('AI Inbox')
+
+    await act(() => router.navigate({ to: '/inbox/$messageId', params: { messageId: 'm1' } }))
+    await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    expect(document.title).toBe('Quote for 40 units by Friday · AI Inbox')
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(document.title).toBe('Inbox · AI Inbox'))
+    await act(() => router.navigate({ to: '/inbox', search: { folder: 'archive' } }))
+    await waitFor(() => expect(document.title).toBe('Archive · AI Inbox'))
+    await act(() => router.navigate({ to: '/settings' }))
+    await waitFor(() => expect(document.title).toBe('Settings · AI Inbox'))
+    await act(() => router.navigate({ to: '/no-such-page' as '/' }))
+    await waitFor(() => expect(document.title).toBe('Page not found · AI Inbox'))
   })
 
   it('opens the section links from a menu button on small screens', async () => {
@@ -1010,6 +1037,7 @@ describe('app', () => {
     it('still shows sign-in, and the demo', async () => {
       renderApp('/sign-in')
       expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
+      expect(document.title).toBe('Sign in · AI Inbox')
       expect(screen.getByRole('alert')).toHaveTextContent("Signing in isn't available right now")
       expect(
         screen.getByRole('link', { name: 'Try the demo with sample emails' }),

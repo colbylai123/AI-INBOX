@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { sessionQuery, signInUrl } from '@/features/auth'
 import { SiteHeader } from '@/features/marketing'
 import { isDemoMode, setDemoMode } from '@/lib/demo-mode'
+import { usePageTitle } from '@/lib/use-page-title'
 import { isSafeRedirectPath } from '@/lib/safe-redirect'
 
 export const Route = createFileRoute('/sign-in')({
@@ -30,6 +31,7 @@ export const Route = createFileRoute('/sign-in')({
 function SignIn() {
   const { redirect: returnTo } = Route.useSearch()
   const { unreachable } = Route.useRouteContext()
+  usePageTitle('Sign in')
   return (
     <div className="flex min-h-svh flex-col" data-surface="sign-in">
       <SiteHeader />

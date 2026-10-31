@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
-import { type MouseEvent, useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Logo } from '@/components/layout/logo'
 import { cn } from '@/lib/utils'
 import { LiveApproveCard } from './live-approve-card'
@@ -18,20 +18,21 @@ const sections = [
 const quietLink =
   'rounded-md text-interface font-medium text-[var(--lp-ink-soft)] underline decoration-transparent decoration-1 underline-offset-[6px] transition-[color,text-decoration-color,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-[var(--lp-ink)] hover:decoration-current motion-safe:active:opacity-80'
 
-// These two ease down the page. The others stay ordinary jumps.
+// These two ease down the page. The others stay ordinary jumps. Either way the browser
+// follows the link itself, so keyboard focus moves on to the section as with any link.
 const easedSections = new Set(['#how-it-works', '#features'])
 
-function followSection(event: MouseEvent<HTMLAnchorElement>, href: string) {
+function followSection(href: string) {
   if (!easedSections.has(href)) return
-  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
-  const target = document.getElementById(href.slice(1))
-  if (!target) return
-  event.preventDefault()
-  const reduce =
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  target.scrollIntoView?.({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
-  history.replaceState(null, '', href)
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+  const root = document.documentElement
+  root.style.scrollBehavior = 'smooth'
+  // Back to ordinary jumps once this one has landed.
+  const reset = () => {
+    root.style.scrollBehavior = ''
+  }
+  window.addEventListener('scrollend', reset, { once: true })
+  window.setTimeout(reset, 1500)
 }
 
 // The field, the white frame and the scene's inset. The header repeats them, so it
@@ -52,12 +53,7 @@ export function HeroHeader() {
             </Link>
             <nav aria-label="Page sections" className="hidden flex-1 justify-center gap-7 md:flex">
               {sections.map(({ href, label }) => (
-                <a
-                  key={href}
-                  href={href}
-                  className={quietLink}
-                  onClick={(event) => followSection(event, href)}
-                >
+                <a key={href} href={href} className={quietLink} onClick={() => followSection(href)}>
                   {label}
                 </a>
               ))}
@@ -244,8 +240,8 @@ function SectionsMenu() {
               <li key={href}>
                 <a
                   href={href}
-                  onClick={(event) => {
-                    followSection(event, href)
+                  onClick={() => {
+                    followSection(href)
                     setOpen(false)
                   }}
                   className={item}
