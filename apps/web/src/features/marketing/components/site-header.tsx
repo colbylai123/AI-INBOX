@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Logo } from '@/components/layout/logo'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -47,6 +48,8 @@ export function SiteHeader({ page }: { page: 'landing' | 'sign-in' }) {
           <Link to="/demo" preload={false} className={buttonVariants({ size: 'sm' })}>
             Try the demo
           </Link>
+          {/* On the narrowest phones the landing page has it in its menu instead. */}
+          <ThemeToggle className={cn(page === 'landing' && 'max-[379px]:hidden')} />
           {page === 'landing' && <SectionsMenu />}
         </div>
       </div>
@@ -123,6 +126,9 @@ function SectionsMenu() {
                 </a>
               </li>
             ))}
+            <li className="min-[380px]:hidden">
+              <ThemeToggle row />
+            </li>
             <li className="min-[380px]:hidden">
               <Link
                 to="/sign-in"

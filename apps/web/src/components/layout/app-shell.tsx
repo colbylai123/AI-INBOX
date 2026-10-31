@@ -10,6 +10,7 @@ import { DemoBar } from './demo-bar'
 import { DismissibleBanner } from './dismissible-banner'
 import { Logo } from './logo'
 import { ShortcutsHelp } from './shortcuts-help'
+import { ThemeToggle } from './theme-toggle'
 
 // Add a nav entry here when you add a top-level page under routes/_app/.
 const nav: { to: LinkProps['to']; label: string }[] = [
@@ -71,20 +72,23 @@ export function AppShell({ user, children }: { user: User; children: ReactNode }
             ))}
           </nav>
 
-          <Link
-            to="/settings"
-            className="flex items-center gap-2 justify-self-end rounded-md border border-white/65 bg-card py-1 pr-2.5 pl-1 text-interface shadow-xs transition-colors hover:bg-muted md:col-start-3"
-          >
-            <span
-              aria-hidden
-              className="grid size-7 place-items-center rounded-full bg-muted text-metadata font-semibold"
+          <div className="flex items-center gap-2 justify-self-end md:col-start-3">
+            <ThemeToggle />
+            <Link
+              to="/settings"
+              className="flex items-center gap-2 rounded-md border border-white/65 bg-card py-1 pr-2.5 pl-1 text-interface shadow-xs transition-colors hover:bg-muted"
             >
-              {user.name.charAt(0)}
-            </span>
-            {/* Read out at every width, so the link keeps a name when phones show only the initial. */}
-            <span className="max-sm:sr-only">{user.name}</span>
-            <ChevronRight className="size-3.5 text-muted-foreground" aria-hidden />
-          </Link>
+              <span
+                aria-hidden
+                className="grid size-7 place-items-center rounded-full bg-muted text-metadata font-semibold"
+              >
+                {user.name.charAt(0)}
+              </span>
+              {/* Read out at every width, so the link keeps a name when phones show only the initial. */}
+              <span className="max-sm:sr-only">{user.name}</span>
+              <ChevronRight className="size-3.5 text-muted-foreground" aria-hidden />
+            </Link>
+          </div>
         </div>
       </header>
 

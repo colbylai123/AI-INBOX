@@ -1,5 +1,5 @@
 import { createMemoryHistory } from '@tanstack/react-router'
-import { act, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockConnections, resetMockConnections } from '@/features/connections/api/mocks'
 import { mockMessages, resetMockMessages } from '@/features/inbox/api/mocks'
@@ -11,6 +11,7 @@ import { UNDO_SECONDS } from '@/features/inbox/lib/outgoing-replies'
 import * as materialsApi from '@/features/materials/api/materials-api'
 import { ApiError } from '@/lib/api-client'
 import { isDemoMode, setDemoMode } from '@/lib/demo-mode'
+import { applyStoredTheme } from '@/lib/theme'
 import { App } from './app'
 import { createQueryClient } from './query-client'
 import { createAppRouter } from './router'
@@ -52,6 +53,7 @@ beforeEach(() => {
   resetMockMaterials()
   resetMockConnections()
   localStorage.clear()
+  applyStoredTheme()
   setDemoMode(false)
 })
 
@@ -122,8 +124,9 @@ describe('app', () => {
 
     // Tabbing past the last link closes it, and Escape still lands back on the button.
     await userEvent.click(menu)
-    const links = within(document.getElementById(menu.getAttribute('aria-controls')!)!)
-    for (let i = 0; i < links.getAllByRole('link').length; i++) await userEvent.tab()
+    const items = within(document.getElementById(menu.getAttribute('aria-controls')!)!)
+    const stops = items.getAllByRole('link').length + items.getAllByRole('button').length
+    for (let i = 0; i < stops; i++) await userEvent.tab()
     await userEvent.tab()
     expect(menu).toHaveAttribute('aria-expanded', 'false')
     await userEvent.click(menu)
@@ -131,6 +134,29 @@ describe('app', () => {
     await userEvent.keyboard('{Escape}')
     expect(menu).toHaveAttribute('aria-expanded', 'false')
     expect(menu).toHaveFocus()
+  })
+
+  it('switches to the dark theme and remembers it', async () => {
+    renderApp('/inbox')
+    await screen.findByRole('list', { name: 'Messages' })
+    const toggle = screen.getByRole('button', { name: 'Dark mode' })
+    expect(toggle).toHaveAttribute('aria-pressed', 'false')
+
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(localStorage.getItem('theme')).toBe('dark')
+
+    // The landing page and sign-in share the same colors, so they follow the choice.
+    cleanup()
+    renderApp('/sign-in')
+    expect(await screen.findByRole('button', { name: 'Dark mode' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Dark mode' }))
+    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(localStorage.getItem('theme')).toBe('light')
   })
 
   it('opens the demo from the landing page and exits back to it', async () => {
