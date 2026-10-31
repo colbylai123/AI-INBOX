@@ -16,7 +16,8 @@ export function PriorityFilter({ value }: { value: Priority | undefined }) {
         return (
           <Link
             key={o.label}
-            to="/inbox"
+            // Stays on the page it's on, so an open email stays open beside the list.
+            to="."
             // Keeps any search words; only the priority changes.
             search={(prev) => ({ ...prev, priority: o.value })}
             // The router sets aria-current on the active option. Without this, "All"

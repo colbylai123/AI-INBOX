@@ -1120,6 +1120,25 @@ describe('dashboard', () => {
     expect(await screen.findByRole('list', { name: 'Messages' })).toBeInTheDocument()
   })
 
+  it('keeps the open email open when the priority filter changes', async () => {
+    const { router } = renderApp('/inbox/m1')
+    await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
+    await openFilters()
+    await userEvent.click(
+      within(screen.getByRole('navigation', { name: 'Filter by priority' })).getByRole('link', {
+        name: 'High',
+      }),
+    )
+    await waitFor(() => expect(router.state.location.search).toEqual({ priority: 'high' }))
+    expect(router.state.location.pathname).toBe('/inbox/m1')
+    expect(
+      screen.getByRole('article', { name: 'Quote for 40 units by Friday' }),
+    ).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('list', { name: 'Messages' })).getAllByRole('listitem'),
+    ).toHaveLength(3)
+  })
+
   it("keeps a real inbox's stars when the demo starts", async () => {
     const { router } = renderApp('/inbox/m1')
     const email = await screen.findByRole('article', { name: 'Quote for 40 units by Friday' })
