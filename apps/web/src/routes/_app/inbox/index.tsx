@@ -98,7 +98,12 @@ function InboxPage() {
               }
             />
           </div>
-          <SearchResults messages={messages} query={q} showAccount={manyAccounts && !account} />
+          <SearchResults
+            messages={messages}
+            query={q}
+            showAccount={manyAccounts && !account}
+            filtered={Boolean(filters.priority || account)}
+          />
           <p className="mt-4 text-metadata text-muted-foreground max-md:hidden">
             Press <kbd className="rounded-sm border border-border bg-muted px-1.5">?</kbd> for
             keyboard shortcuts.
@@ -113,10 +118,12 @@ function SearchResults({
   messages,
   query,
   showAccount,
+  filtered,
 }: {
   messages: MessageSummary[]
   query: string | undefined
   showAccount: boolean
+  filtered: boolean
 }) {
   const found = searchMessages(messages, query)
   return (
@@ -131,7 +138,7 @@ function SearchResults({
       {found.length === 0 && messages.length > 0 ? (
         <p className="text-sm text-muted-foreground">No messages match “{query?.trim()}”.</p>
       ) : (
-        <MessageList messages={found} showAccount={showAccount} />
+        <MessageList messages={found} showAccount={showAccount} filtered={filtered} />
       )}
     </>
   )

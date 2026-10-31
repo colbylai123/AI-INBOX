@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { CircleCheck } from 'lucide-react'
 import { useRef } from 'react'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useShortcuts } from '@/lib/use-shortcuts'
 import type { MessageSummary } from '../types'
 import { PriorityBadge } from './priority-badge'
@@ -8,10 +9,13 @@ import { PriorityBadge } from './priority-badge'
 export function MessageList({
   messages,
   showAccount = false,
+  filtered = false,
 }: {
   messages: MessageSummary[]
   /** Say which account each email came to, for a list that mixes accounts. */
   showAccount?: boolean
+  /** A priority or account filter is on, so an empty list doesn't mean an empty inbox. */
+  filtered?: boolean
 }) {
   const listRef = useRef<HTMLUListElement>(null)
 
@@ -24,9 +28,7 @@ export function MessageList({
   }
   useShortcuts({ j: () => move(1), k: () => move(-1) }, messages.length > 0)
 
-  if (messages.length === 0) {
-    return <p className="text-sm text-muted-foreground">No messages yet.</p>
-  }
+  if (messages.length === 0) return <InboxEmpty filtered={filtered} />
   return (
     <ul
       ref={listRef}
@@ -69,5 +71,31 @@ export function MessageList({
         </li>
       ))}
     </ul>
+  )
+}
+
+function InboxEmpty({ filtered }: { filtered: boolean }) {
+  return (
+    <Card className="max-w-2xl">
+      <CardHeader>
+        {filtered ? (
+          <>
+            <CardTitle>No messages match these filters</CardTitle>
+            <CardDescription>
+              Choose a different priority or account above to see the rest of your inbox.
+            </CardDescription>
+          </>
+        ) : (
+          <>
+            <CardTitle>No messages yet</CardTitle>
+            <CardDescription>
+              New mail from your connected accounts lands here, most important first. Each one comes
+              with a short summary and, when it needs an answer, a drafted reply for you to review.
+              Nothing is sent until you approve it.
+            </CardDescription>
+          </>
+        )}
+      </CardHeader>
+    </Card>
   )
 }
