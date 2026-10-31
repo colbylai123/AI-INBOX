@@ -223,6 +223,89 @@
     }
   }
 }
+
+/*
+ * The public landing page has its own palette (docs/landing-page-design-spec.md):
+ * lavender, soft gold and warm white, a white frame, a dusty lavender pill and a
+ * lime arrow, with soft violet bubbles and one violet shape under the hero card.
+ * It remaps the role colors inside the page, so the dashboard's violet pills never
+ * show here and this palette never reaches the app.
+ */
+[data-surface='marketing'] {
+  --lp-field: #f1ecf8;
+  --lp-frame: #ffffff;
+  --lp-ink: #231d33;
+  --lp-ink-soft: #5c5470; /* 6.8:1 on the frame, 5.9:1 on the field */
+  --lp-ink-faded: #76679a; /* the lighter headline line; 3.9:1 on the sky, for large type */
+  --lp-sky-top: #ddd2f2;
+  --lp-sky: #ebe2f7;
+  --lp-fog: #f8f2ee;
+  --lp-hill-purple: #b7a2de;
+  --lp-hill-deep: #8f78c0;
+  --lp-hill-gold: #efcf86;
+  --lp-hill-gold-deep: #dcae5a;
+  --lp-warm: rgb(247 168 132 / 0.55);
+  --lp-pill: #76679a; /* white labels at 5:1 */
+  --lp-pill-hover: #63558a;
+  --lp-lime: #c3f04f;
+  --lp-on-lime: #1d2a0a;
+  --lp-card: rgb(29 23 41 / 0.8);
+  --lp-on-card: #f7f4fb;
+  --lp-on-card-soft: #d6cde6;
+  --lp-rule: #e4dcef;
+  --lp-violet-ink: #5c4d86; /* kickers and quotes, 6.3:1 on the field */
+
+  --background: var(--lp-field);
+  --foreground: var(--lp-ink);
+  --card: var(--lp-frame);
+  --card-foreground: var(--lp-ink);
+  --muted: #f4f0fa;
+  --muted-foreground: var(--lp-ink-soft);
+  --border: var(--lp-rule);
+  --approve: var(--lp-pill);
+  --approve-foreground: #ffffff;
+  --approve-hover: var(--lp-pill-hover);
+  --primary: var(--lp-pill);
+  --primary-foreground: #ffffff;
+  --primary-soft: #ece6f6;
+  --ring: var(--lp-ink);
+  --dp-color-card-edge: var(--lp-rule);
+  --dp-color-ink: var(--lp-ink);
+  --dp-shadow-panel: 0 1px 2px rgb(35 29 51 / 0.05);
+}
+
+/* The same scene at dusk. */
+:root[data-theme='dark'] [data-surface='marketing'] {
+  --lp-field: #15111d;
+  --lp-frame: #201a2b;
+  --lp-ink: #f3eefa;
+  --lp-ink-soft: #cbc2dc;
+  --lp-ink-faded: #b6a6dc;
+  --lp-sky-top: #2a2140;
+  --lp-sky: #3a2d55;
+  --lp-fog: #574568;
+  --lp-hill-purple: #5b4785;
+  --lp-hill-deep: #3f3163;
+  --lp-hill-gold: #9c7a3c;
+  --lp-hill-gold-deep: #7a5b26;
+  --lp-warm: rgb(232 140 110 / 0.3);
+  --lp-pill: #6d5e99; /* still a light label, at 5.7:1 */
+  --lp-pill-hover: #5f5189;
+  --lp-card: rgb(14 10 22 / 0.78);
+  --lp-rule: #342b42;
+  --lp-violet-ink: #c4b4ea;
+
+  --muted: #2a2338;
+  --primary-soft: #2f2742;
+}
+
+/* The lime arrow's hover: along its direction and back. */
+@keyframes nudge {
+  50% {
+    transform: translateX(4px);
+  }
+}
+
 /*
  * Landing to inbox. A lavender field covers the swap, then a rounded
  * dark frame eases in and both fade so the inbox is what's left.
@@ -280,7 +363,8 @@
 .landing-bubble {
   position: absolute;
   border-radius: 999px;
-  background: radial-gradient(circle at 32% 28%, #fff 0%, #e7d9f6 38%, #9078c8 100%);
+  /* Light enough at the rim that muted text drifting over one still reads at 4.5:1. */
+  background: radial-gradient(circle at 32% 28%, #fff 0%, #ece2f8 38%, #c9b8ea 100%);
   opacity: 0.55;
 }
 .landing-bubble-a {
@@ -321,15 +405,11 @@
     radial-gradient(ellipse at 70% 60%, #c4b0e8, #6d4ea8 62%, transparent 74%);
   opacity: 0.85;
 }
-.landing-reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 640ms ease,
-    transform 640ms ease;
-}
-.landing-reveal-in {
-  opacity: 1;
-  transform: none;
-}
 
+/* At dusk the bubbles and the shape glow less, so they don't outshine the text. */
+:root[data-theme='dark'] .landing-bubble {
+  opacity: 0.16;
+}
+:root[data-theme='dark'] .landing-blob {
+  opacity: 0.45;
+}
