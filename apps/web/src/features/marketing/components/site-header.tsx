@@ -63,22 +63,34 @@ function SectionsMenu() {
 
   useEffect(() => {
     if (!open) return
+    const inside = (target: EventTarget | null) =>
+      target instanceof Node && Boolean(rootRef.current?.contains(target))
     // A tap anywhere else on the page closes it.
     const closeOutside = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+      if (!inside(event.target)) setOpen(false)
+    }
+    // Escape closes it wherever focus is, and puts focus back on the button.
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      setOpen(false)
+      buttonRef.current?.focus()
     }
     document.addEventListener('pointerdown', closeOutside)
-    return () => document.removeEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
   }, [open])
 
   return (
     <div
       ref={rootRef}
       className="md:hidden"
-      onKeyDown={(event) => {
-        if (event.key === 'Escape' && open) {
+      // Tabbing past the last link closes it, so it never covers the page behind focus.
+      onBlur={(event) => {
+        if (event.relatedTarget && !rootRef.current?.contains(event.relatedTarget)) {
           setOpen(false)
-          buttonRef.current?.focus()
         }
       }}
     >

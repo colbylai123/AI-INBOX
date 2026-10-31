@@ -118,6 +118,18 @@ describe('app', () => {
     await userEvent.click(menu)
     await userEvent.click(screen.getByRole('heading', { level: 1 }))
     expect(menu).toHaveAttribute('aria-expanded', 'false')
+
+    // Tabbing past the last link closes it, and Escape still lands back on the button.
+    await userEvent.click(menu)
+    const links = within(document.getElementById(menu.getAttribute('aria-controls')!)!)
+    for (let i = 0; i < links.getAllByRole('link').length; i++) await userEvent.tab()
+    await userEvent.tab()
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(menu)
+    ;(document.activeElement as HTMLElement).blur()
+    await userEvent.keyboard('{Escape}')
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+    expect(menu).toHaveFocus()
   })
 
   it('opens the demo from the landing page and exits back to it', async () => {
