@@ -1302,6 +1302,31 @@ describe('dashboard', () => {
     expect(router.state.location.pathname).toBe('/inbox/m1')
   })
 
+  it('keeps two disconnects apart when they run at once', async () => {
+    const disconnect = connectionsApi.disconnect
+    let failOutlook!: (error: Error) => void
+    vi.spyOn(connectionsApi, 'disconnect').mockImplementation((id) =>
+      id === 'con-1'
+        ? new Promise((_, reject) => {
+            failOutlook = reject
+          })
+        : disconnect(id),
+    )
+    renderApp('/settings')
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Disconnect' }))[0]!)
+    const outlook = screen.getByRole('group', { name: 'Disconnect demo@example.com?' })
+    await userEvent.click(within(outlook).getByRole('button', { name: 'Disconnect' }))
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Disconnect' })[1]!)
+    const gmail = screen.getByRole('group', { name: 'Disconnect demo@gmail.example?' })
+    await userEvent.click(within(gmail).getByRole('button', { name: 'Disconnect' }))
+    expect(await screen.findByText(/Gmail is disconnected/)).toBeInTheDocument()
+    // Outlook's request is still running, and its failure is still its own.
+    expect(within(outlook).getByRole('button', { name: 'Disconnect' })).toBeDisabled()
+    act(() => failOutlook(new ApiError(500, 'Down')))
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't disconnect Outlook.")
+  })
+
   it('keeps focus on Settings when an account is kept or disconnected', async () => {
     renderApp('/settings')
     expect(await screen.findByRole('region', { name: 'Theme and account' })).toBeInTheDocument()

@@ -28,7 +28,6 @@ export function ConnectedAccounts({
   provider?: Provider
 }) {
   const name = provider ? providerNames[provider] : 'Your email'
-  const disconnect = useDisconnect()
   // The account just disconnected. Its row is gone, so focus that was on its
   // Disconnect button comes to the notice that says so.
   const [disconnected, setDisconnected] = useState<Connection | null>(null)
@@ -80,13 +79,7 @@ export function ConnectedAccounts({
                 <ConnectionRow
                   key={connection.id}
                   connection={connection}
-                  pending={disconnect.isPending && disconnect.variables === connection.id}
-                  failed={disconnect.isError && disconnect.variables === connection.id}
-                  onDisconnect={() =>
-                    disconnect.mutate(connection.id, {
-                      onSuccess: () => setDisconnected(connection),
-                    })
-                  }
+                  onDisconnected={() => setDisconnected(connection)}
                 />
               ))}
             </ul>
@@ -104,18 +97,15 @@ export function ConnectedAccounts({
 
 function ConnectionRow({
   connection,
-  pending,
-  failed,
-  onDisconnect,
+  onDisconnected,
 }: {
   connection: Connection
-  pending: boolean
-  failed: boolean
-  onDisconnect: () => void
+  onDisconnected: () => void
 }) {
   const [confirming, setConfirming] = useState(false)
   // Cancel puts focus back on Disconnect, where it was before the question.
   const [cancelled, setCancelled] = useState(false)
+  const disconnect = useDisconnect(onDisconnected)
   const needsReconnect = connection.status === 'reconnect_needed'
   const name = providerNames[connection.provider]
 
@@ -148,7 +138,12 @@ function ConnectionRow({
           className="flex w-full flex-wrap items-center justify-end gap-2"
         >
           <span className="text-metadata text-muted-foreground">New mail stops arriving.</span>
-          <Button size="sm" variant="destructive" disabled={pending} onClick={onDisconnect}>
+          <Button
+            size="sm"
+            variant="destructive"
+            disabled={disconnect.isPending}
+            onClick={() => disconnect.mutate(connection.id)}
+          >
             Disconnect
           </Button>
           <Button
@@ -180,7 +175,7 @@ function ConnectionRow({
           </Button>
         </div>
       )}
-      {failed && (
+      {disconnect.isError && (
         <p role="alert" className="w-full text-metadata text-destructive">
           Couldn't disconnect {name}. Try again.
         </p>
