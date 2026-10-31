@@ -15,6 +15,7 @@ import { Logo } from '@/components/layout/logo'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { usePageTitle } from '@/lib/use-page-title'
 import { cn } from '@/lib/utils'
+import { sections } from '../lib/sections'
 import { Hero, HeroHeader } from './hero'
 import { ArrowPill } from './pills'
 import { Reveal } from './reveal'
@@ -116,6 +117,13 @@ const benefits = [
   },
 ]
 
+// In a three-card row that is two across on tablets, the third card takes the full width.
+const lastSpans = 'md:last:col-span-2 lg:last:col-span-1'
+
+// Quiet like the header's links, a little taller so they're easy to tap.
+const footerLink =
+  'inline-block rounded-md py-1.5 text-metadata font-medium text-muted-foreground underline decoration-transparent underline-offset-4 transition-[color,text-decoration-color] hover:text-foreground hover:decoration-current'
+
 export function LandingPage() {
   usePageTitle()
   return (
@@ -141,9 +149,10 @@ export function LandingPage() {
                 “The draft can wait. Your name on it should not be a surprise.”
               </p>
             </Reveal>
-            <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {/* Two across on tablets, with the last card the full width under them. */}
+            <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {benefits.map((benefit, index) => (
-                <Reveal key={benefit.kicker} delay={index * 100}>
+                <Reveal key={benefit.kicker} delay={index * 100} className={lastSpans}>
                   <article className="h-full rounded-[28px] bg-card p-6 shadow-panel md:p-7">
                     <p className="text-label font-semibold tracking-[0.08em] text-[var(--lp-violet-ink)] uppercase">
                       {benefit.kicker}
@@ -151,7 +160,7 @@ export function LandingPage() {
                     <h3 className="mt-3 font-display text-xl leading-snug font-semibold tracking-tight">
                       {benefit.title}
                     </h3>
-                    <p className="mt-3 text-muted-foreground">{benefit.body}</p>
+                    <p className="mt-3 text-pretty text-muted-foreground">{benefit.body}</p>
                   </article>
                 </Reveal>
               ))}
@@ -160,9 +169,12 @@ export function LandingPage() {
         </section>
 
         <Section id="how-it-works" eyebrow="How it works" title="Set up in three steps">
-          <ol className="mt-12 grid gap-5 md:grid-cols-3">
+          <ol className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {steps.map(({ icon: Icon, title, body }, index) => (
-              <li key={title} className="rounded-[28px] bg-card p-6 shadow-panel md:p-7">
+              <li
+                key={title}
+                className={cn('rounded-[28px] bg-card p-6 shadow-panel md:p-7', lastSpans)}
+              >
                 <div className="flex items-center justify-between">
                   <IconMark icon={Icon} />
                   <span className="text-label font-semibold tracking-[0.08em] text-muted-foreground uppercase">
@@ -170,7 +182,7 @@ export function LandingPage() {
                   </span>
                 </div>
                 <h3 className="mt-5 font-display text-lg font-semibold tracking-tight">{title}</h3>
-                <p className="mt-2 text-muted-foreground">{body}</p>
+                <p className="mt-2 text-pretty text-muted-foreground">{body}</p>
               </li>
             ))}
           </ol>
@@ -189,7 +201,7 @@ export function LandingPage() {
                 <h3 className="mt-4 font-display text-base font-semibold tracking-tight">
                   {title}
                 </h3>
-                <p className="mt-2 text-muted-foreground">{body}</p>
+                <p className="mt-2 text-pretty text-muted-foreground">{body}</p>
               </li>
             ))}
           </ul>
@@ -219,7 +231,7 @@ export function LandingPage() {
               </ul>
             </div>
             <div className="rounded-[28px] bg-card p-6 shadow-panel md:p-8">
-              <h3 className="font-display text-lg font-semibold tracking-tight">
+              <h3 className="font-display text-lg font-semibold tracking-tight text-balance">
                 What we ask Microsoft and Google for
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -266,7 +278,7 @@ export function LandingPage() {
         </section>
 
         <section className="mx-auto max-w-page px-gutter pb-20">
-          <div className="flex flex-col items-start gap-8 rounded-[32px] bg-[linear-gradient(160deg,var(--lp-sky-top),var(--lp-sky)_55%,var(--lp-fog))] p-8 md:flex-row md:items-center md:justify-between md:p-12">
+          <div className="flex flex-col items-start gap-8 rounded-[32px] bg-[linear-gradient(160deg,var(--lp-sky-top),var(--lp-sky)_55%,var(--lp-fog))] p-8 md:p-12 min-[880px]:flex-row min-[880px]:items-center min-[880px]:justify-between">
             <div>
               <h2 className="font-display text-3xl leading-tight font-semibold tracking-[-0.03em] md:text-4xl">
                 See it with sample emails
@@ -289,8 +301,26 @@ export function LandingPage() {
       </main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-4 px-gutter py-8">
+        <div className="mx-auto grid max-w-page gap-6 px-gutter py-10 lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-10">
           <Logo />
+          {/* The sections again, for anyone who reads to the end. Privacy, terms and a
+              contact address go here once they are published. */}
+          <nav aria-label="Footer" className="lg:justify-self-center">
+            <ul className="flex flex-wrap gap-x-6 gap-y-1">
+              {sections.map(({ href, label }) => (
+                <li key={href}>
+                  <a href={href} className={footerLink}>
+                    {label}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <Link to="/sign-in" className={footerLink}>
+                  Sign in
+                </Link>
+              </li>
+            </ul>
+          </nav>
           <div className="flex items-center gap-4">
             <p className="text-metadata text-muted-foreground">
               Nothing sends without your approval.
@@ -344,7 +374,9 @@ function Section({
             {title}
           </h2>
           {description && (
-            <p className="mt-3 text-base text-muted-foreground md:text-lg">{description}</p>
+            <p className="mt-3 text-base text-pretty text-muted-foreground md:text-lg">
+              {description}
+            </p>
           )}
         </Reveal>
         <Reveal>{children}</Reveal>

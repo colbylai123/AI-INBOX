@@ -102,6 +102,24 @@ describe('app', () => {
     }
   })
 
+  it('repeats the section links and Sign in in the footer', async () => {
+    renderApp('/')
+    const footer = await screen.findByRole('navigation', { name: 'Footer' })
+    expect(
+      within(footer)
+        .getAllByRole('link')
+        .map((link) => [link.textContent, link.getAttribute('href')]),
+    ).toEqual([
+      ['How it works', '#how-it-works'],
+      ['Features', '#features'],
+      ['Your control', '#control'],
+      ['FAQ', '#faq'],
+      ['Sign in', '/sign-in'],
+    ])
+    // The theme switch stays in the footer, outside that list.
+    expect(within(screen.getByRole('contentinfo')).getByRole('button')).toBeInTheDocument()
+  })
+
   it('names each page in the browser tab', async () => {
     const { router } = renderApp('/')
     await screen.findByRole('heading', { level: 1, name: 'Read it. Approve it. Then it sends.' })

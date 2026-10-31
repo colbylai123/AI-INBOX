@@ -3,16 +3,10 @@ import { Menu, X } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Logo } from '@/components/layout/logo'
 import { cn } from '@/lib/utils'
+import { sections } from '../lib/sections'
 import { LiveApproveCard } from './live-approve-card'
 import { ArrowPill, DemoPill } from './pills'
 import { Reveal } from './reveal'
-
-const sections = [
-  { href: '#how-it-works', label: 'How it works' },
-  { href: '#features', label: 'Features' },
-  { href: '#control', label: 'Your control' },
-  { href: '#faq', label: 'FAQ' },
-]
 
 // Quiet nav type: hover darkens it and draws a thin underline. A press eases out.
 const quietLink =
@@ -47,11 +41,15 @@ export function HeroHeader() {
     <header className="absolute inset-x-0 top-0 z-20">
       <div className={field}>
         <div className={frame}>
-          <div className={cn('flex items-center gap-3 pt-4 sm:pt-5 md:gap-8', inset)}>
+          <div className={cn('flex items-center gap-3 pt-4 sm:pt-5 min-[880px]:gap-8', inset)}>
             <Link to="/" className="shrink-0 rounded-md">
               <Logo />
             </Link>
-            <nav aria-label="Page sections" className="hidden flex-1 justify-center gap-7 md:flex">
+            {/* From 880px, where all four fit without wrapping; narrower screens use the menu. */}
+            <nav
+              aria-label="Page sections"
+              className="hidden flex-1 justify-center gap-7 min-[880px]:flex"
+            >
               {sections.map(({ href, label }) => (
                 <a key={href} href={href} className={quietLink} onClick={() => followSection(href)}>
                   {label}
@@ -89,7 +87,7 @@ export function Hero() {
       >
         <div
           className={cn(
-            'relative isolate flex flex-col overflow-hidden rounded-[24px] pt-24 pb-6 sm:rounded-[32px] sm:pt-28 sm:pb-8 lg:min-h-[44rem] lg:pb-10',
+            'relative isolate flex flex-col overflow-hidden rounded-[24px] pt-24 pb-6 sm:rounded-[32px] sm:pt-28 sm:pb-8 lg:min-h-[44rem] lg:pt-24 lg:pb-10',
             inset,
           )}
         >
@@ -99,10 +97,11 @@ export function Hero() {
               <p className="mb-5 font-display text-lg text-balance text-[var(--lp-violet-ink)]">
                 Mail, but it waits its turn.
               </p>
-              {/* Spaces between the lines, so it reads as one sentence. */}
+              {/* Spaces between the lines, so it reads as one sentence. Capped by the
+                  window's height too, so on a laptop the sample card below fits on screen. */}
               <h1
                 id="hero-heading"
-                className="font-display text-[clamp(46px,7.5vw,112px)] leading-[0.94] font-semibold tracking-[-0.05em] text-[var(--lp-ink)]"
+                className="font-display text-[clamp(46px,min(7.5vw,10vh),112px)] leading-[0.94] font-semibold tracking-[-0.05em] text-[var(--lp-ink)]"
               >
                 <span className="block">Read it.</span>{' '}
                 <span className="block text-[var(--lp-ink-faded)]">Approve it.</span>{' '}
@@ -110,7 +109,7 @@ export function Hero() {
               </h1>
             </Reveal>
             <Reveal delay={120}>
-              <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-[var(--lp-ink-soft)] sm:text-lg">
+              <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-pretty text-[var(--lp-ink-soft)] sm:text-lg">
                 The AI drafts each reply and fills in your forms, and nothing leaves your inbox
                 until you have read it and pressed Approve &amp; send.
               </p>
@@ -175,7 +174,7 @@ function Scene() {
   )
 }
 
-/** Below md the section links are hidden, so a menu button opens them instead. */
+/** Below 880px the section links are hidden, so a menu button opens them instead. */
 function SectionsMenu() {
   const [open, setOpen] = useState(false)
   const panelId = useId()
@@ -210,7 +209,7 @@ function SectionsMenu() {
   return (
     <div
       ref={rootRef}
-      className="relative md:hidden"
+      className="relative min-[880px]:hidden"
       // Tabbing past the last link closes it, so it never covers the page behind focus.
       onBlur={(event) => {
         if (event.relatedTarget && !rootRef.current?.contains(event.relatedTarget)) {
