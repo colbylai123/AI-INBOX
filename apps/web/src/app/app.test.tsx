@@ -730,12 +730,75 @@ describe('app', () => {
     expect(router.state.location.pathname).toBe('/inbox')
   })
 
+  it('opens the next and previous email with j and k, in the order of the list you came from', async () => {
+    const { router } = renderApp('/inbox/m1?q=units')
+    await screen.findByRole('heading', { name: 'Quote for 40 units by Friday' })
+    // k at the top of the list stays put.
+    await userEvent.keyboard('k')
+    expect(router.state.location.pathname).toBe('/inbox/m1')
+
+    // The search matched two emails; j skips the ones it didn't match.
+    await userEvent.keyboard('j')
+    expect(await screen.findByRole('heading', { name: '12 units arrived damaged' })).toBeVisible()
+    expect(router.state.location.search).toEqual({ q: 'units' })
+    const second = router.state.location.pathname
+    // j at the bottom stays put too.
+    await userEvent.keyboard('j')
+    expect(router.state.location.pathname).toBe(second)
+
+    await userEvent.keyboard('k')
+    expect(
+      await screen.findByRole('heading', { name: 'Quote for 40 units by Friday' }),
+    ).toBeVisible()
+    expect(router.state.location.pathname).toBe('/inbox/m1')
+  })
+
+  it('goes back to the inbox search with / from an email', async () => {
+    const { router } = renderApp('/inbox/m1')
+    await screen.findByRole('button', { name: 'Approve & send' })
+    await userEvent.keyboard('/')
+    const search = await screen.findByRole('searchbox', { name: 'Search the inbox' })
+    await waitFor(() => expect(search).toHaveFocus())
+    expect(router.state.location.pathname).toBe('/inbox')
+    // The slash itself isn't typed into the box.
+    expect(search).toHaveValue('')
+  })
+
+  it('saves edits with Ctrl+Enter without sending, and ignores j and k while editing', async () => {
+    const approve = vi.spyOn(inboxApi, 'approveDraft')
+    const { router } = renderApp('/inbox/m1')
+    await screen.findByRole('button', { name: 'Approve & send' })
+    await userEvent.keyboard('e')
+    const reply = screen.getByRole('textbox', { name: 'Reply' })
+    await userEvent.clear(reply)
+    await userEvent.type(reply, 'Hi Maya, the quote is attached.')
+
+    // Focus off the fields, as after a click on the page: j and k still do nothing.
+    reply.blur()
+    await userEvent.keyboard('jk')
+    expect(router.state.location.pathname).toBe('/inbox/m1')
+
+    await userEvent.click(reply)
+    await userEvent.keyboard('{Control>}{Enter}{/Control}')
+    expect(await screen.findByText('Hi Maya, the quote is attached.')).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Reply' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Approve & send' })).toBeEnabled()
+    expect(approve).not.toHaveBeenCalled()
+  })
+
   it('lists the shortcuts on ?', async () => {
     const { router } = renderApp('/inbox/m1')
     await screen.findByRole('button', { name: 'Approve & send' })
     await userEvent.keyboard('?')
     const help = screen.getByRole('dialog', { name: 'Keyboard shortcuts' })
     expect(help).toHaveTextContent('Edit the draft')
+    for (const group of ['In the inbox', 'On an email', 'Editing a reply', 'Anywhere']) {
+      expect(within(help).getByRole('heading', { name: group })).toBeInTheDocument()
+    }
+    expect(help).toHaveTextContent('Open the next or previous email')
+    expect(help).toHaveTextContent('Back to the inbox, searching')
+    expect(help).toHaveTextContent(/Ctrl\s*Enter\s*Save your changes|Save your changesCtrlEnter/)
+    expect(help).toHaveTextContent('a stray key can never send an email')
     expect(within(help).getByRole('button', { name: 'Close' })).toHaveFocus()
     // Escape closes the list without also leaving the page.
     await userEvent.keyboard('{Escape}')

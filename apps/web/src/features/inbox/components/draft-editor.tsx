@@ -6,7 +6,7 @@ import { FilledFormHeader } from './filled-form'
 
 /**
  * Editable copy of the AI's reply and its filled form. Submitted by the Save
- * button in DraftReview's footer through the form `id`.
+ * button in DraftReview's footer through the form `id`, or with Ctrl+Enter.
  */
 export function DraftEditor({
   id,
@@ -39,7 +39,19 @@ export function DraftEditor({
   }
 
   return (
-    <form id={id} onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form
+      id={id}
+      onSubmit={handleSubmit}
+      onKeyDown={(event) => {
+        // Ctrl+Enter (⌘+Enter on a Mac) saves the edits. It never sends: that
+        // still takes a click on Approve & send.
+        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+          event.preventDefault()
+          event.currentTarget.requestSubmit()
+        }
+      }}
+      className="flex flex-col gap-5"
+    >
       <label className="flex flex-col gap-1.5">
         <span className="px-1 text-label font-medium text-muted-foreground">Reply</span>
         <Textarea
