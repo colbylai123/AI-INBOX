@@ -16,7 +16,11 @@ const Devtools = import.meta.env.DEV
       return {
         default: () => (
           <>
-            <TanStackRouterDevtools position="bottom-right" />
+            <TanStackRouterDevtools
+              position="bottom-right"
+              containerElement="div"
+              toggleButtonProps={{ style: { position: 'relative', inset: 'auto' } }}
+            />
             <ReactQueryDevtools buttonPosition="relative" />
           </>
         ),
