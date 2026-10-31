@@ -167,15 +167,23 @@ export function ConnectButton({
   variant,
 }: ConnectButtonProps) {
   const connect = useConnect(provider, connectionId)
+  const company = providerCompanies[provider]
   return (
-    <Button
-      size={size}
-      variant={variant}
-      disabled={connect.isPending}
-      onClick={() => connect.mutate()}
-    >
-      <Plug aria-hidden />{' '}
-      {connect.isPending ? `Opening ${providerCompanies[provider]}…` : children}
-    </Button>
+    <div className="flex flex-col items-start gap-1.5">
+      <Button
+        size={size}
+        variant={variant}
+        disabled={connect.isPending}
+        onClick={() => connect.mutate()}
+      >
+        <Plug aria-hidden /> {connect.isPending ? `Opening ${company}…` : children}
+      </Button>
+      {/* Only a failure before the page leaves for the provider lands here. */}
+      {connect.isError && (
+        <p role="alert" className="text-metadata text-destructive">
+          Couldn't open {company}. Try again.
+        </p>
+      )}
+    </div>
   )
 }

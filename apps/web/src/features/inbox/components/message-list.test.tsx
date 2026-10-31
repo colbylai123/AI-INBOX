@@ -25,8 +25,17 @@ describe('MessageList', () => {
     }
   })
 
-  it('shows an empty state', async () => {
+  it('shows an empty state that says what will arrive, with no made-up actions', async () => {
     renderWithRouter(<MessageList messages={[]} />)
-    expect(await screen.findByText('No messages yet.')).toBeInTheDocument()
+    expect(await screen.findByText('No messages yet')).toBeInTheDocument()
+    expect(screen.getByText(/Nothing is sent until you approve it/)).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
+  })
+
+  it("doesn't call a filtered list an empty inbox", async () => {
+    renderWithRouter(<MessageList messages={[]} filtered />)
+    expect(await screen.findByText('No messages match these filters')).toBeInTheDocument()
+    expect(screen.queryByText('No messages yet')).not.toBeInTheDocument()
   })
 })

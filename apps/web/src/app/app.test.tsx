@@ -5,6 +5,7 @@ import { mockConnections, resetMockConnections } from '@/features/connections/ap
 import { mockMessages, resetMockMessages } from '@/features/inbox/api/mocks'
 import { mockMaterials, resetMockMaterials } from '@/features/materials/api/mocks'
 import * as sessionApi from '@/features/auth/api/session'
+import * as connectionsApi from '@/features/connections/api/connections-api'
 import * as inboxApi from '@/features/inbox/api/inbox-api'
 import { UNDO_SECONDS } from '@/features/inbox/lib/outgoing-replies'
 import * as materialsApi from '@/features/materials/api/materials-api'
@@ -389,6 +390,20 @@ describe('app', () => {
     expect(screen.getByText(/demo@example.com · Synced/)).toBeInTheDocument()
     expect(mockConnections.map((c) => c.provider)).toEqual(['outlook', 'gmail'])
     expect(router.state.location.search).toEqual({ provider: 'gmail', connection: 'connected' })
+  })
+
+  it('says so beside the button when connecting fails before leaving the page', async () => {
+    vi.spyOn(connectionsApi, 'connect').mockRejectedValueOnce(new Error('Chunk failed to load'))
+    renderApp('/settings')
+    await screen.findByText(/demo@example.com · Synced/)
+    await userEvent.click(screen.getByRole('button', { name: 'Connect Gmail' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't open Google. Try again.")
+    expect(screen.getByRole('button', { name: 'Connect Gmail' })).toBeEnabled()
+
+    // Trying again works and clears the error.
+    await userEvent.click(screen.getByRole('button', { name: 'Connect Gmail' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Gmail is connected')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
   it('adds a second account from the same provider', async () => {
