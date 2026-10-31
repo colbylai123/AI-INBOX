@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound } from '@tanstack/react-router'
+import { NotFound } from '@/components/feedback/not-found'
 import { messageQuery, ReadingPane } from '@/features/inbox'
 import { isApiError } from '@/lib/api-client'
 
@@ -13,6 +14,8 @@ export const Route = createFileRoute('/_app/inbox/$messageId')({
       throw error
     }
   },
+  // In the reading card, so the list stays beside it.
+  notFoundComponent: NotFound,
   component: MessagePage,
 })
 

@@ -115,7 +115,7 @@ function InboxLayout() {
         <section
           key={`${search.folder ?? 'inbox'}-${search.priority ?? 'all'}-${account ?? 'all'}`}
           aria-labelledby="list-heading"
-          className="app-view flex max-h-[30rem] min-h-0 flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:max-h-none print:hidden"
+          className="app-view flex max-h-[30rem] min-h-0 min-w-0 flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:max-h-none print:hidden"
         >
           <div className="flex items-baseline justify-between gap-3 px-5 pt-4 pb-2">
             <h2 id="list-heading" className="text-metadata font-semibold text-muted-foreground">
@@ -150,7 +150,7 @@ function InboxLayout() {
         </section>
         <section
           aria-label="Reading pane"
-          className="flex min-h-[24rem] flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:min-h-0 print:min-h-0 print:border-0 print:shadow-none"
+          className="flex min-h-[24rem] min-w-0 flex-col rounded-[20px] border border-card-edge bg-card shadow-panel lg:min-h-0 print:min-h-0 print:border-0 print:shadow-none"
         >
           <div key={openId ?? 'closed'} className="app-view flex min-h-0 flex-1 flex-col">
             <Outlet />

@@ -61,7 +61,7 @@ export function SearchBox({
             else inputRef.current?.blur()
           }}
           // The browser's own clear button is replaced by the one below, which every browser shows.
-          className="h-11 w-full rounded-full border border-card-edge bg-card pr-20 pl-11 text-interface text-foreground shadow-panel outline-none placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground [&::-webkit-search-cancel-button]:appearance-none"
+          className="h-11 w-full rounded-full border border-card-edge bg-card pr-20 pl-11 text-interface text-foreground shadow-panel placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:appearance-none"
         />
         <span className="absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center gap-0.5">
           {value && (

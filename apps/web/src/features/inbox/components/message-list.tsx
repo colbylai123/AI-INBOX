@@ -163,6 +163,8 @@ function MessageRow({
       params={{ messageId: m.id }}
       // Carries the folder, filters and search, so the list stays as it is.
       search
+      // Closing the email with Esc brings focus back to its row.
+      data-message-id={m.id}
       className="flex gap-3 rounded-2xl px-3 py-3 transition-colors hover:bg-muted focus-visible:-outline-offset-2 aria-[current=page]:bg-raised"
     >
       <SenderMark from={m.from} />

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import { z } from 'zod/mini'
+import { Notice } from '@/components/feedback/notice'
 import { Button } from '@/components/ui/button'
 import { sessionQuery, signInUrl } from '@/features/auth'
 import { SiteHeader } from '@/features/marketing'
@@ -18,14 +19,17 @@ export const Route = createFileRoute('/sign-in')({
       setDemoMode(false)
       context.queryClient.clear()
     }
-    const user = await context.queryClient.ensureQueryData(sessionQuery())
+    // A server that can't be reached doesn't hide the page, which also offers the demo.
+    const user = await context.queryClient.ensureQueryData(sessionQuery()).catch(() => undefined)
     if (user) throw redirect({ to: search.redirect ?? '/inbox' })
+    return { unreachable: user === undefined }
   },
   component: SignIn,
 })
 
 function SignIn() {
   const { redirect: returnTo } = Route.useSearch()
+  const { unreachable } = Route.useRouteContext()
   return (
     <div className="flex min-h-svh flex-col" data-surface="sign-in">
       <SiteHeader />
@@ -37,6 +41,11 @@ function SignIn() {
           <p className="mt-2 text-sm text-muted-foreground">
             Use your work account to open your inbox.
           </p>
+          {unreachable && (
+            <Notice tone="error" className="mt-6">
+              Signing in isn't available right now. Try again in a moment, or try the demo below.
+            </Notice>
+          )}
           <Button
             size="lg"
             className="mt-8 w-full"

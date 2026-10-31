@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query'
 import { createMemoryHistory } from '@tanstack/react-router'
 import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -979,9 +980,52 @@ describe('app', () => {
     expect(list).not.toHaveTextContent('to demo@')
   })
 
-  it('shows not found for an unknown message', async () => {
+  it('shows not found for an unknown message, beside the list', async () => {
     renderApp('/inbox/does-not-exist')
     expect(await screen.findByText('Not found')).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'Messages' })).toBeInTheDocument()
+  })
+
+  it('gives an unknown address a page of its own, with the way home', async () => {
+    renderApp('/no-such-page')
+    const main = await screen.findByRole('main')
+    expect(within(main).getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible()
+    expect(within(main).getByRole('link', { name: 'Go to the home page' })).toHaveAttribute(
+      'href',
+      '/',
+    )
+  })
+
+  describe('when the server cannot be reached', () => {
+    beforeEach(() => {
+      vi.spyOn(sessionApi, 'sessionQuery').mockReturnValue(
+        queryOptions({
+          queryKey: ['session'],
+          queryFn: () => Promise.reject(new TypeError('Failed to fetch')),
+          retry: false,
+        }),
+      )
+    })
+
+    it('still shows sign-in, and the demo', async () => {
+      renderApp('/sign-in')
+      expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent("Signing in isn't available right now")
+      expect(
+        screen.getByRole('link', { name: 'Try the demo with sample emails' }),
+      ).toBeInTheDocument()
+    })
+
+    it('says the inbox did not load, with the site header to go elsewhere', async () => {
+      renderApp('/inbox')
+      const main = await screen.findByRole('main')
+      expect(
+        await within(main).findByRole('heading', { name: 'Something went wrong' }),
+      ).toBeInTheDocument()
+      expect(
+        within(screen.getByRole('banner')).getByRole('link', { name: 'Try the demo' }),
+      ).toBeInTheDocument()
+    })
   })
 })
 
@@ -1206,6 +1250,73 @@ describe('dashboard', () => {
     } finally {
       window.matchMedia = matchMedia
     }
+  })
+
+  it('brings focus back to the email in the list when Escape closes it', async () => {
+    const { router } = renderApp('/inbox/m4')
+    await screen.findByRole('article', { name: 'PO needed for 200 shipping boxes' })
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/inbox'))
+    const list = screen.getByRole('list', { name: 'Messages' })
+    await waitFor(() =>
+      expect(
+        within(list).getByRole('link', { name: /PO needed for 200 shipping boxes/ }),
+      ).toHaveFocus(),
+    )
+  })
+
+  it('reads out an undo and a send, and keeps focus in the email', async () => {
+    fakeClock()
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Undo' }))
+    expect(screen.getByText('Not sent. Your draft is back.')).toHaveAttribute('role', 'status')
+    // Not Approve & send, so pressing Enter again can't approve.
+    expect(screen.getByRole('button', { name: 'Edit' })).toHaveFocus()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Approve & send' }))
+    await waitOutUndo()
+    expect(await screen.findByText('Your reply was sent.')).toHaveAttribute('role', 'status')
+    expect(await screen.findByText('Sent')).toHaveFocus()
+  })
+
+  it('keeps focus in the email after saving or cancelling an edit', async () => {
+    renderApp('/inbox/m1')
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.getByRole('button', { name: 'Edit' })).toHaveFocus()
+    await userEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Edit' })).toHaveFocus())
+  })
+
+  it('closes the shortcuts with Escape after focus has left them', async () => {
+    const { router } = renderApp('/inbox/m1')
+    await screen.findByRole('button', { name: 'Approve & send' })
+    await userEvent.keyboard('?')
+    const help = screen.getByRole('dialog', { name: 'Keyboard shortcuts' })
+    await userEvent.tab()
+    expect(help).not.toContainElement(document.activeElement as HTMLElement)
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/inbox/m1')
+  })
+
+  it('keeps focus on Settings when an account is kept or disconnected', async () => {
+    renderApp('/settings')
+    expect(await screen.findByRole('region', { name: 'Theme and account' })).toBeInTheDocument()
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Disconnect' }))[0]!)
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.getAllByRole('button', { name: 'Disconnect' })[0]).toHaveFocus()
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Disconnect' })[0]!)
+    const confirm = screen.getByRole('group', { name: 'Disconnect demo@example.com?' })
+    await userEvent.click(within(confirm).getByRole('button', { name: 'Disconnect' }))
+    const notice = await screen.findByText(/Outlook is disconnected/)
+    expect(notice.closest('[role="status"]')).toHaveTextContent(
+      'New mail from demo@example.com no longer arrives.',
+    )
+    expect(notice.closest('[tabindex="-1"]')).toHaveFocus()
   })
 
   it('prints only the open email', async () => {

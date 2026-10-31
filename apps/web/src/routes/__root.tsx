@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense } from 'react'
 import { LandingHandoff } from '@/features/marketing/components/landing-handoff'
+import { PageNotFound } from '@/features/marketing/components/page-not-found'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -30,6 +31,9 @@ const Devtools = import.meta.env.DEV
   : () => null
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+  // An unknown address gets a page of its own. Unknown emails and app pages show
+  // NotFound inside the app instead (the router's default).
+  notFoundComponent: PageNotFound,
   component: () => (
     <>
       <Outlet />
