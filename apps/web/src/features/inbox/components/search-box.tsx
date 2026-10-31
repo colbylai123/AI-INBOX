@@ -1,5 +1,6 @@
 import { Search, X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRouterState } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { useShortcuts } from '@/lib/use-shortcuts'
 
@@ -19,6 +20,11 @@ export function SearchBox({
   if (!focused && (query ?? '') !== value) setValue(query ?? '')
 
   useShortcuts({ '/': () => inputRef.current?.focus() })
+  // "/" on an email comes back here and asks for the box, through the history entry.
+  const focusRequested = useRouterState({ select: (state) => state.location.state.focusSearch })
+  useEffect(() => {
+    if (focusRequested) inputRef.current?.focus()
+  }, [focusRequested])
 
   const change = (next: string) => {
     setValue(next)
@@ -65,4 +71,11 @@ export function SearchBox({
       )}
     </div>
   )
+}
+
+declare module '@tanstack/react-router' {
+  interface HistoryState {
+    /** Set by "/" on an email, so the inbox opens with its search box focused. */
+    focusSearch?: boolean
+  }
 }

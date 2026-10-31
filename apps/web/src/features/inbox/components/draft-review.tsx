@@ -4,6 +4,7 @@ import { useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useShortcuts } from '@/lib/use-shortcuts'
+import { useOpenAdjacent } from '../hooks/use-open-adjacent'
 import { useSaveDraft } from '../hooks/use-save-draft'
 import { highlight } from '../lib/highlight'
 import {
@@ -41,10 +42,15 @@ export function DraftReview({ message }: { message: Message }) {
     dismissReply(message.id)
     setEditing(true)
   }
-  // No shortcut approves: sending always takes a click on Approve & send.
+  const openAdjacent = useOpenAdjacent(message)
+  // No shortcut approves: sending always takes a click on Approve & send. None of
+  // these run while editing, so a stray key can't leave unsaved changes behind.
   useShortcuts(
     {
       ...(canEdit && { e: startEditing }),
+      j: () => void openAdjacent(1),
+      k: () => void openAdjacent(-1),
+      '/': () => void navigate({ to: '/inbox', search: true, state: { focusSearch: true } }),
       Escape: () => void navigate({ to: '/inbox', search: true }),
     },
     !editing,
@@ -89,7 +95,11 @@ export function DraftReview({ message }: { message: Message }) {
           <DraftEditor
             id={editorId}
             message={message}
-            onSubmit={(update) => save.mutate(update, { onSuccess: () => setEditing(false) })}
+            onSubmit={(update) => {
+              // Ctrl+Enter can submit while the Save button is disabled.
+              if (save.isPending) return
+              save.mutate(update, { onSuccess: () => setEditing(false) })
+            }}
           />
         ) : message.draftReply ? (
           <>
