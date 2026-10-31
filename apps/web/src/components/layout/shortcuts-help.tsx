@@ -70,7 +70,7 @@ export function ShortcutsHelp() {
         }
       }}
       // Scrolls inside itself on short screens, so every shortcut can be reached.
-      className="fixed right-4 bottom-4 left-4 z-20 max-h-[calc(100svh-2rem)] overflow-y-auto rounded-lg border border-white/65 bg-card p-5 shadow-panel sm:left-auto sm:w-96"
+      className="fixed right-4 bottom-4 left-4 z-20 max-h-[calc(100svh-2rem)] overflow-y-auto rounded-lg border border-card-edge bg-card p-5 shadow-panel sm:left-auto sm:w-96"
     >
       <div className="flex items-center justify-between gap-3">
         <h2 id={headingId} className="font-display text-base font-semibold tracking-tight">

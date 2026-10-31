@@ -5,7 +5,7 @@ import { useSyncExternalStore } from 'react'
 export type Theme = 'light' | 'dark'
 
 const storageKey = 'theme'
-const themeColors: Record<Theme, string> = { light: '#fcfcfd', dark: '#0e131b' }
+const themeColors: Record<Theme, string> = { light: '#e8e8ec', dark: '#141414' }
 const listeners = new Set<() => void>()
 let theme = readStored()
 

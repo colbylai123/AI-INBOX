@@ -139,17 +139,15 @@ describe('app', () => {
   it('switches to the dark theme and remembers it', async () => {
     renderApp('/inbox')
     await screen.findByRole('list', { name: 'Messages' })
-    const toggle = screen.getByRole('button', { name: 'Dark mode' })
-    expect(toggle).toHaveAttribute('aria-pressed', 'false')
-
-    await userEvent.click(toggle)
-    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    // The app's pill is labeled with the theme it switches to.
+    await userEvent.click(screen.getByRole('button', { name: 'Dark mode' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(localStorage.getItem('theme')).toBe('dark')
+    expect(screen.getByRole('button', { name: 'Light mode' })).toBeInTheDocument()
 
-    // The landing page and sign-in share the same colors, so they follow the choice.
+    // The landing page follows the choice too. Its toggle is a pressed button.
     cleanup()
-    renderApp('/sign-in')
+    renderApp('/')
     expect(await screen.findByRole('button', { name: 'Dark mode' })).toHaveAttribute(
       'aria-pressed',
       'true',

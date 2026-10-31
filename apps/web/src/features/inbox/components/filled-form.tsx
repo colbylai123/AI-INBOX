@@ -19,7 +19,7 @@ export function FilledFormView({
   onShowSourcesChange?: (show: boolean) => void
 }) {
   return (
-    <section aria-label={form.name} className="rounded-lg border border-white/65">
+    <section aria-label={form.name} className="rounded-lg border border-card-edge">
       <FilledFormHeader
         name={form.name}
         action={

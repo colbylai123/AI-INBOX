@@ -12,7 +12,7 @@ export function MaterialsList({ materials }: { materials: Material[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="divide-y divide-border overflow-hidden rounded-lg border border-white/65 bg-card shadow-panel">
+      <ul className="divide-y divide-border overflow-hidden rounded-lg border border-card-edge bg-card shadow-panel">
         {materials.map((m) => (
           <li key={m.id} className="flex items-center gap-4 px-5 py-4">
             <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />

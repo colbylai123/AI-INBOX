@@ -125,7 +125,7 @@ function ReplyToast({ reply }: { reply: OutgoingReply }) {
 
 function Toast({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
-    <div className="pointer-events-auto flex items-center gap-3 rounded-lg border border-white/65 bg-card px-4 py-3 text-interface shadow-panel [&>svg]:size-4 [&>svg]:shrink-0">
+    <div className="pointer-events-auto flex items-center gap-3 rounded-lg border border-card-edge bg-card px-4 py-3 text-interface shadow-panel [&>svg]:size-4 [&>svg]:shrink-0">
       {icon}
       {children}
     </div>
