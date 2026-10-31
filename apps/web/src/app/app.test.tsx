@@ -81,6 +81,57 @@ describe('app', () => {
     ).toHaveTextContent('Not yet')
   })
 
+  it('opens the section links from a menu button on small screens', async () => {
+    renderApp('/')
+    const menu = await screen.findByRole('button', { name: 'Page sections' })
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+
+    await userEvent.click(menu)
+    expect(menu).toHaveAttribute('aria-expanded', 'true')
+    const panel = document.getElementById(menu.getAttribute('aria-controls')!)!
+    expect(
+      within(panel)
+        .getAllByRole('link')
+        .map((link) => [link.textContent, link.getAttribute('href')]),
+    ).toEqual([
+      ['How it works', '#how-it-works'],
+      ['Features', '#features'],
+      ['Your control', '#control'],
+      ['FAQ', '#faq'],
+      // Shown only on the narrowest phones, where the header's Sign in is hidden.
+      ['Sign in', '/sign-in'],
+    ])
+
+    // Following a link closes it.
+    await userEvent.click(within(panel).getByRole('link', { name: 'FAQ' }))
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+    expect(panel).not.toBeInTheDocument()
+
+    // Escape closes it and puts focus back on the button.
+    await userEvent.click(menu)
+    await userEvent.tab()
+    await userEvent.keyboard('{Escape}')
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+    expect(menu).toHaveFocus()
+
+    // So does a tap elsewhere on the page.
+    await userEvent.click(menu)
+    await userEvent.click(screen.getByRole('heading', { level: 1 }))
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+
+    // Tabbing past the last link closes it, and Escape still lands back on the button.
+    await userEvent.click(menu)
+    const links = within(document.getElementById(menu.getAttribute('aria-controls')!)!)
+    for (let i = 0; i < links.getAllByRole('link').length; i++) await userEvent.tab()
+    await userEvent.tab()
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(menu)
+    ;(document.activeElement as HTMLElement).blur()
+    await userEvent.keyboard('{Escape}')
+    expect(menu).toHaveAttribute('aria-expanded', 'false')
+    expect(menu).toHaveFocus()
+  })
+
   it('opens the demo from the landing page and exits back to it', async () => {
     const { router } = renderApp('/')
     const [tryDemo] = await screen.findAllByRole('link', { name: /Try the demo/ })
