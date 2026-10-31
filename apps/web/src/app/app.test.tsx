@@ -64,7 +64,7 @@ describe('app', () => {
   it('shows the landing page at /', async () => {
     renderApp('/')
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Your inbox, sorted and drafted' }),
+      await screen.findByRole('heading', { level: 1, name: 'Read it. Approve it. Then it sends.' }),
     ).toBeInTheDocument()
     expect(screen.getByText('Mail, but it waits its turn.')).toBeInTheDocument()
     expect(
@@ -109,7 +109,7 @@ describe('app', () => {
       ['Features', '#features'],
       ['Your control', '#control'],
       ['FAQ', '#faq'],
-      // Shown only on the narrowest phones, where the header's Sign in is hidden.
+      // Shown only on phones, where the header's Sign in is hidden.
       ['Sign in', '/sign-in'],
     ])
 
@@ -133,8 +133,7 @@ describe('app', () => {
     // Tabbing past the last link closes it, and Escape still lands back on the button.
     await userEvent.click(menu)
     const items = within(document.getElementById(menu.getAttribute('aria-controls')!)!)
-    const stops = items.getAllByRole('link').length + items.getAllByRole('button').length
-    for (let i = 0; i < stops; i++) await userEvent.tab()
+    for (let i = 0; i < items.getAllByRole('link').length; i++) await userEvent.tab()
     await userEvent.tab()
     expect(menu).toHaveAttribute('aria-expanded', 'false')
     await userEvent.click(menu)
@@ -142,6 +141,34 @@ describe('app', () => {
     await userEvent.keyboard('{Escape}')
     expect(menu).toHaveAttribute('aria-expanded', 'false')
     expect(menu).toHaveFocus()
+  })
+
+  it('approves the sample on the landing page in the same card, with undo', async () => {
+    const approve = vi.spyOn(inboxApi, 'approveDraft')
+    const { router } = renderApp('/')
+    fakeClock()
+    await userEvent.click(await screen.findByRole('button', { name: 'Approve & send' }))
+    expect(screen.getByText('Ready to send')).toBeInTheDocument()
+    // The swap is read out in one line.
+    expect(
+      screen.getByText('Ready to send. It sends in 10 seconds unless you undo.'),
+    ).toHaveAttribute('role', 'status')
+    // The draft waits hidden under it, so the card keeps its height.
+    const draft = screen.getByText(/Hi Maya, the quote for 40 units/)
+    expect(draft.closest('[aria-hidden="true"]')).not.toBeNull()
+    // Undo brings the draft back, still on the same page.
+    await userEvent.click(screen.getByRole('button', { name: 'Undo' }))
+    expect(screen.queryByText('Ready to send')).not.toBeInTheDocument()
+    expect(draft.closest('[aria-hidden="true"]')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Approve & send' })).toHaveFocus()
+
+    // Left alone, the hold runs out and the card says Sent.
+    await userEvent.click(screen.getByRole('button', { name: 'Approve & send' }))
+    await act(() => vi.advanceTimersByTimeAsync(10_000))
+    expect(screen.getByText('Sent')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'See it again' })).toHaveFocus()
+    expect(router.state.location.pathname).toBe('/')
+    expect(approve).not.toHaveBeenCalled()
   })
 
   it('switches to the dark theme and remembers it', async () => {
@@ -179,7 +206,7 @@ describe('app', () => {
     expect(screen.queryByRole('region', { name: 'Announcement' })).not.toBeInTheDocument()
 
     await userEvent.click(within(bar).getByRole('button', { name: 'Exit demo' }))
-    await screen.findByRole('heading', { level: 1, name: 'Your inbox, sorted and drafted' })
+    await screen.findByRole('heading', { level: 1, name: 'Read it. Approve it. Then it sends.' })
     expect(router.state.location.pathname).toBe('/')
     expect(isDemoMode()).toBe(false)
   })
