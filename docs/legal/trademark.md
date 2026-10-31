@@ -6,7 +6,7 @@
 
 ## Notice to publish once a name is in use
 
-[Product name] is a trademark of [Company legal name].
+[Product name] is a trademark of [Company Name].
 
 Until a name is chosen and actually used on the live product, do not print this notice on the website. “AI Inbox” is a working title only.
 
@@ -14,7 +14,7 @@ Use the ™ symbol for an unregistered mark. Do not use ® unless a registration
 
 ## Suggested line
 
-[Product name]™ is a trademark of [Company legal name]. Outlook is a trademark of Microsoft. Gmail is a trademark of Google. WorkOS is a trademark of WorkOS. Cloudflare is a trademark of Cloudflare. Other names are the property of their owners. Using those names here is only to say which services the product connects to.
+[Product name]™ is a trademark of [Company Name]. Outlook is a trademark of Microsoft. Gmail is a trademark of Google. WorkOS is a trademark of WorkOS. Cloudflare is a trademark of Cloudflare. Other names are the property of their owners. Using those names here is only to say which services the product connects to.
 
 ## About the placeholder “AI Inbox”
 

@@ -4,7 +4,7 @@
 **Product:** AI Inbox (name not final)
 **Last updated:** October 30, 2026
 
-These terms are a contract between you and [Company legal name] (“we,” “us”) for AI Inbox (the “Service”). By creating an account, connecting a mailbox, or using the Service, you agree to them. If you do not agree, do not use the Service.
+These terms are a contract between you and [Company Name] (“we,” “us”) for AI Inbox (the “Service”). By creating an account, connecting a mailbox, or using the Service, you agree to them. If you do not agree, do not use the Service.
 
 Replace every bracket before publishing. The Acceptable Use Policy, Privacy Policy, Cookie and Tracking Disclosure, and DMCA page are part of these terms where they say they are.
 
@@ -48,15 +48,19 @@ Some places do not allow an implied-warranty disclaimer. In those places, the di
 
 ## Limitation of liability
 
-TO THE FULLEST EXTENT THE LAW ALLOWS, [COMPANY LEGAL NAME] AND ITS DIRECTORS, EMPLOYEES, AND SUPPLIERS WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, DATA, GOODWILL, OR BUSINESS, ARISING OUT OF OR RELATED TO THE SERVICE OR THESE TERMS. THIS INCLUDES USE OR INABILITY TO USE THE SERVICE, LOST OR UNDELIVERED EMAIL, AND AN INACCURATE AI SUMMARY, DRAFT, OR FORM. THIS APPLIES WHETHER THE CLAIM IS IN CONTRACT, TORT, OR ANY OTHER THEORY, AND EVEN IF WE WERE TOLD THE DAMAGE WAS POSSIBLE.
+TO THE FULLEST EXTENT THE LAW ALLOWS, [COMPANY NAME] AND ITS DIRECTORS, EMPLOYEES, AND SUPPLIERS WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, DATA, GOODWILL, OR BUSINESS, ARISING OUT OF OR RELATED TO THE SERVICE OR THESE TERMS. THIS INCLUDES USE OR INABILITY TO USE THE SERVICE, LOST OR UNDELIVERED EMAIL, AND AN INACCURATE AI SUMMARY, DRAFT, OR FORM. THIS APPLIES WHETHER THE CLAIM IS IN CONTRACT, TORT, OR ANY OTHER THEORY, AND EVEN IF WE WERE TOLD THE DAMAGE WAS POSSIBLE.
 
 TO THE FULLEST EXTENT THE LAW ALLOWS, OUR TOTAL LIABILITY FOR ALL CLAIMS RELATING TO THE SERVICE OR THESE TERMS WILL NOT EXCEED THE GREATER OF (A) THE AMOUNT YOU PAID US FOR THE SERVICE IN THE THREE MONTHS BEFORE THE CLAIM OR (B) ONE HUNDRED U.S. DOLLARS.
+
+THIS CAP DOES NOT APPLY TO LIABILITY FOR OUR GROSS NEGLIGENCE, OUR WILLFUL MISCONDUCT, OR A PRIVACY OR SECURITY FAILURE CAUSED BY US. IT ALSO DOES NOT APPLY TO ANY LIABILITY THE GOVERNING LAW DOES NOT ALLOW US TO CAP. COUNSEL SHOULD CONFIRM THIS LIST AGAINST THE LAW OF [STATE] BEFORE THESE TERMS ARE PUBLISHED.
 
 Some places do not allow certain limits. In those places, the limits apply to the fullest extent allowed. These limits are a basic part of the bargain for a first release offered at little or no charge.
 
 ## Indemnity
 
-You will defend, indemnify, and hold harmless [Company legal name] and its directors, employees, and suppliers from any claim, loss, and expense (including reasonable attorneys’ fees) arising out of your use of the Service, your mail or files, a message you approved or sent, your connection of a mailbox, or your breach of these terms or the Acceptable Use Policy. We will give you prompt notice of the claim, and you will not settle it in a way that admits our fault or imposes a duty on us without our written consent.
+You will defend, indemnify, and hold harmless [Company Name] and its directors, employees, and suppliers from any third-party claim, loss, and expense (including reasonable attorneys’ fees) to the extent it is caused by your mail or files, a message you approved or sent, your connection of a mailbox you were not allowed to use, or your breach of these terms or the Acceptable Use Policy. You do not cover a claim to the extent it is caused by us, including our gross negligence, our willful misconduct, or a privacy or security failure on our side.
+
+We will give you prompt notice of a claim you must cover. You control the defense of that claim. You will not settle it in a way that admits our fault or imposes a duty on us without our written consent. We may join with our own counsel, at our own expense.
 
 ## Ending use
 

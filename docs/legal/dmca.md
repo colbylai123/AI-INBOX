@@ -4,7 +4,7 @@
 **Product:** AI Inbox (name not final)
 **Last updated:** October 30, 2026
 
-[Company legal name] respects copyright. This page is how a copyright owner, or their agent, asks us to remove material on AI Inbox that they believe infringes their work. It follows the notice-and-takedown process in the U.S. Digital Millennium Copyright Act, 17 U.S.C. § 512.
+[Company Name] respects copyright. This page is how a copyright owner, or their agent, asks us to remove material on AI Inbox that they believe infringes their work. It follows the notice-and-takedown process in the U.S. Digital Millennium Copyright Act, 17 U.S.C. § 512.
 
 This address is for copyright notices only. It is not for product support, privacy requests, or trademark complaints. Those go to the addresses in the other pages of this packet.
 
@@ -12,7 +12,7 @@ Before this page is published, counsel should designate an agent with the U.S. C
 
 ## Designated agent
 
-[Company legal name]
+[Company Name]
 Attn: DMCA Agent
 [street address]
 [city, state, ZIP]
@@ -21,7 +21,7 @@ Phone: [phone number]
 
 ## What the Service hosts
 
-Users may upload forms and files, and the Service stores drafts and account material so it can run. Users, not [Company legal name], are responsible for whether they have the rights to what they upload. Mail sitting in Microsoft or Google is also governed by those companies.
+Users may upload forms and files, and the Service stores drafts and account material so it can run. Users, not [Company Name], are responsible for whether they have the rights to what they upload. Mail sitting in Microsoft or Google is also governed by those companies.
 
 ## Sending a takedown notice
 
@@ -38,7 +38,7 @@ Do not send a notice you know is false. Under 17 U.S.C. § 512(f), a person who 
 
 ## What we do with a complete notice
 
-If the notice is complete, we may remove or disable the material, and we may tell the user who posted it. We may also send the notice, including your contact details, to that user. We may suspend or close accounts of repeat infringers in appropriate cases.
+If the notice is complete and identifies material stored on the Service, we will remove or disable access to that material. We will promptly notify the user who posted it and send that user a copy of the notice, including the sender’s contact details. We may suspend or close accounts of repeat infringers in appropriate cases.
 
 Removing material does not mean we agree the claim is valid.
 
@@ -51,7 +51,7 @@ If your material was removed and you believe it was a mistake or was misidentifi
 3. A statement, under penalty of perjury, that you have a good-faith belief the material was removed or disabled as a result of mistake or misidentification.
 4. Your name, address, and telephone number, and a statement that you consent to the jurisdiction of the Federal District Court for the judicial district in which your address is located, or, if you are outside the United States, for any judicial district in which we may be found, and that you will accept service of process from the person who sent the takedown notice.
 
-If we receive a valid counter-notice, we may forward it to the person who sent the takedown. Unless that person files a court action and tells us, we may restore the material in not less than 10 and not more than 14 business days after we receive the counter-notice. We do not have to restore it where the law does not require us to.
+If we receive a valid counter-notice, we will promptly forward it to the person who sent the takedown notice. Unless that person then files a court action seeking to restrain the user and tells us, we will restore the material not less than 10 and not more than 14 business days after we receive the counter-notice. Those two steps are required, not optional, where we rely on the safe harbor in 17 U.S.C. § 512(g).
 
 ## Other intellectual property
 

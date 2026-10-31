@@ -4,13 +4,13 @@
 **Product:** AI Inbox (name not final)
 **Last updated:** October 30, 2026
 
-This policy explains what [Company legal name] (“we,” “us”) collects when you use AI Inbox (the “Service”), how we use it, and the choices you have. The Service is an email client. You review a reply and approve it before it is sent.
+This policy explains what [Company Name] (“we,” “us”) collects when you use AI Inbox (the “Service”), how we use it, and the choices you have. The Service is an email client. You review a reply and approve it before it is sent.
 
 Replace every bracket before publishing. If the product name changes, replace “AI Inbox” throughout.
 
 ## Who we are
 
-The Service is operated by [Company legal name], [address]. Privacy questions go to [privacy@example.com].
+The Service is operated by [Company Name], [address]. Privacy questions go to [privacy@example.com].
 
 ## Information we collect
 
@@ -37,7 +37,7 @@ We share data with providers only so they can do their part of the Service:
 - **WorkOS** handles sign-in and the session.
 - **Microsoft** handles Outlook mail, when you connect an Outlook account.
 - **Google** handles Gmail, when you connect a Gmail account.
-- **Our AI provider** receives the message content and files needed to produce a summary, ranking, draft, or filled form. The provider is not allowed to use that content to advertise to you. Name the provider here before launch: [AI provider].
+- **[AI Provider Name]** provides the AI summaries, rankings, drafts, and form fills. AI summaries are provided by [AI Provider Name]. It receives the message content and files needed for that work. It is not allowed to use that content to advertise to you. Replace [AI Provider Name] with the real provider before launch.
 - **Cloudflare** hosts and delivers the site.
 
 We may also disclose information if the law requires it, or to protect the rights, safety, and security of our users and the Service.
@@ -46,13 +46,17 @@ Connecting Outlook or Gmail is optional, but the Service cannot read or send mai
 
 ## How long we keep it
 
-We keep account and mailbox data while your account is open and you stay connected. If you disconnect an account, we delete the stored access for that account and stop syncing it. If you close your account, we delete or de-identify your personal information within 30 days, except for logs and records we must keep for security, fraud prevention, or law. Those leftover records are kept only as long as that purpose requires, and no longer than [24 months] unless the law requires more.
+We keep account and mailbox data while your account is open and you stay connected.
 
-Backups may hold a copy until the backup cycle overwrites it.
+If you disconnect a mailbox, we delete that mailbox’s stored access and stop syncing it. Within 30 days we also delete the messages, drafts, and uploaded files we stored for that mailbox. Disconnecting one mailbox does not delete mail or files from a mailbox you leave connected.
+
+If you close your account, we delete or de-identify your account information and the messages, drafts, and uploaded files we stored for every mailbox on that account, within 30 days.
+
+We may keep security, fraud-prevention, and legal logs after that. Those leftover records are kept only as long as that purpose requires, and no longer than [24 months] unless the law requires more. Backups may still hold a copy of deleted mail, drafts, or files until the backup cycle overwrites it, and no longer than [90 days].
 
 ## Your choices and rights
 
-You can disconnect Outlook or Gmail in Settings. That stops new mail from that account and deletes our stored access for it. You can ask us to access, correct, or delete the personal information we hold about you, or to export it, by emailing [privacy@example.com]. You can sign out at any time. Signing out ends your session. It does not by itself disconnect a mailbox.
+You can disconnect Outlook or Gmail in Settings. That stops new mail from that account, deletes our stored access for it, and starts the 30-day deletion of that mailbox’s messages, drafts, and files described above. You can ask us to access, correct, or delete the personal information we hold about you, or to export it, by emailing [privacy@example.com]. You can sign out at any time. Signing out ends your session. It does not by itself disconnect a mailbox.
 
 Depending on where you live, you may also have the right to appeal a refusal, or to complain to a privacy regulator. We will not discriminate against you for making a request.
 

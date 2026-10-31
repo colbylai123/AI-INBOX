@@ -23,21 +23,29 @@ Sources, in the same order as the PDF
   docs/legal/dmca.md
 
 What each piece is for
-  Privacy policy. What we collect (account, mailbox, files, logs), why, that the AI key stays on the server, who else touches the data (WorkOS, Microsoft, Google, the AI provider, Cloudflare), how long we keep it, and how to ask for access or deletion.
-  Terms of service. The contract. Written to protect the company on a first release: as-is, no warranty, a low cap on damages, no liability for lost mail or a wrong AI summary, users cover claims that come from their use, and the product is not professional or legal advice.
+  Privacy policy. What we collect (account, mailbox, files, logs), why, that the AI key stays on the server, who else touches the data (WorkOS, Microsoft, Google, [AI Provider Name], Cloudflare), and what mail, drafts, and files are deleted on disconnect or account closure.
+  Terms of service. The contract. As-is, no warranty, a low cap on damages with exceptions for gross negligence, willful misconduct, and a privacy or security failure caused by the company. Users cover only third-party claims they caused. The product is not professional or legal advice.
   Copyright notice. Original code, copy, and design are all rights reserved. Third-party packages keep their own licenses. Do not add an open-source license at the repo root.
   Trademark notice. Placeholder only. "AI Inbox" is descriptive and is not a registered mark. Do not use the R-in-a-circle. Swap in a real name after a search.
-  IP protection summary. The short version for workers: copyright covers our expression, not the idea of approve-and-send. The name is not locked. Dependencies are not ours. Nothing here is a patent.
+  IP protection summary. Copyright covers our expression, not the idea of approve-and-send. Do not claim contractor work without a signed written transfer. The name is not locked. Dependencies are not ours. Nothing here is a patent.
   Acceptable use. No mailboxes you do not own, no spam, phishing, or malware, no attacks on the service. We may suspend.
   Cookies and tracking. Honest for this release: a WorkOS session cookie set by the API, a few preferences in browser storage, Cloudflare for hosting. No advertising analytics, and no analytics vendor is installed. Update that section before one is turned on.
-  DMCA page. How a copyright owner asks us to take material down, and how a user sends a counter-notice. The agent block is still blank.
+  DMCA page. How a copyright owner asks us to take material down. Forwarding a valid counter-notice and restoring the material are required steps, so the copyright safe harbor is not optional. The agent block is still blank.
+
+Codex review
+  A review on pull request 40 flagged seven items. Those edits are in this packet: the DMCA steps are mandatory, the liability cap has exceptions for gross negligence, willful misconduct, and a privacy or security failure caused by the company, indemnity is limited to claims the user caused, deletion of mail, drafts, and files is spelled out, the AI provider is named as [AI Provider Name], and the IP summary warns against claiming contractor work without a signed transfer.
 
 Before anyone publishes a page
-  Fill every bracket: company legal name, address, state, county, and the privacy, legal, abuse, and DMCA emails.
-  Name the AI provider in the privacy policy.
-  Put the real session-cookie name, lifetime, and flags in the cookie page.
+  Replace the brackets with real values. They are still placeholders because the real company details are not available:
+    [Company Name]
+    [privacy@example.com]
+    [legal@example.com]
+    [abuse@example.com]
+    [dmca@example.com]
+    [AI Provider Name]
+  Also fill the address, state, county, session-cookie name, and the DMCA agent's street address and phone.
   Have a lawyer read the packet, especially the liability cap, the class-action waiver, and the DMCA agent filing.
   Do not tell anyone "AI Inbox" is trademarked.
   Do not wire these pages into the app until Colby asks.
 
-The product name, company, and state are still undecided. The drafts use "AI Inbox" and [Company legal name] on purpose.
+The product name, company, and state are still undecided. The drafts use "AI Inbox" and [Company Name] on purpose.

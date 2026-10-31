@@ -8,7 +8,9 @@ This page is for the team. It says what the legal packet actually protects, and 
 
 ## What is protected
 
-**Original code, copy, and design.** Copyright in the original source, the original words, and the original visual design belongs to [Company legal name] as soon as the work is created. The Copyright Notice says that work is all rights reserved. Someone who copies our screens, our marketing text, or our code without permission is infringing that copyright. The DMCA page is how we receive claims that something on the Service infringes someone else’s copyright.
+**Original code, copy, and design.** Copyright in original source, words, and visual design made by employees of [Company Name] belongs to the company as soon as that work is created. The Copyright Notice says that work is all rights reserved. Someone who copies our screens, our marketing text, or our code without permission is infringing that copyright. The DMCA page is how we receive claims that something on the Service infringes someone else’s copyright.
+
+**Contractor work.** Do not claim the company owns code, design, or copy made by a contractor, or by anyone who is not an employee, unless a signed written agreement transfers that copyright to [Company Name]. Under U.S. law, copyright starts with the author. A commission is not automatically work made for hire. Confirm the chain of title before publishing the copyright notice.
 
 **The brand, once there is a real one.** Trademark protects a name or logo used to identify the source of the product. It does not exist in a meaningful way until we use a distinctive name in commerce. A later registration strengthens it. The Trademark Notice is the wording to use after that name is chosen.
 
