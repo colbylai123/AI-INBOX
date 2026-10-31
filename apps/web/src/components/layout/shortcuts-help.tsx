@@ -25,8 +25,8 @@ const groups: { title: string; shortcuts: { keys: Key[]; does: string }[] }[] = 
     shortcuts: [
       { keys: ['j', 'k'], does: 'Open the next or previous email' },
       { keys: ['e'], does: 'Edit the draft' },
-      { keys: ['/'], does: 'Back to the inbox, searching' },
-      { keys: ['Esc'], does: 'Back to the inbox' },
+      { keys: ['/'], does: 'Search the inbox' },
+      { keys: ['Esc'], does: 'Close the email' },
     ],
   },
   {
